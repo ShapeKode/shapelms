@@ -1,0 +1,13 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "shapelms/instructor-registration",
+	"title": "Instructor Registration",
+	"category": "shapelms",
+	"icon": "businessperson",
+	"description": "Form for users to apply to become an instructor.",
+	"keywords": [ "instructor", "register", "lms" ],
+	"textdomain": "shapelms",
+	"supports": { "html": false, "multiple": false },
+	"editorScript": "shapelms-blocks"
+}

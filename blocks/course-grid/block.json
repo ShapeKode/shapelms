@@ -1,0 +1,23 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "shapelms/course-grid",
+	"title": "Course Grid",
+	"category": "shapelms",
+	"icon": "grid-view",
+	"description": "Shows a grid of courses with optional filters.",
+	"keywords": [ "courses", "lms", "grid" ],
+	"textdomain": "shapelms",
+	"attributes": {
+		"perPage": { "type": "number", "default": 6 },
+		"columns": { "type": "number", "default": 3 },
+		"category": { "type": "string", "default": "" },
+		"tag": { "type": "string", "default": "" },
+		"orderBy": { "type": "string", "default": "date" },
+		"featured": { "type": "boolean", "default": false },
+		"level": { "type": "string", "default": "" },
+		"price": { "type": "string", "default": "" }
+	},
+	"supports": { "html": false, "align": [ "wide", "full" ] },
+	"editorScript": "shapelms-blocks"
+}

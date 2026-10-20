@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "shapelms/enroll-button",
+	"title": "Course Enroll Box",
+	"category": "shapelms",
+	"icon": "yes-alt",
+	"description": "Price, enroll/buy button and course facts for a course.",
+	"keywords": [ "enroll", "buy", "course" ],
+	"textdomain": "shapelms",
+	"attributes": {
+		"courseId": { "type": "number", "default": 0 }
+	},
+	"supports": { "html": false },
+	"editorScript": "shapelms-blocks"
+}

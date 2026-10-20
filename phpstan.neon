@@ -1,0 +1,21 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 6
+    checkMissingIterableValueType: false
+    paths:
+        - shapelms.php
+        - uninstall.php
+        - includes
+    excludePaths:
+        - vendor
+        - node_modules
+    bootstrapFiles:
+        - tests/phpstan-bootstrap.php
+    scanFiles:
+        - tests/stubs/wp-cli.php
+        - tests/stubs/woocommerce.php
+        - tests/stubs/elementor.php
+    ignoreErrors:
+        - '#Unable to resolve the template type T in call to function rest_sanitize_boolean#'

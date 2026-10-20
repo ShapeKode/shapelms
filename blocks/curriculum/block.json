@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "shapelms/curriculum",
+	"title": "Course Curriculum",
+	"category": "shapelms",
+	"icon": "list-view",
+	"description": "Accordion of topics, lessons and quizzes for a course.",
+	"keywords": [ "curriculum", "lessons", "course" ],
+	"textdomain": "shapelms",
+	"attributes": {
+		"courseId": { "type": "number", "default": 0 }
+	},
+	"supports": { "html": false },
+	"editorScript": "shapelms-blocks"
+}

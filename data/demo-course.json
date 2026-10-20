@@ -1,0 +1,118 @@
+{
+	"format": 1,
+	"plugin": "shapelms",
+	"courses": [
+		{
+			"title": "Getting Started with ShapeLMS (Demo)",
+			"slug": "getting-started-demo",
+			"status": "draft",
+			"excerpt": "A short demo course that shows lessons, videos, attachments and a quiz. Edit or delete it at any time.",
+			"content": "<p>This demo course walks you through how ShapeLMS works from a student's point of view. Open it, enroll, complete a lesson and take the quiz.</p><p>Everything you see here was built with the course builder. Open the builder to see how topics, lessons and questions fit together.</p>",
+			"meta": {
+				"level": "beginner",
+				"requirements": [ "A WordPress site with ShapeLMS installed", "Five minutes" ],
+				"outcomes": [ "Understand how courses, topics and lessons are organised", "Know what students see on the learning page", "Take a quiz and see instant results" ],
+				"audience": [ "Site owners trying ShapeLMS for the first time", "Instructors building their first course" ],
+				"price_type": "free",
+				"price": 0,
+				"sale_price": 0,
+				"max_students": 0,
+				"featured": true
+			},
+			"categories": [ "Getting started" ],
+			"tags": [ "demo" ],
+			"topics": [
+				{
+					"title": "Welcome",
+					"summary": "Start here.",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "How this course works",
+							"content": "<p>Courses are made of <strong>topics</strong>, and each topic holds <strong>lessons</strong> and <strong>quizzes</strong>. The sidebar on the left shows the full curriculum and your progress.</p><p>When you finish reading a lesson, click <em>Mark as complete</em> at the bottom. Your progress bar at the top updates immediately.</p>",
+							"meta": { "video_source": "none", "preview": true, "video_duration": 180 }
+						},
+						{
+							"type": "lesson",
+							"title": "Watching a video lesson",
+							"content": "<p>Lessons can embed a YouTube or Vimeo video, play a self-hosted file, or use an embed code from another provider. The video sits above the text so students can watch and read.</p>",
+							"meta": { "video_source": "youtube", "video_url": "https://www.youtube.com/watch?v=o4v6zq6k2nM", "video_duration": 420 }
+						}
+					]
+				},
+				{
+					"title": "Check your understanding",
+					"summary": "A short quiz with every question type.",
+					"items": [
+						{
+							"type": "quiz",
+							"title": "Demo quiz",
+							"content": "<p>Five questions, one of each type. You need 60% to pass and you can retake it as often as you like.</p>",
+							"meta": { "time_limit": 10, "attempts_allowed": 0, "pass_mark": 60, "randomize": false, "feedback_mode": "instant", "show_answers": true, "questions_per_page": 1 },
+							"questions": [
+								{
+									"title": "What is a course made of?",
+									"type": "single_choice",
+									"points": 1,
+									"options": [
+										{ "id": "a", "text": "Topics that contain lessons and quizzes" },
+										{ "id": "b", "text": "Only videos" },
+										{ "id": "c", "text": "Blog posts" }
+									],
+									"correct": [ "a" ],
+									"explanation": "Courses are organised as topics, and each topic holds lessons and quizzes."
+								},
+								{
+									"title": "Which of these can a lesson contain? (select all that apply)",
+									"type": "multiple_choice",
+									"points": 2,
+									"options": [
+										{ "id": "a", "text": "A video" },
+										{ "id": "b", "text": "Downloadable files" },
+										{ "id": "c", "text": "Text and images" },
+										{ "id": "d", "text": "Another course" }
+									],
+									"correct": [ "a", "b", "c" ],
+									"explanation": "Lessons hold video, attachments and rich text. Courses cannot be nested.",
+									"settings": { "partial_credit": true }
+								},
+								{
+									"title": "Progress is tracked automatically when you mark a lesson complete.",
+									"type": "true_false",
+									"points": 1,
+									"options": [],
+									"correct": [ "true" ],
+									"explanation": "Yes. Completing lessons and passing quizzes updates your course progress."
+								},
+								{
+									"title": "What button do you click at the bottom of a lesson when you finish it?",
+									"type": "short_answer",
+									"points": 1,
+									"options": [],
+									"correct": [ "Mark as complete", "mark complete", "complete" ],
+									"explanation": "The button is labelled \"Mark as complete\".",
+									"settings": { "case_sensitive": false }
+								},
+								{
+									"title": "Fill in the blanks",
+									"description": "<p>A course contains {blank}, and each one holds lessons and {blank}.</p>",
+									"type": "fill_blank",
+									"points": 2,
+									"options": [],
+									"correct": [ "topics|sections", "quizzes|quiz" ],
+									"explanation": "Topics hold lessons and quizzes."
+								}
+							]
+						},
+						{
+							"type": "lesson",
+							"title": "What's next",
+							"content": "<p>You have seen the whole student journey. Now open <strong>ShapeLMS → Courses</strong> in the admin, edit this course in the builder, and make it your own, or create a brand-new course.</p>",
+							"meta": { "video_source": "none" }
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,7 @@
+/vendor/
+/node_modules/
+/assets/build/
+.DS_Store
+*.log
+.phpunit.result.cache
+/languages/*.mo
