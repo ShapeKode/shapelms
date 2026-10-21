@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Api;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Database\AttemptRepository;
 use ShapeLMS\Services\QuizService;
 use WP_REST_Request;
@@ -145,10 +149,21 @@ class QuizzesController extends RestController {
 	 * Quiz overview for the current user.
 	 *
 	 * @param WP_REST_Request $request Request.
-	 * @return array<string, mixed>
+	 * @return array<string, mixed>|\WP_Error
 	 */
 	public function overview( WP_REST_Request $request ) {
-		return $this->quiz->overview( (int) $request->get_param( 'id' ), get_current_user_id() );
+		$id        = (int) $request->get_param( 'id' );
+		$course_id = \ShapeLMS\Content\Curriculum::course_id_for( $id );
+
+		if ( \ShapeLMS\Content\PostTypes::QUIZ !== get_post_type( $id ) || ! $course_id || 'publish' !== get_post_status( $id ) ) {
+			return $this->not_found();
+		}
+
+		if ( ! shapelms()->get( \ShapeLMS\Services\EnrollmentService::class )->can_access( get_current_user_id(), $course_id ) ) {
+			return $this->forbidden();
+		}
+
+		return $this->quiz->overview( $id, get_current_user_id() );
 	}
 
 	/**

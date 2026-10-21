@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\Instructors;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Modules\AbstractModule;
 use ShapeLMS\Services\InstructorService;
 
@@ -105,7 +109,7 @@ class Module extends AbstractModule {
 		$user_id = get_current_user_id();
 
 		if ( ! $user_id ) {
-			if ( ! get_option( 'users_can_register' ) && ! apply_filters( 'shapelms_allow_instructor_signup', true ) ) {
+			if ( ! get_option( 'users_can_register' ) && ! apply_filters( 'shapelms_allow_instructor_signup', false ) ) {
 				$errors->add( 'closed', __( 'Registration is closed.', 'shapelms' ) );
 			}
 

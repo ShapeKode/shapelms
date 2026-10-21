@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Core;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Registers the instructor and student roles and the LMS capabilities.
  */
@@ -32,11 +36,47 @@ class Capabilities {
 	 * @return array<string, string[]>
 	 */
 	public static function role_caps() {
+		$instructor = array(
+			self::EDIT_COURSES,
+			'read',
+			'upload_files',
+			'delete_shapelms_courses',
+			'edit_published_shapelms_courses',
+			'delete_published_shapelms_courses',
+		);
+
+		$admin = array_merge(
+			$instructor,
+			array(
+				self::MANAGE,
+				'edit_others_shapelms_courses',
+				'delete_others_shapelms_courses',
+				'publish_shapelms_courses',
+				'read_private_shapelms_courses',
+				'edit_private_shapelms_courses',
+				'delete_private_shapelms_courses',
+			)
+		);
+
 		return array(
-			'administrator'  => array( self::MANAGE, self::EDIT_COURSES, 'upload_files' ),
-			self::INSTRUCTOR => array( self::EDIT_COURSES, 'read', 'upload_files' ),
+			'administrator'  => $admin,
+			self::INSTRUCTOR => $instructor,
 			self::STUDENT    => array( 'read' ),
 		);
+	}
+
+	/**
+	 * Re-applies role capabilities once per plugin version (covers upgrades that add caps).
+	 *
+	 * @return void
+	 */
+	public function maybe_sync() {
+		if ( get_option( 'shapelms_caps_version' ) === SHAPELMS_VERSION ) {
+			return;
+		}
+
+		$this->add_caps();
+		update_option( 'shapelms_caps_version', SHAPELMS_VERSION );
 	}
 
 	/**
@@ -69,6 +109,22 @@ class Capabilities {
 	 * @return string[]
 	 */
 	public function map_meta_cap( $caps, $cap, $user_id, $args ) {
+		$lms_types = array( 'shapelms_course', 'shapelms_topic', 'shapelms_lesson', 'shapelms_quiz', 'shapelms_question', 'shapelms_announce' );
+
+		if ( in_array( $cap, array( 'edit_post', 'delete_post', 'read_post' ), true ) && ! empty( $args[0] ) ) {
+			$post = get_post( (int) $args[0] );
+
+			if ( ! $post || ! in_array( $post->post_type, $lms_types, true ) ) {
+				return $caps;
+			}
+
+			if ( 'read_post' === $cap && 'publish' === $post->post_status ) {
+				return array( 'read' );
+			}
+
+			$cap = 'shapelms_edit_course';
+		}
+
 		if ( 'shapelms_edit_course' !== $cap ) {
 			return $caps;
 		}
@@ -77,6 +133,10 @@ class Capabilities {
 
 		if ( user_can( $user_id, self::MANAGE ) ) {
 			return array( self::MANAGE );
+		}
+
+		if ( ! user_can( $user_id, self::EDIT_COURSES ) ) {
+			return array( 'do_not_allow' );
 		}
 
 		if ( ! $post_id ) {

@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Database;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Data access for the progress table.
  */

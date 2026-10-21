@@ -3,7 +3,7 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 import { Button, SelectControl, ToggleControl, TabPanel, FormFileUpload, TextControl } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { get, post, errorMessage } from '../../shared/api';
 import { PageHeader, Card, Loading, ErrorNotice, Badge } from '../../shared/components';
 import { success, error as notifyError } from '../notices';
@@ -81,7 +81,7 @@ function Setup( { status, reload, config } ) {
 	];
 
 	return (
-		<Card title={ sprintf( __( 'Step %1$d of %2$d: %3$s', 'shapelms' ), step + 1, steps.length, steps[ step ].title ) }>
+		<Card title={ /* translators: 1: current step, 2: total steps, 3: step title */ sprintf( __( 'Step %1$d of %2$d: %3$s', 'shapelms' ), step + 1, steps.length, steps[ step ].title ) }>
 			<div className="shapelms-wizard-body">{ steps[ step ].body }</div>
 			<div className="shapelms-modal-actions">
 				{ step > 0 && <Button variant="tertiary" onClick={ () => setStep( step - 1 ) }>{ __( 'Back', 'shapelms' ) }</Button> }
@@ -126,7 +126,7 @@ function ImportExport( { config } ) {
 			}
 			setBusy( true );
 			post( 'tools/import', { data } )
-				.then( ( res ) => success( sprintf( __( 'Imported %d course(s).', 'shapelms' ), res.imported ) ) )
+				.then( ( res ) => success( sprintf( /* translators: %d: number of courses */ _n( 'Imported %d course.', 'Imported %d courses.', res.imported, 'shapelms' ), res.imported ) ) )
 				.catch( ( e ) => notifyError( errorMessage( e ) ) )
 				.finally( () => setBusy( false ) );
 		};

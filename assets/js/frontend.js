@@ -15,9 +15,15 @@
 	var sprintf = window.wp && window.wp.i18n ? window.wp.i18n.sprintf : function ( s ) {
 		var args = Array.prototype.slice.call( arguments, 1 );
 		var i = 0;
-		return s.replace( /%(\d+\$)?[sd]/g, function () {
-			return args[ i++ ];
+		return s.replace( /%%|%(\d+)\$?[sd]|%[sd]/g, function ( match, pos ) {
+			if ( match === '%%' ) {
+				return '%';
+			}
+			return pos ? args[ parseInt( pos, 10 ) - 1 ] : args[ i++ ];
 		} );
+	};
+	var _n = window.wp && window.wp.i18n ? window.wp.i18n._n : function ( single, plural, n ) {
+		return n === 1 ? single : plural;
 	};
 
 	/* ------------------------------------------------------------------ */
@@ -239,7 +245,7 @@
 			}
 		}
 		if ( text ) {
-			text.textContent = sprintf( __( '%d%% complete', 'shapelms' ), summary.percent );
+			text.textContent = sprintf( /* translators: %d: percent */ __( '%d%% complete', 'shapelms' ), summary.percent );
 		}
 		var item = root.querySelector( '.shapelms-learn__item[data-item-id="' + itemId + '"]' );
 		if ( item ) {
@@ -278,7 +284,7 @@
 			api( learn, 'quizzes/' + quizId ).then( function ( data ) {
 				var left = quiz.querySelector( '[data-shapelms-quiz-attempts]' );
 				if ( left && data.attempts_left >= 0 ) {
-					left.textContent = sprintf( __( '%1$d of %2$d left', 'shapelms' ), data.attempts_left, data.settings.attempts_allowed );
+					left.textContent = sprintf( /* translators: 1: attempts left, 2: attempts allowed */ __( '%1$d of %2$d left', 'shapelms' ), data.attempts_left, data.settings.attempts_allowed );
 				}
 				if ( startBtn && data.attempts_left === 0 ) {
 					startBtn.disabled = true;
@@ -305,7 +311,7 @@
 				} } );
 				tbody.appendChild( el( 'tr', {}, [
 					el( 'td', { text: '#' + row.attempt_number } ),
-					el( 'td', { text: row.percentage + '%' } ),
+					el( 'td', { text: sprintf( /* translators: %d: percent */ __( '%d%%', 'shapelms' ), row.percentage ) } ),
 					el( 'td', {}, [ el( 'span', { class: 'shapelms-tag ' + ( row.passed ? 'shapelms-tag--success' : 'shapelms-tag--danger' ), text: row.passed ? __( 'Passed', 'shapelms' ) : __( 'Failed', 'shapelms' ) } ) ] ),
 					el( 'td', { text: row.finished_at ? new Date( row.finished_at.replace( ' ', 'T' ) + 'Z' ).toLocaleDateString() : '' } ),
 					el( 'td', {}, [ view ] )
@@ -384,8 +390,8 @@
 			} );
 
 			counter.textContent = state.perPage === 1
-				? sprintf( __( 'Question %1$d of %2$d', 'shapelms' ), state.page + 1, state.questions.length )
-				: sprintf( __( 'Page %1$d of %2$d', 'shapelms' ), state.page + 1, pageCount() );
+				? sprintf( /* translators: 1: question number, 2: total questions */ __( 'Question %1$d of %2$d', 'shapelms' ), state.page + 1, state.questions.length )
+				: sprintf( /* translators: 1: page number, 2: total pages */ __( 'Page %1$d of %2$d', 'shapelms' ), state.page + 1, pageCount() );
 
 			prevBtn.hidden = state.page === 0;
 			nextBtn.hidden = state.page >= pageCount() - 1;
@@ -397,7 +403,7 @@
 			fieldset.appendChild( el( 'legend', { class: 'shapelms-question__title' }, [
 				el( 'span', { class: 'shapelms-question__number', text: ( index + 1 ) + '.' } ),
 				' ' + q.title,
-				el( 'span', { class: 'shapelms-question__points', text: ' ' + sprintf( __( '(%s pts)', 'shapelms' ), q.points ) } )
+				el( 'span', { class: 'shapelms-question__points', text: ' ' + sprintf( /* translators: %s: points */ __( '(%s pts)', 'shapelms' ), q.points ) } )
 			] ) );
 			if ( q.description ) {
 				fieldset.appendChild( el( 'div', { class: 'shapelms-question__description shapelms-prose', html: q.description } ) );
@@ -441,7 +447,7 @@
 				( q.data.parts || [] ).forEach( function ( part, i ) {
 					wrap.appendChild( el( 'span', { html: part } ) );
 					if ( i < q.data.blanks ) {
-						var blank = el( 'input', { type: 'text', class: 'shapelms-input shapelms-input--blank', name: name + '_' + i, value: values[ i ] || '', 'aria-label': sprintf( __( 'Blank %d', 'shapelms' ), i + 1 ) } );
+						var blank = el( 'input', { type: 'text', class: 'shapelms-input shapelms-input--blank', name: name + '_' + i, value: values[ i ] || '', 'aria-label': sprintf( /* translators: %d: blank number */ __( 'Blank %d', 'shapelms' ), i + 1 ) } );
 						blank.addEventListener( 'change', function () {
 							var list = Array.prototype.map.call( wrap.querySelectorAll( 'input' ), function ( b ) {
 								return b.value;
@@ -486,7 +492,7 @@
 					var a = state.answers[ q.id ];
 					return a === undefined || a === null || a === '' || ( Array.isArray( a ) && ! a.length );
 				} ).length;
-				if ( unanswered > 0 && ! window.confirm( sprintf( __( 'You have %d unanswered question(s). Submit anyway?', 'shapelms' ), unanswered ) ) ) {
+				if ( unanswered > 0 && ! window.confirm( sprintf( /* translators: %d: number of unanswered questions */ _n( 'You have %d unanswered question. Submit anyway?', 'You have %d unanswered questions. Submit anyway?', unanswered, 'shapelms' ), unanswered ) ) ) {
 					return;
 				}
 			}
@@ -517,9 +523,9 @@
 
 			var passed = data.passed;
 			result.appendChild( el( 'div', { class: 'shapelms-result ' + ( passed ? 'is-passed' : 'is-failed' ) }, [
-				el( 'div', { class: 'shapelms-result__score', text: data.percentage + '%' } ),
+				el( 'div', { class: 'shapelms-result__score', text: sprintf( /* translators: %d: percent */ __( '%d%%', 'shapelms' ), data.percentage ) } ),
 				el( 'h2', { text: passed ? __( 'Congratulations, you passed!', 'shapelms' ) : __( 'You did not pass this time.', 'shapelms' ) } ),
-				el( 'p', { class: 'shapelms-muted', text: sprintf( __( 'Score: %1$s of %2$s points. Pass mark: %3$d%%.', 'shapelms' ), data.score, data.max_score, data.settings.pass_mark ) } )
+				el( 'p', { class: 'shapelms-muted', text: sprintf( /* translators: 1: score, 2: maximum score, 3: pass mark percent */ __( 'Score: %1$s of %2$s points. Pass mark: %3$d%%.', 'shapelms' ), data.score, data.max_score, data.settings.pass_mark ) } )
 			] ) );
 
 			if ( data.questions && data.questions.length ) {
@@ -527,11 +533,11 @@
 				data.questions.forEach( function ( q, i ) {
 					var item = el( 'div', { class: 'shapelms-review__item is-' + ( q.is_correct ? 'correct' : 'incorrect' ) } );
 					item.appendChild( el( 'h3', { text: ( i + 1 ) + '. ' + q.title } ) );
-					item.appendChild( el( 'p', { class: 'shapelms-muted', text: sprintf( __( 'Your answer: %s', 'shapelms' ), formatAnswer( q, q.answer ) ) } ) );
+					item.appendChild( el( 'p', { class: 'shapelms-muted', text: sprintf( /* translators: %s: the student's answer */ __( 'Your answer: %s', 'shapelms' ), formatAnswer( q, q.answer ) ) } ) );
 					if ( q.correct ) {
-						item.appendChild( el( 'p', { text: sprintf( __( 'Correct answer: %s', 'shapelms' ), formatAnswer( q, q.correct ) ) } ) );
+						item.appendChild( el( 'p', { text: sprintf( /* translators: %s: the correct answer */ __( 'Correct answer: %s', 'shapelms' ), formatAnswer( q, q.correct ) ) } ) );
 					}
-					item.appendChild( el( 'p', { class: 'shapelms-review__points', text: sprintf( __( '%1$s / %2$s points', 'shapelms' ), q.points, q.max_points ) } ) );
+					item.appendChild( el( 'p', { class: 'shapelms-review__points', text: sprintf( /* translators: 1: points earned, 2: maximum points */ __( '%1$s / %2$s points', 'shapelms' ), q.points, q.max_points ) } ) );
 					if ( q.explanation ) {
 						item.appendChild( el( 'div', { class: 'shapelms-review__explanation shapelms-prose', html: q.explanation } ) );
 					}

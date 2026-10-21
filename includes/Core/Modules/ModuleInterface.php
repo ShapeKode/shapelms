@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Core\Modules;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * A module is a feature that can be switched on or off from the Modules screen.
  */
@@ -34,11 +38,11 @@ interface ModuleInterface {
 	public function description();
 
 	/**
-	 * Whether the module comes from a Pro plugin or add-on.
+	 * Whether the module is provided by an add-on plugin.
 	 *
 	 * @return bool
 	 */
-	public function is_pro();
+	public function is_addon();
 
 	/**
 	 * Ids of modules that must be active first.

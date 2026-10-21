@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Core\Modules;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Collects modules from the shapelms_register_modules filter and boots the active ones.
  */
@@ -163,7 +167,7 @@ class ModuleRegistry {
 				'id'           => $id,
 				'name'         => $module->name(),
 				'description'  => $module->description(),
-				'is_pro'       => $module->is_pro(),
+				'is_addon'     => $module->is_addon(),
 				'dependencies' => $module->dependencies(),
 				'enabled'      => $this->is_enabled( $id ),
 				'active'       => $this->is_active( $id ),

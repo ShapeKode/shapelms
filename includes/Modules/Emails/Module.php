@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\Emails;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Events;
 use ShapeLMS\Core\Modules\AbstractModule;
 use ShapeLMS\Core\Pages;

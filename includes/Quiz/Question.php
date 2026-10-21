@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Quiz;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Content\PostTypes;
 
 /**

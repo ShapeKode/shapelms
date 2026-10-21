@@ -109,7 +109,7 @@ function StudentModal( { id, onClose, onChange } ) {
 						<Avatar src={ student.avatar } size={ 56 } />
 						<div>
 							<strong>{ student.name }</strong>
-							<div className="shapelms-muted">{ student.email } · { sprintf( __( 'Joined %s', 'shapelms' ), formatDate( student.registered ) ) }</div>
+							<div className="shapelms-muted">{ student.email } · { /* translators: %s: registration date */ sprintf( __( 'Joined %s', 'shapelms' ), formatDate( student.registered ) ) }</div>
 						</div>
 					</div>
 					<h3>{ __( 'Enrollments', 'shapelms' ) }</h3>

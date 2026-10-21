@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\Checkout;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Settings;
 use WP_Error;
 use WP_REST_Request;
@@ -155,7 +159,7 @@ class StripeGateway implements GatewayInterface {
 				'amount'                    => $this->minor( (float) $order->total, $order->currency ),
 				'currency'                  => strtolower( $order->currency ),
 				'automatic_payment_methods' => array( 'enabled' => 'true' ),
-				'description'               => sprintf( 'Order #%d on %s', $order->id, get_bloginfo( 'name' ) ),
+				'description'               => sprintf( /* translators: 1: order id, 2: site name */ __( 'Order #%1$d on %2$s', 'shapelms' ), $order->id, get_bloginfo( 'name' ) ),
 				'receipt_email'             => $order->billing_email,
 				'metadata'                  => array(
 					'shapelms_order_id' => (string) $order->id,
@@ -205,11 +209,32 @@ class StripeGateway implements GatewayInterface {
 			return new WP_Error( 'shapelms_stripe_pending', __( 'Payment has not completed yet.', 'shapelms' ) );
 		}
 
-		if ( (int) $intent['amount_received'] < $this->minor( (float) $order->total, $order->currency ) ) {
-			return new WP_Error( 'shapelms_stripe', __( 'Payment amount does not match the order.', 'shapelms' ) );
+		if ( ! $this->matches_order( $intent, $order ) ) {
+			return new WP_Error( 'shapelms_stripe', __( 'Payment does not match the order.', 'shapelms' ) );
 		}
 
 		return $intent['id'];
+	}
+
+	/**
+	 * Whether a PaymentIntent belongs to this site and covers the order in the right currency.
+	 *
+	 * @param array<string, mixed> $intent PaymentIntent object.
+	 * @param object               $order  Order row.
+	 * @return bool
+	 */
+	private function matches_order( array $intent, $order ) {
+		$site = isset( $intent['metadata']['site'] ) ? (string) $intent['metadata']['site'] : '';
+
+		if ( home_url() !== $site ) {
+			return false;
+		}
+
+		if ( strtolower( (string) $order->currency ) !== strtolower( (string) ( $intent['currency'] ?? '' ) ) ) {
+			return false;
+		}
+
+		return (int) ( $intent['amount_received'] ?? 0 ) >= $this->minor( (float) $order->total, $order->currency );
 	}
 
 	/**
@@ -266,6 +291,16 @@ class StripeGateway implements GatewayInterface {
 
 		switch ( $event['type'] ) {
 			case 'payment_intent.succeeded':
+				$order = $order_id ? shapelms()->get( \ShapeLMS\Database\OrderRepository::class )->find( $order_id ) : null;
+
+				if ( ! $order || ! $this->matches_order( $object, $order ) ) {
+					return array(
+						'order_id'       => 0,
+						'transaction_id' => '',
+						'action'         => 'ignore',
+					);
+				}
+
 				return array(
 					'order_id'       => $order_id,
 					'transaction_id' => isset( $object['id'] ) ? sanitize_text_field( $object['id'] ) : '',

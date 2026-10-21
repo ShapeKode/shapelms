@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Cli;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Services\EnrollmentService;
 use ShapeLMS\Services\ImportExportService;
 use ShapeLMS\Database\Migrator;

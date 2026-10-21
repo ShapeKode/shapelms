@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Quiz;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Holds the available question types. Pro adds more through the filter.
  */

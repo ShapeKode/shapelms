@@ -51,7 +51,7 @@ $shapelms_enrolled  = $shapelms_user_id && shapelms()->get( \ShapeLMS\Services\E
 				<span class="shapelms-stars" role="radiogroup" aria-label="<?php esc_attr_e( 'Rating', 'shapelms' ); ?>">
 					<?php for ( $shapelms_star = 5; $shapelms_star >= 1; $shapelms_star-- ) : ?>
 						<input type="radio" id="shapelms-star-<?php echo esc_attr( (string) $shapelms_star ); ?>" name="rating" value="<?php echo esc_attr( (string) $shapelms_star ); ?>" <?php checked( $shapelms_mine ? $shapelms_mine['rating'] : 5, $shapelms_star ); ?> required>
-						<label for="shapelms-star-<?php echo esc_attr( (string) $shapelms_star ); ?>" data-value="<?php echo esc_attr( (string) $shapelms_star ); ?>" aria-label="<?php echo esc_attr( sprintf( /* translators: %d: stars */ __( '%d stars', 'shapelms' ), $shapelms_star ) ); ?>">★</label>
+						<label for="shapelms-star-<?php echo esc_attr( (string) $shapelms_star ); ?>" data-value="<?php echo esc_attr( (string) $shapelms_star ); ?>" aria-label="<?php echo esc_attr( sprintf( /* translators: %d: stars */ _n( '%d star', '%d stars', $shapelms_star, 'shapelms' ), $shapelms_star ) ); ?>">★</label>
 					<?php endfor; ?>
 				</span>
 			</div>

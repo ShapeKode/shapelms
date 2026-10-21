@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\Checkout;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Settings;
 use WP_Error;
 use WP_REST_Request;
@@ -179,7 +183,7 @@ class PayPalGateway implements GatewayInterface {
 					array(
 						'reference_id' => (string) $order->id,
 						'custom_id'    => (string) $order->id,
-						'description'  => sprintf( 'Order #%d on %s', $order->id, get_bloginfo( 'name' ) ),
+						'description'  => sprintf( /* translators: 1: order id, 2: site name */ __( 'Order #%1$d on %2$s', 'shapelms' ), $order->id, get_bloginfo( 'name' ) ),
 						'amount'       => array(
 							'currency_code' => strtoupper( $order->currency ),
 							'value'         => number_format( (float) $order->total, 2, '.', '' ),

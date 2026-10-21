@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\Elementor;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Modules\AbstractModule;
 
 /**
@@ -91,6 +95,8 @@ class Module extends AbstractModule {
 	 */
 	public function styles() {
 		wp_enqueue_style( 'shapelms-frontend', SHAPELMS_URL . 'assets/css/frontend.css', array(), SHAPELMS_VERSION );
-		wp_enqueue_script( 'shapelms-frontend', SHAPELMS_URL . 'assets/js/frontend.js', array(), SHAPELMS_VERSION, true );
+		wp_style_add_data( 'shapelms-frontend', 'rtl', 'replace' );
+		wp_enqueue_script( 'shapelms-frontend', SHAPELMS_URL . 'assets/js/frontend.js', array( 'wp-i18n' ), SHAPELMS_VERSION, true );
+		wp_set_script_translations( 'shapelms-frontend', 'shapelms', SHAPELMS_DIR . 'languages' );
 	}
 }

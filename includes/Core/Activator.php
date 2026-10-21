@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Core;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Database\Migrator;
 
 /**
@@ -45,6 +49,7 @@ class Activator {
 		$capabilities = new Capabilities();
 		$capabilities->register();
 		$capabilities->add_caps();
+		update_option( 'shapelms_caps_version', SHAPELMS_VERSION );
 
 		Pages::create_pages();
 

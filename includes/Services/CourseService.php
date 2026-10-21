@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Services;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Content\Curriculum;
 use ShapeLMS\Content\PostTypes;
 use ShapeLMS\Content\Taxonomies;

@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Api;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Capabilities;
 use ShapeLMS\Services\InstructorService;
 use WP_Error;
@@ -108,23 +112,15 @@ abstract class RestController {
 			return true;
 		}
 
-		$post_id = 0;
 		foreach ( array( 'course_id', 'id', 'topic_id', 'quiz_id', 'lesson_id', 'item_id' ) as $key ) {
-			if ( $request->get_param( $key ) ) {
-				$post_id = (int) $request->get_param( $key );
-				break;
+			$post_id = (int) $request->get_param( $key );
+
+			if ( $post_id && ! InstructorService::is_course_instructor( get_current_user_id(), $post_id ) ) {
+				return $this->forbidden();
 			}
 		}
 
-		if ( ! $post_id ) {
-			return true;
-		}
-
-		if ( InstructorService::is_course_instructor( get_current_user_id(), $post_id ) ) {
-			return true;
-		}
-
-		return $this->forbidden();
+		return true;
 	}
 
 	/**

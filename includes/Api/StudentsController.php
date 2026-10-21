@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Api;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Database\ActivityLogRepository;
 use ShapeLMS\Database\EnrollmentRepository;
 use ShapeLMS\Services\EnrollmentService;
@@ -276,6 +280,22 @@ class StudentsController extends RestController {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public function search_users( WP_REST_Request $request ) {
+		if ( ! current_user_can( 'manage_shapelms' ) ) {
+			$user = get_user_by( 'email', sanitize_email( (string) $request->get_param( 'search' ) ) );
+
+			if ( ! $user ) {
+				return array();
+			}
+
+			return array(
+				array(
+					'id'    => (int) $user->ID,
+					'name'  => $user->display_name,
+					'email' => $user->user_email,
+				),
+			);
+		}
+
 		$query = new \WP_User_Query(
 			array(
 				'search'         => '*' . $request->get_param( 'search' ) . '*',

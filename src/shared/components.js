@@ -2,7 +2,7 @@
  * Shared UI components for the admin app and builder.
  */
 import { Button, Spinner, Notice, SearchControl, SelectControl } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { config } from './config';
 
 export function PageHeader( { title, description, actions } ) {
@@ -76,11 +76,11 @@ export function Empty( { title, description, action } ) {
 
 export function Pagination( { page, pages, total, onChange } ) {
 	if ( pages <= 1 ) {
-		return total ? <p className="shapelms-pagination-info">{ sprintf( __( '%d items', 'shapelms' ), total ) }</p> : null;
+		return total ? <p className="shapelms-pagination-info">{ sprintf( /* translators: %d: number of items */ _n( '%d item', '%d items', total, 'shapelms' ), total ) }</p> : null;
 	}
 	return (
 		<div className="shapelms-pagination-bar">
-			<span className="shapelms-pagination-info">{ sprintf( __( 'Page %1$d of %2$d · %3$d items', 'shapelms' ), page, pages, total ) }</span>
+			<span className="shapelms-pagination-info">{ sprintf( /* translators: 1: current page, 2: total pages */ __( 'Page %1$d of %2$d', 'shapelms' ), page, pages ) } · { sprintf( /* translators: %d: number of items */ _n( '%d item', '%d items', total, 'shapelms' ), total ) }</span>
 			<div className="shapelms-pagination-buttons">
 				<Button variant="secondary" size="compact" disabled={ page <= 1 } onClick={ () => onChange( page - 1 ) }>
 					{ __( 'Previous', 'shapelms' ) }

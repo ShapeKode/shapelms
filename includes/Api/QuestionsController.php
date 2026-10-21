@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Api;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Content\Meta;
 use ShapeLMS\Content\PostTypes;
 use ShapeLMS\Quiz\Question;

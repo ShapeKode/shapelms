@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Api;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Modules\Reviews\ReviewService;
 use WP_REST_Request;
 use WP_REST_Server;

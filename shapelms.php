@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ShapeLMS
  * Description: A fast, modern learning management system for WordPress. Build courses, lessons and quizzes, enroll students and sell courses.
- * Plugin URI:  https://themewant.com/
+ * Plugin URI:  https://themewant.com/shapelms/
  * Author:      Themewant
  * Author URI:  https://themewant.com/
  * Version:     1.0.0

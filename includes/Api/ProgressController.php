@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Api;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Content\Curriculum;
 use ShapeLMS\Services\ProgressService;
 use WP_REST_Request;

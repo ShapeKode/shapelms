@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Admin;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Content\PostTypes;
 use ShapeLMS\Content\Taxonomies;
 use ShapeLMS\Core\Capabilities;
@@ -183,7 +187,7 @@ class Menu {
 	 * @return void
 	 */
 	public function activation_redirect() {
-		if ( ! get_transient( 'shapelms_activation_redirect' ) || wp_doing_ajax() || is_network_admin() ) {
+		if ( ! get_transient( 'shapelms_activation_redirect' ) || wp_doing_ajax() || is_network_admin() || isset( $_GET['activate-multi'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only flag set by core.
 			return;
 		}
 

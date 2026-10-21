@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Database;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Runs versioned migrations and tracks the installed database version.
  */

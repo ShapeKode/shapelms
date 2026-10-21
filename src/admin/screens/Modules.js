@@ -37,7 +37,7 @@ export default function Modules() {
 						<div key={ m.id } className={ `shapelms-module-card ${ m.enabled ? 'is-enabled' : '' }` }>
 							<div className="shapelms-module-card__head">
 								<h3>{ m.name }</h3>
-								{ m.is_pro && <Badge tone="info">{ __( 'Add-on', 'shapelms' ) }</Badge> }
+								{ m.is_addon && <Badge tone="info">{ __( 'Add-on', 'shapelms' ) }</Badge> }
 							</div>
 							<p>{ m.description }</p>
 							{ m.dependencies.length > 0 && <p className="shapelms-muted">{ __( 'Requires:', 'shapelms' ) } { m.dependencies.join( ', ' ) }</p> }

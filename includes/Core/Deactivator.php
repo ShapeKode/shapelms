@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Core;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Runs on deactivation. Data is kept; only scheduled events and rewrite rules are cleared.
  */

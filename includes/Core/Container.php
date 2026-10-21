@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Core;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ReflectionClass;
 use ReflectionNamedType;
 use RuntimeException;

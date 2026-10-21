@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\Privacy;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Modules\AbstractModule;
 use ShapeLMS\Database\AttemptRepository;
 use ShapeLMS\Database\EnrollmentRepository;

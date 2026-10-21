@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Frontend;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Capabilities;
 
 /**

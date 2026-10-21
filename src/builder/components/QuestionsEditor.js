@@ -36,7 +36,7 @@ function OptionsEditor( { question, onChange } ) {
 			{ options.map( ( option, i ) => (
 				<div className="shapelms-option-row" key={ option.id }>
 					<input type={ multi ? 'checkbox' : 'radio' } checked={ correct.includes( option.id ) } onChange={ () => toggleCorrect( option.id ) } aria-label={ __( 'Correct', 'shapelms' ) } />
-					<TextControl value={ option.text } onChange={ ( v ) => setOption( i, v ) } placeholder={ sprintf( __( 'Option %d', 'shapelms' ), i + 1 ) } __nextHasNoMarginBottom />
+					<TextControl value={ option.text } onChange={ ( v ) => setOption( i, v ) } placeholder={ /* translators: %d: option number */ sprintf( __( 'Option %d', 'shapelms' ), i + 1 ) } __nextHasNoMarginBottom />
 					<Button icon="no-alt" label={ __( 'Remove', 'shapelms' ) } onClick={ () => remove( i ) } />
 				</div>
 			) ) }
@@ -140,7 +140,7 @@ export default function QuestionsEditor( { quizId, initial, types } ) {
 
 	return (
 		<div className="shapelms-questions shapelms-list-editor">
-			<span className="shapelms-list-editor__label">{ sprintf( __( 'Questions (%d)', 'shapelms' ), questions.length ) }</span>
+			<span className="shapelms-list-editor__label">{ /* translators: %d: number of questions */ sprintf( __( 'Questions (%d)', 'shapelms' ), questions.length ) }</span>
 			{ questions.map( ( q, i ) => (
 				<div key={ q.id } className={ `shapelms-questions__item ${ editing?.id === q.id ? 'is-active' : '' }` }>
 					<span className="shapelms-muted">{ i + 1 }.</span>

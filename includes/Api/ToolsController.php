@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Api;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Pages;
 use ShapeLMS\Core\Settings;
 use ShapeLMS\Services\ImportExportService;

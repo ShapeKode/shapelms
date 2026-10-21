@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Database;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Data access for the activity log. Feeds reports and the dashboard.
  */
@@ -95,7 +99,7 @@ class ActivityLogRepository extends Repository {
 
 		$sql .= ' GROUP BY DATE(created_at) ORDER BY day ASC';
 
-		$rows   = (array) $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$rows   = (array) $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
 		$counts = array();
 		foreach ( $rows as $row ) {
 			$counts[ (string) $row->day ] = (int) $row->total;

@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\QA;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Content\Curriculum;
 use ShapeLMS\Core\Modules\AbstractModule;
 use ShapeLMS\Services\EnrollmentService;

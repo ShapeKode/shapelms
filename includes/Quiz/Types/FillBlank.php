@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Quiz\Types;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Quiz\Question;
 use ShapeLMS\Quiz\QuestionTypeInterface;
 

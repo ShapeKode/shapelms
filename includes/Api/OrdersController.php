@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Api;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Database\OrderRepository;
 use ShapeLMS\Services\OrderService;
 use WP_REST_Request;

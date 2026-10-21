@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\Checkout;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use WP_REST_Request;
 
 /**

@@ -50,10 +50,10 @@ export default function Dashboard( { config } ) {
 				<>
 					<div className="shapelms-stats-grid">
 						<StatCard label={ __( 'Published courses', 'shapelms' ) } value={ data.totals.courses } />
-						<StatCard label={ __( 'Students', 'shapelms' ) } value={ data.totals.students } hint={ sprintf( __( '%d active', 'shapelms' ), data.totals.active ) } />
+						<StatCard label={ __( 'Students', 'shapelms' ) } value={ data.totals.students } hint={ /* translators: %d: active students */ sprintf( __( '%d active', 'shapelms' ), data.totals.active ) } />
 						<StatCard label={ __( 'Enrollments (30 days)', 'shapelms' ) } value={ data.period.enrollments } />
 						<StatCard label={ __( 'Completions (30 days)', 'shapelms' ) } value={ data.period.completions } />
-						{ config.canManage && <StatCard label={ __( 'Revenue (30 days)', 'shapelms' ) } value={ data.period_revenue_html } hint={ sprintf( __( '%s total', 'shapelms' ), data.revenue_html ) } tone="success" /> }
+						{ config.canManage && <StatCard label={ __( 'Revenue (30 days)', 'shapelms' ) } value={ data.period_revenue_html } hint={ /* translators: %s: all-time revenue */ sprintf( __( '%s total', 'shapelms' ), data.revenue_html ) } tone="success" /> }
 						{ config.canManage && config.pendingInstructors > 0 && (
 							<StatCard label={ __( 'Pending instructors', 'shapelms' ) } value={ config.pendingInstructors } tone="warning" />
 						) }

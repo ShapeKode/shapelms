@@ -45,7 +45,7 @@ export default function Courses( { config } ) {
 	};
 
 	const trash = ( course ) => {
-		if ( ! window.confirm( sprintf( __( 'Move "%s" to the trash?', 'shapelms' ), course.title ) ) ) {
+		if ( ! window.confirm( /* translators: %s: course title */ sprintf( __( 'Move "%s" to the trash?', 'shapelms' ), course.title ) ) ) {
 			return;
 		}
 		del( `courses/${ course.id }` )

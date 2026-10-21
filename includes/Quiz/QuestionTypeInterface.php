@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Quiz;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * A question type knows how to present a question safely and grade an answer.
  */

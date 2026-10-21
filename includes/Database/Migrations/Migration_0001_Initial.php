@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Database\Migrations;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Creates the core tables.
  */

@@ -2,6 +2,7 @@
  * Small dependency-free SVG line chart for daily series.
  */
 import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 export default function LineChart( { series, height = 220 } ) {
 	const [ hover, setHover ] = useState( null );
@@ -10,7 +11,7 @@ export default function LineChart( { series, height = 220 } ) {
 	const points = series[ 0 ]?.data || [];
 
 	if ( ! points.length ) {
-		return <p className="shapelms-muted">No data for this period.</p>;
+		return <p className="shapelms-muted">{ __( 'No data for this period.', 'shapelms' ) }</p>;
 	}
 
 	const max = Math.max( 1, ...series.flatMap( ( s ) => s.data.map( ( p ) => p.value ) ) );

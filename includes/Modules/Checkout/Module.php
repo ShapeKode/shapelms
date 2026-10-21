@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\Checkout;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Modules\AbstractModule;
 use ShapeLMS\Core\Pages;
 use ShapeLMS\Database\OrderRepository;

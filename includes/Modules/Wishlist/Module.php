@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\Wishlist;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Modules\AbstractModule;
 use WP_REST_Request;
 use WP_REST_Server;

@@ -7,17 +7,21 @@
 
 namespace ShapeLMS\Core\Modules;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Sensible defaults for modules.
  */
 abstract class AbstractModule implements ModuleInterface {
 
 	/**
-	 * Whether this module is from a Pro plugin or add-on.
+	 * Whether this module is provided by an add-on plugin.
 	 *
 	 * @return bool
 	 */
-	public function is_pro() {
+	public function is_addon() {
 		return false;
 	}
 

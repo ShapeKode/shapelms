@@ -1,8 +1,8 @@
-=== ShapeLMS – Courses, Quizzes & Online Learning ===
+=== ShapeLMS ===
 Contributors: themewant
 Tags: lms, courses, elearning, quiz, education
 Requires at least: 6.5
-Tested up to: 6.8
+Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 1.0.0
 License: GPLv2 or later
@@ -53,13 +53,23 @@ ShapeLMS turns your WordPress site into an online school. It is built on custom 
 
 == External services ==
 
-ShapeLMS only connects to third-party services when you enable them in Settings → Selling:
+ShapeLMS only connects to third-party services when you enable them or add their content. No data is sent to the plugin author.
 
-* **Stripe** – when Stripe is enabled, payment details are sent to Stripe to process card payments, and the Stripe.js script is loaded on the checkout page. [Terms](https://stripe.com/legal) · [Privacy](https://stripe.com/privacy)
-* **PayPal** – when PayPal is enabled, order details are sent to PayPal to process payments, and the PayPal JS SDK is loaded on the checkout page. [Terms](https://www.paypal.com/legalhub/home) · [Privacy](https://www.paypal.com/privacy)
-* **Video embeds** – lessons that use YouTube, Vimeo or embed codes load the video from that provider.
+**Stripe** (optional, Settings → Selling). When Stripe is enabled, the checkout page loads Stripe.js from https://js.stripe.com and, when a student pays, the plugin sends the order amount, currency, order number, the buyer's billing email, your site name and site URL to the Stripe API to create and confirm the payment. Card details are entered in Stripe's own form and never reach your server. Stripe may also call your site's webhook endpoint. [Terms](https://stripe.com/legal/ssa) · [Privacy](https://stripe.com/privacy)
 
-No data is sent to the plugin author.
+**PayPal** (optional, Settings → Selling). When PayPal is enabled, the checkout page loads the PayPal JS SDK from https://www.paypal.com and, when a student pays, the plugin sends the order amount, currency, order number and your site name to the PayPal Orders API to create and capture the payment, and calls PayPal's webhook verification endpoint to validate notifications. [Terms](https://www.paypal.com/legalhub/home) · [Privacy](https://www.paypal.com/privacy)
+
+**YouTube** (when an instructor adds a YouTube lesson or intro video). The video is embedded from https://www.youtube-nocookie.com; the visitor's browser requests the video ID from YouTube, which receives the visitor's IP address and browser data. [Terms](https://www.youtube.com/t/terms) · [Privacy](https://policies.google.com/privacy)
+
+**Vimeo** (when an instructor adds a Vimeo lesson or intro video). The video is embedded from https://player.vimeo.com with "do not track" enabled; Vimeo receives the visitor's IP address and browser data. [Terms](https://vimeo.com/terms) · [Privacy](https://vimeo.com/privacy)
+
+**Other video providers.** If an instructor pastes a URL from another oEmbed provider, WordPress contacts that provider to fetch the embed, and the visitor's browser loads the player from it.
+
+**Course import.** When an administrator imports a course JSON file that references image URLs, the plugin downloads those images into the media library.
+
+== Source code ==
+
+The JavaScript for the admin app, course builder and blocks is shipped unminified in the `src/` folder; the built files are in `assets/build/`. To rebuild: `npm install && npm run build`.
 
 == Installation ==
 

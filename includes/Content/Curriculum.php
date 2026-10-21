@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Content;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Reads the course → topic → item tree. Results are cached per request.
  */

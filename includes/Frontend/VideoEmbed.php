@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Frontend;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Builds privacy-friendly iframes for YouTube and Vimeo without a network call; falls back to oEmbed.
  */

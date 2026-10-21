@@ -30,7 +30,7 @@ function shapelms_get_setting( $section, $key, $fallback = null ) {
 function shapelms_table( $table ) {
 	global $wpdb;
 
-	return $wpdb->prefix . 'shapelms_' . $table;
+	return esc_sql( $wpdb->prefix . 'shapelms_' . sanitize_key( $table ) );
 }
 
 /**

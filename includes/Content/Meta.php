@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Content;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Registers typed, sanitized meta for courses, lessons, quizzes and questions.
  */
@@ -201,7 +205,7 @@ class Meta {
 					'type'          => $field['type'],
 					'single'        => true,
 					'default'       => $field['default'],
-					'show_in_rest'  => $this->rest_schema( $field ),
+					'show_in_rest'  => false,
 					'auth_callback' => array( $this, 'auth' ),
 				);
 
@@ -212,48 +216,6 @@ class Meta {
 				register_post_meta( $post_type, $key, $args );
 			}
 		}
-	}
-
-	/**
-	 * Builds the REST schema for a field.
-	 *
-	 * @param array<string, mixed> $field Field.
-	 * @return array<string, mixed>|bool
-	 */
-	private function rest_schema( array $field ) {
-		if ( 'array' === $field['type'] ) {
-			$items = isset( $field['items'] ) ? $field['items'] : 'string';
-
-			if ( 'object' === $items ) {
-				return array(
-					'schema' => array(
-						'type'  => 'array',
-						'items' => array(
-							'type'                 => 'object',
-							'additionalProperties' => true,
-						),
-					),
-				);
-			}
-
-			return array(
-				'schema' => array(
-					'type'  => 'array',
-					'items' => array( 'type' => $items ),
-				),
-			);
-		}
-
-		if ( 'object' === $field['type'] ) {
-			return array(
-				'schema' => array(
-					'type'                 => 'object',
-					'additionalProperties' => true,
-				),
-			);
-		}
-
-		return true;
 	}
 
 	/**
@@ -371,12 +333,9 @@ class Meta {
 
 		$clean = wp_kses( (string) $value, $allowed );
 
-		if ( ! preg_match( '#src=["\'](https?://[^"\']+)["\']#i', $clean, $match ) ) {
+		if ( ! preg_match_all( '#<iframe[^>]*\ssrc=["\'](https?://[^"\']+)["\']#i', $clean, $matches ) ) {
 			return '';
 		}
-
-		$host = wp_parse_url( $match[1], PHP_URL_HOST );
-		$host = is_string( $host ) ? strtolower( $host ) : '';
 
 		/**
 		 * Filters the hosts allowed in lesson embed codes.
@@ -385,13 +344,24 @@ class Meta {
 		 */
 		$hosts = apply_filters( 'shapelms_allowed_embed_hosts', array( 'youtube.com', 'youtube-nocookie.com', 'youtu.be', 'vimeo.com', 'player.vimeo.com', 'wistia.com', 'wistia.net', 'loom.com', 'bunny.net', 'mediadelivery.net', 'dailymotion.com', 'vidyard.com' ) );
 
-		foreach ( $hosts as $allowed_host ) {
-			if ( $host === $allowed_host || substr( $host, -strlen( '.' . $allowed_host ) ) === '.' . $allowed_host ) {
-				return $clean;
+		foreach ( $matches[1] as $src ) {
+			$host    = wp_parse_url( $src, PHP_URL_HOST );
+			$host    = is_string( $host ) ? strtolower( $host ) : '';
+			$allowed = false;
+
+			foreach ( $hosts as $allowed_host ) {
+				if ( $host === $allowed_host || substr( $host, -strlen( '.' . $allowed_host ) ) === '.' . $allowed_host ) {
+					$allowed = true;
+					break;
+				}
+			}
+
+			if ( ! $allowed ) {
+				return '';
 			}
 		}
 
-		return '';
+		return $clean;
 	}
 
 	/**

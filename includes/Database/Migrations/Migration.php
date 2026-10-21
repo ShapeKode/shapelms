@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Database\Migrations;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * A migration creates or alters tables in up() and reverts them in down().
  */

@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Database;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Data access for orders and order items.
  */
@@ -166,7 +170,7 @@ class OrderRepository extends Repository {
 		$per_page  = max( 1, min( 100, (int) $args['per_page'] ) );
 		$offset    = max( 0, ( (int) $args['page'] - 1 ) * $per_page );
 
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} o WHERE {$where_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} o WHERE {$where_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
 		$items = $wpdb->get_results( $wpdb->prepare( "SELECT o.* FROM {$table} o WHERE {$where_sql} ORDER BY o.id DESC LIMIT %d OFFSET %d", $per_page, $offset ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return array(
@@ -232,6 +236,6 @@ class OrderRepository extends Repository {
 			$sql .= $wpdb->prepare( ' AND paid_at <= %s', $to );
 		}
 
-		return (float) $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return (float) $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
 	}
 }

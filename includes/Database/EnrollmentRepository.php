@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Database;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Data access for the enrollments table.
  */
@@ -161,7 +165,7 @@ class EnrollmentRepository extends Repository {
 		$offset      = max( 0, ( (int) $args['page'] - 1 ) * $per_page );
 		$where_sql   = implode( ' AND ', $where );
 
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} e INNER JOIN {$wpdb->users} u ON u.ID = e.user_id WHERE {$where_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} e INNER JOIN {$wpdb->users} u ON u.ID = e.user_id WHERE {$where_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
 
 		$items = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(

@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\Reviews;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Events;
 use ShapeLMS\Services\EnrollmentService;
 

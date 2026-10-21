@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Modules\WooCommerce;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Content\PostTypes;
 use ShapeLMS\Core\Modules\AbstractModule;
 use ShapeLMS\Services\EnrollmentService;

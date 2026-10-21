@@ -5,7 +5,7 @@
   "private": true,
   "license": "GPL-2.0-or-later",
   "scripts": {
-    "build": "wp-scripts build --webpack-src-dir=src --output-path=assets/build",
+    "build": "wp-scripts build --webpack-src-dir=src --output-path=assets/build && rtlcss assets/css/frontend.css assets/css/frontend-rtl.css",
     "start": "wp-scripts start --webpack-src-dir=src --output-path=assets/build",
     "lint:js": "wp-scripts lint-js src",
     "lint:css": "wp-scripts lint-style src",

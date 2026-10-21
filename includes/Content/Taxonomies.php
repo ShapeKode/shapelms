@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Content;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Capabilities;
 
 /**

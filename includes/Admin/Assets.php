@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Admin;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Content\PostTypes;
 use ShapeLMS\Core\Capabilities;
 use ShapeLMS\Core\Settings;
@@ -87,6 +91,7 @@ class Assets {
 			array( 'wp-components' ),
 			$asset['version']
 		);
+		wp_style_add_data( $handle, 'rtl', 'replace' );
 	}
 
 	/**

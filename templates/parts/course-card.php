@@ -51,7 +51,7 @@ $shapelms_level_map  = array(
 		<?php endif; ?>
 
 		<ul class="shapelms-card__meta">
-			<li><?php echo esc_html( sprintf( /* translators: %d: number of lessons */ _n( '%d lesson', '%d lessons', $shapelms_course['lessons'], 'shapelms' ), $shapelms_course['lessons'] ) ); ?></li>
+			<li><?php echo esc_html( sprintf( /* translators: %d: lessons */ _n( '%d lesson', '%d lessons', $shapelms_course['lessons'], 'shapelms' ), $shapelms_course['lessons'] ) ); ?></li>
 			<?php if ( $shapelms_course['duration'] ) : ?>
 				<li><?php echo esc_html( shapelms_format_duration( $shapelms_course['duration'] ) ); ?></li>
 			<?php endif; ?>
@@ -60,7 +60,7 @@ $shapelms_level_map  = array(
 
 		<div class="shapelms-card__footer">
 			<?php if ( $shapelms_course['rating']['count'] > 0 ) : ?>
-				<span class="shapelms-rating" aria-label="<?php echo esc_attr( sprintf( /* translators: 1: rating, 2: count */ __( 'Rated %1$s out of 5 by %2$d students', 'shapelms' ), number_format_i18n( $shapelms_course['rating']['average'], 1 ), $shapelms_course['rating']['count'] ) ); ?>">
+				<span class="shapelms-rating" aria-label="<?php echo esc_attr( sprintf( /* translators: 1: rating, 2: number of students */ _n( 'Rated %1$s out of 5 by %2$d student', 'Rated %1$s out of 5 by %2$d students', $shapelms_course['rating']['count'], 'shapelms' ), number_format_i18n( $shapelms_course['rating']['average'], 1 ), $shapelms_course['rating']['count'] ) ); ?>">
 					<span class="shapelms-rating__star">★</span>
 					<?php echo esc_html( number_format_i18n( $shapelms_course['rating']['average'], 1 ) ); ?>
 					<small>(<?php echo esc_html( number_format_i18n( $shapelms_course['rating']['count'] ) ); ?>)</small>

@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Services;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Events;
 use ShapeLMS\Database\OrderRepository;
 

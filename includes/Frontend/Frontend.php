@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Frontend;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Content\Curriculum;
 use ShapeLMS\Content\PostTypes;
 use ShapeLMS\Content\Taxonomies;
@@ -182,13 +186,14 @@ class Frontend {
 		}
 
 		wp_enqueue_style( 'shapelms-frontend', SHAPELMS_URL . 'assets/css/frontend.css', array(), SHAPELMS_VERSION );
+		wp_style_add_data( 'shapelms-frontend', 'rtl', 'replace' );
 
 		$custom = ThemeCss::url();
 		if ( $custom ) {
 			wp_enqueue_style( 'shapelms-theme', $custom, array( 'shapelms-frontend' ), ThemeCss::version() );
 		}
 
-		wp_enqueue_script( 'shapelms-frontend', SHAPELMS_URL . 'assets/js/frontend.js', array(), SHAPELMS_VERSION, true );
+		wp_enqueue_script( 'shapelms-frontend', SHAPELMS_URL . 'assets/js/frontend.js', array( 'wp-i18n' ), SHAPELMS_VERSION, true );
 		wp_set_script_translations( 'shapelms-frontend', 'shapelms', SHAPELMS_DIR . 'languages' );
 
 		/**

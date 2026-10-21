@@ -7,6 +7,10 @@
 
 namespace ShapeLMS\Core;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Modules\ModuleRegistry;
 use ShapeLMS\Database\Migrator;
 
@@ -97,11 +101,10 @@ final class Plugin {
 	 * @return void
 	 */
 	public function on_plugins_loaded() {
-		load_plugin_textdomain( 'shapelms', false, dirname( SHAPELMS_BASENAME ) . '/languages' );
-
 		Migrator::maybe_upgrade();
 
 		$this->get( Capabilities::class )->register();
+		$this->get( Capabilities::class )->maybe_sync();
 		$this->get( ModuleRegistry::class )->boot();
 
 		if ( is_admin() ) {

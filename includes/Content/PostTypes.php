@@ -7,7 +7,10 @@
 
 namespace ShapeLMS\Content;
 
-use ShapeLMS\Core\Capabilities;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use ShapeLMS\Core\Settings;
 
 /**
@@ -44,23 +47,6 @@ class PostTypes {
 		$slug = sanitize_title( (string) Settings::get( 'general', 'course_slug', 'courses' ) );
 		$slug = $slug ? $slug : 'courses';
 
-		$caps = array(
-			'edit_post'              => Capabilities::EDIT_COURSES,
-			'read_post'              => 'read',
-			'delete_post'            => Capabilities::EDIT_COURSES,
-			'edit_posts'             => Capabilities::EDIT_COURSES,
-			'edit_others_posts'      => Capabilities::MANAGE,
-			'delete_posts'           => Capabilities::EDIT_COURSES,
-			'delete_others_posts'    => Capabilities::MANAGE,
-			'publish_posts'          => Capabilities::EDIT_COURSES,
-			'read_private_posts'     => Capabilities::EDIT_COURSES,
-			'create_posts'           => Capabilities::EDIT_COURSES,
-			'delete_private_posts'   => Capabilities::MANAGE,
-			'delete_published_posts' => Capabilities::EDIT_COURSES,
-			'edit_private_posts'     => Capabilities::MANAGE,
-			'edit_published_posts'   => Capabilities::EDIT_COURSES,
-		);
-
 		register_post_type(
 			self::COURSE,
 			array(
@@ -81,8 +67,7 @@ class PostTypes {
 				'public'          => true,
 				'show_ui'         => true,
 				'show_in_menu'    => false,
-				'show_in_rest'    => true,
-				'rest_base'       => 'shapelms-courses',
+				'show_in_rest'    => false,
 				'menu_icon'       => 'dashicons-welcome-learn-more',
 				'supports'        => array( 'title', 'editor', 'excerpt', 'thumbnail', 'author', 'revisions', 'custom-fields' ),
 				'has_archive'     => $slug,
@@ -91,8 +76,7 @@ class PostTypes {
 					'with_front' => false,
 				),
 				'capability_type' => array( 'shapelms_course', 'shapelms_courses' ),
-				'capabilities'    => $caps,
-				'map_meta_cap'    => false,
+				'map_meta_cap'    => true,
 				'taxonomies'      => array( Taxonomies::CATEGORY, Taxonomies::TAG ),
 			)
 		);
@@ -103,14 +87,13 @@ class PostTypes {
 			'exclude_from_search' => true,
 			'show_ui'             => false,
 			'show_in_nav_menus'   => false,
-			'show_in_rest'        => true,
+			'show_in_rest'        => false,
 			'supports'            => array( 'title', 'editor', 'author', 'revisions', 'custom-fields' ),
 			'hierarchical'        => false,
 			'rewrite'             => false,
 			'query_var'           => false,
 			'capability_type'     => array( 'shapelms_course', 'shapelms_courses' ),
-			'capabilities'        => $caps,
-			'map_meta_cap'        => false,
+			'map_meta_cap'        => true,
 		);
 
 		register_post_type(
@@ -123,8 +106,6 @@ class PostTypes {
 						'singular_name' => __( 'Topic', 'shapelms' ),
 					),
 					'publicly_queryable' => false,
-					'show_in_rest'       => true,
-					'rest_base'          => 'shapelms-topics',
 				)
 			)
 		);
@@ -138,7 +119,6 @@ class PostTypes {
 						'name'          => __( 'Lessons', 'shapelms' ),
 						'singular_name' => __( 'Lesson', 'shapelms' ),
 					),
-					'rest_base' => 'shapelms-lessons',
 					'rewrite'   => array(
 						'slug'       => $slug . '/%shapelms_course%/lessons',
 						'with_front' => false,
@@ -157,7 +137,6 @@ class PostTypes {
 						'name'          => __( 'Quizzes', 'shapelms' ),
 						'singular_name' => __( 'Quiz', 'shapelms' ),
 					),
-					'rest_base' => 'shapelms-quizzes',
 					'rewrite'   => array(
 						'slug'       => $slug . '/%shapelms_course%/quizzes',
 						'with_front' => false,
@@ -177,7 +156,6 @@ class PostTypes {
 						'singular_name' => __( 'Question', 'shapelms' ),
 					),
 					'publicly_queryable' => false,
-					'rest_base'          => 'shapelms-questions',
 				)
 			)
 		);
