@@ -113,6 +113,7 @@ class Module extends AbstractModule {
 				$errors->add( 'closed', __( 'Registration is closed.', 'shapelms' ) );
 			}
 
+			$username = '';
 			$email    = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
 			$name     = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
 			$password = isset( $_POST['password'] ) ? (string) wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- passwords are not sanitized.
@@ -137,6 +138,14 @@ class Module extends AbstractModule {
 					$username = $base . ( $i++ );
 				}
 
+				/** This action is documented in wp-login.php */
+				do_action( 'register_post', $username, $email, $errors ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core hook.
+
+				/** This filter is documented in wp-includes/user.php */
+				$errors = apply_filters( 'registration_errors', $errors, $username, $email ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core hook.
+			}
+
+			if ( ! $errors->has_errors() ) {
 				$user_id = wp_insert_user(
 					array(
 						'user_login'   => $username,

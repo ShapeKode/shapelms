@@ -120,6 +120,11 @@ class ReviewService {
 
 		if ( $existing ) {
 			$comment_id = (int) $existing[0]->comment_ID;
+
+			if ( in_array( wp_get_comment_status( $comment_id ), array( 'spam', 'trash' ), true ) ) {
+				return new \WP_Error( 'shapelms_review_blocked', __( 'Your review cannot be updated.', 'shapelms' ), array( 'status' => 403 ) );
+			}
+
 			wp_update_comment(
 				array(
 					'comment_ID'       => $comment_id,

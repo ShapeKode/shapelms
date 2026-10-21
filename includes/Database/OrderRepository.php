@@ -84,7 +84,7 @@ class OrderRepository extends Repository {
 	public function items( $order_id ) {
 		global $wpdb;
 
-		$table = shapelms_table( 'order_items' );
+		$table = esc_sql( shapelms_table( 'order_items' ) );
 
 		return (array) $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE order_id = %d ORDER BY id ASC", (int) $order_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
@@ -149,7 +149,7 @@ class OrderRepository extends Repository {
 			)
 		);
 
-		$table = $this->table();
+		$table = esc_sql( $this->table() );
 		$where = array( '1=1' );
 
 		if ( $args['status'] ) {
@@ -196,7 +196,7 @@ class OrderRepository extends Repository {
 
 		$placeholders = implode( ', ', array_fill( 0, count( $course_ids ), '%d' ) );
 		$orders       = $this->table();
-		$items        = shapelms_table( 'order_items' );
+		$items        = esc_sql( shapelms_table( 'order_items' ) );
 
 		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
@@ -226,7 +226,7 @@ class OrderRepository extends Repository {
 	public function revenue( $from = '', $to = '' ) {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql( $this->table() );
 		$sql   = "SELECT COALESCE(SUM(total),0) FROM {$table} WHERE status = 'completed'";
 
 		if ( $from ) {
@@ -236,6 +236,6 @@ class OrderRepository extends Repository {
 			$sql .= $wpdb->prepare( ' AND paid_at <= %s', $to );
 		}
 
-		return (float) $wpdb->get_var( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
+		return (float) $wpdb->get_var( $sql ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
 	}
 }

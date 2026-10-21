@@ -158,7 +158,18 @@ class ImportExportService {
 			return new \WP_Error( 'shapelms_import_empty', __( 'No courses found in the file.', 'shapelms' ) );
 		}
 
-		$author  = $author ? $author : get_current_user_id();
+		$author = $author ? $author : get_current_user_id();
+
+		if ( ! $author ) {
+			$admins = get_users(
+				array(
+					'role'   => 'administrator',
+					'number' => 1,
+					'fields' => 'ID',
+				)
+			);
+			$author = $admins ? (int) $admins[0] : 0;
+		}
 		$created = array();
 
 		foreach ( $data['courses'] as $course ) {

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-21T02:56:08+00:00\n"
+"POT-Creation-Date: 2026-10-21T04:13:55+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: shapelms\n"
@@ -47,6 +47,7 @@ msgstr ""
 #: includes/Core/Pages.php:27
 #: templates/dashboard.php:28
 #: templates/learn.php:67
+#: assets/build/admin.js:1
 msgid "Dashboard"
 msgstr ""
 
@@ -54,6 +55,8 @@ msgstr ""
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:64
 #: templates/archive-course.php:23
 #: templates/dashboard/orders.php:36
+#: assets/build/admin.js:1
+#: assets/build/blocks.js:1
 msgid "Courses"
 msgstr ""
 
@@ -62,6 +65,7 @@ msgstr ""
 #: templates/dashboard/instructor-courses.php:36
 #: templates/dashboard/instructor-students.php:38
 #: templates/parts/enroll-box.php:101
+#: assets/build/admin.js:1
 msgid "Students"
 msgstr ""
 
@@ -71,44 +75,53 @@ msgstr ""
 
 #: includes/Admin/Menu.php:36
 #: includes/Core/Settings.php:110
+#: assets/build/admin.js:1
 msgid "Instructors"
 msgstr ""
 
 #: includes/Admin/Menu.php:37
 #: templates/dashboard/instructor-earnings.php:44
+#: assets/build/admin.js:1
 msgid "Orders"
 msgstr ""
 
 #: includes/Admin/Menu.php:38
+#: assets/build/admin.js:1
 msgid "Reports"
 msgstr ""
 
 #: includes/Admin/Menu.php:39
+#: assets/build/admin.js:1
 msgid "Modules"
 msgstr ""
 
 #: includes/Admin/Menu.php:40
 #: includes/Frontend/Dashboard.php:53
 #: templates/dashboard/settings.php:16
+#: assets/build/admin.js:1
+#: assets/build/builder.js:1
 msgid "Settings"
 msgstr ""
 
 #: includes/Admin/Menu.php:41
+#: assets/build/admin.js:1
 msgid "Tools"
 msgstr ""
 
 #: includes/Admin/Menu.php:88
-#: includes/Content/PostTypes.php:75
+#: includes/Content/PostTypes.php:57
 msgid "Add New Course"
 msgstr ""
 
 #: includes/Admin/Menu.php:89
 #: includes/Content/Taxonomies.php:48
+#: assets/build/builder.js:1
 msgid "Categories"
 msgstr ""
 
 #: includes/Admin/Menu.php:90
 #: includes/Content/Taxonomies.php:76
+#: assets/build/builder.js:1
 msgid "Tags"
 msgstr ""
 
@@ -135,12 +148,12 @@ msgstr ""
 msgid "You must be logged in."
 msgstr ""
 
-#: includes/Api/RestController.php:140
+#: includes/Api/RestController.php:132
 #: includes/Modules/QA/Module.php:309
 msgid "You are not allowed to do that."
 msgstr ""
 
-#: includes/Api/RestController.php:150
+#: includes/Api/RestController.php:142
 #: includes/Modules/QA/Module.php:303
 msgid "Not found."
 msgstr ""
@@ -150,86 +163,89 @@ msgstr ""
 msgid "No courses found."
 msgstr ""
 
-#: includes/Content/PostTypes.php:72
+#: includes/Content/PostTypes.php:54
 msgctxt "post type general name"
 msgid "Courses"
 msgstr ""
 
-#: includes/Content/PostTypes.php:73
+#: includes/Content/PostTypes.php:55
 msgctxt "post type singular name"
 msgid "Course"
 msgstr ""
 
-#: includes/Content/PostTypes.php:74
+#: includes/Content/PostTypes.php:56
 msgid "Add New"
 msgstr ""
 
-#: includes/Content/PostTypes.php:76
+#: includes/Content/PostTypes.php:58
 msgid "Edit Course"
 msgstr ""
 
-#: includes/Content/PostTypes.php:77
+#: includes/Content/PostTypes.php:59
 msgid "New Course"
 msgstr ""
 
-#: includes/Content/PostTypes.php:78
+#: includes/Content/PostTypes.php:60
 msgid "View Course"
 msgstr ""
 
-#: includes/Content/PostTypes.php:79
+#: includes/Content/PostTypes.php:61
 msgid "Search Courses"
 msgstr ""
 
-#: includes/Content/PostTypes.php:80
+#: includes/Content/PostTypes.php:62
 msgid "No courses found"
 msgstr ""
 
-#: includes/Content/PostTypes.php:81
+#: includes/Content/PostTypes.php:63
 msgid "No courses found in Trash"
 msgstr ""
 
-#: includes/Content/PostTypes.php:82
+#: includes/Content/PostTypes.php:64
 msgid "All Courses"
 msgstr ""
 
-#: includes/Content/PostTypes.php:83
+#: includes/Content/PostTypes.php:65
 msgid "Course Archives"
 msgstr ""
 
-#: includes/Content/PostTypes.php:126
+#: includes/Content/PostTypes.php:105
 msgid "Topics"
 msgstr ""
 
-#: includes/Content/PostTypes.php:127
+#: includes/Content/PostTypes.php:106
 msgid "Topic"
 msgstr ""
 
-#: includes/Content/PostTypes.php:142
+#: includes/Content/PostTypes.php:119
 #: templates/parts/enroll-box.php:96
+#: assets/build/admin.js:1
 msgid "Lessons"
 msgstr ""
 
-#: includes/Content/PostTypes.php:143
+#: includes/Content/PostTypes.php:120
 msgid "Lesson"
 msgstr ""
 
-#: includes/Content/PostTypes.php:161
+#: includes/Content/PostTypes.php:137
 #: templates/parts/enroll-box.php:97
 msgid "Quizzes"
 msgstr ""
 
-#: includes/Content/PostTypes.php:162
+#: includes/Content/PostTypes.php:138
 #: includes/Modules/Privacy/Module.php:148
 #: templates/dashboard/quizzes.php:32
+#: assets/build/admin.js:1
 msgid "Quiz"
 msgstr ""
 
-#: includes/Content/PostTypes.php:180
+#: includes/Content/PostTypes.php:155
 #: templates/parts/quiz-player.php:26
 msgid "Questions"
 msgstr ""
 
-#: includes/Content/PostTypes.php:181
+#: includes/Content/PostTypes.php:156
+#: assets/build/builder.js:1
 msgid "Question"
 msgstr ""
 
@@ -281,14 +297,16 @@ msgstr ""
 msgid "Add New Tag"
 msgstr ""
 
-#: includes/Core/Capabilities.php:52
+#: includes/Core/Capabilities.php:88
 #: templates/parts/qa.php:41
 #: templates/parts/qa.php:58
+#: assets/build/admin.js:1
 msgid "Instructor"
 msgstr ""
 
-#: includes/Core/Capabilities.php:53
+#: includes/Core/Capabilities.php:89
 #: templates/dashboard/instructor-students.php:45
+#: assets/build/admin.js:1
 msgid "Student"
 msgstr ""
 
@@ -390,6 +408,7 @@ msgid "When off, instructor courses are submitted as pending for an admin to pub
 msgstr ""
 
 #: includes/Core/Settings.php:132
+#: assets/build/admin.js:1
 msgid "Selling"
 msgstr ""
 
@@ -402,15 +421,19 @@ msgid "Commerce engine"
 msgstr ""
 
 #: includes/Core/Settings.php:140
+#: assets/build/admin.js:1
 msgid "ShapeLMS checkout (Stripe, PayPal)"
 msgstr ""
 
 #: includes/Core/Settings.php:141
 #: includes/Modules/WooCommerce/Module.php:40
+#: assets/build/admin.js:1
+#: assets/build/builder.js:1
 msgid "WooCommerce"
 msgstr ""
 
 #: includes/Core/Settings.php:145
+#: assets/build/admin.js:1
 msgid "Currency"
 msgstr ""
 
@@ -527,6 +550,7 @@ msgstr ""
 #: includes/Modules/Privacy/Module.php:144
 #: templates/dashboard/overview.php:44
 #: templates/dashboard/quizzes.php:26
+#: assets/build/admin.js:1
 msgid "Quiz attempts"
 msgstr ""
 
@@ -549,6 +573,7 @@ msgid "Account"
 msgstr ""
 
 #: includes/Frontend/VideoEmbed.php:81
+#: assets/build/builder.js:1
 msgid "Video"
 msgstr ""
 
@@ -594,7 +619,7 @@ msgid "Checkout is not available."
 msgstr ""
 
 #: includes/Modules/Checkout/Module.php:225
-#: includes/Modules/Checkout/Module.php:286
+#: includes/Modules/Checkout/Module.php:290
 msgid "Payment method not available."
 msgstr ""
 
@@ -602,11 +627,15 @@ msgstr ""
 msgid "Order not found."
 msgstr ""
 
-#: includes/Modules/Checkout/Module.php:315
+#: includes/Modules/Checkout/Module.php:285
+msgid "This order can no longer be paid."
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:319
 msgid "Unknown gateway."
 msgstr ""
 
-#: includes/Modules/Checkout/Module.php:403
+#: includes/Modules/Checkout/Module.php:410
 #: templates/dashboard/orders.php:29
 msgid "Purchases"
 msgstr ""
@@ -641,17 +670,16 @@ msgid "Payment has not completed yet."
 msgstr ""
 
 #: includes/Modules/Checkout/PayPalGateway.php:243
-#: includes/Modules/Checkout/StripeGateway.php:213
 msgid "Payment amount does not match the order."
 msgstr ""
 
 #: includes/Modules/Checkout/PayPalGateway.php:260
-#: includes/Modules/Checkout/StripeGateway.php:265
+#: includes/Modules/Checkout/StripeGateway.php:286
 msgid "Invalid payload."
 msgstr ""
 
 #: includes/Modules/Checkout/PayPalGateway.php:279
-#: includes/Modules/Checkout/StripeGateway.php:260
+#: includes/Modules/Checkout/StripeGateway.php:281
 msgid "Invalid signature."
 msgstr ""
 
@@ -671,15 +699,19 @@ msgstr ""
 msgid "Invalid payment reference."
 msgstr ""
 
-#: includes/Modules/Checkout/StripeGateway.php:231
+#: includes/Modules/Checkout/StripeGateway.php:213
+msgid "Payment does not match the order."
+msgstr ""
+
+#: includes/Modules/Checkout/StripeGateway.php:252
 msgid "Webhook not configured."
 msgstr ""
 
-#: includes/Modules/Checkout/StripeGateway.php:243
+#: includes/Modules/Checkout/StripeGateway.php:264
 msgid "Invalid signature header."
 msgstr ""
 
-#: includes/Modules/Checkout/StripeGateway.php:248
+#: includes/Modules/Checkout/StripeGateway.php:269
 msgid "Signature timestamp out of range."
 msgstr ""
 
@@ -696,14 +728,17 @@ msgid "Course Grid"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:69
+#: assets/build/blocks.js:1
 msgid "Number of courses"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:79
+#: assets/build/blocks.js:1
 msgid "Columns"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:92
+#: assets/build/blocks.js:1
 msgid "Category slug"
 msgstr ""
 
@@ -712,25 +747,32 @@ msgid "Leave empty for all categories."
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:101
+#: assets/build/blocks.js:1
 msgid "Order by"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:105
 #: templates/parts/filters.php:31
+#: assets/build/blocks.js:1
 msgid "Newest"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:106
 #: templates/dashboard/announcements.php:38
+#: assets/build/blocks.js:1
+#: assets/build/builder.js:1
 msgid "Title"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:107
 #: templates/parts/filters.php:56
+#: assets/build/admin.js:1
+#: assets/build/blocks.js:1
 msgid "Price"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:108
+#: assets/build/blocks.js:1
 msgid "Popular"
 msgstr ""
 
@@ -739,6 +781,7 @@ msgid "Featured only"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/Curriculum.php:37
+#: assets/build/blocks.js:1
 msgid "Course Curriculum"
 msgstr ""
 
@@ -750,6 +793,8 @@ msgstr ""
 #: templates/dashboard/instructor-earnings.php:51
 #: templates/dashboard/instructor-students.php:46
 #: templates/dashboard/quizzes.php:33
+#: assets/build/admin.js:1
+#: assets/build/blocks.js:1
 msgid "Course"
 msgstr ""
 
@@ -764,6 +809,7 @@ msgid "Leave 0 to use the current course."
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/EnrollButton.php:37
+#: assets/build/blocks.js:1
 msgid "Course Enroll Box"
 msgstr ""
 
@@ -947,6 +993,7 @@ msgstr ""
 #: includes/Modules/Emails/Module.php:248
 #: includes/Modules/Privacy/Module.php:156
 #: templates/dashboard/quizzes.php:45
+#: assets/build/admin.js:1
 #: assets/js/frontend.js:315
 msgid "Passed"
 msgstr ""
@@ -954,6 +1001,7 @@ msgstr ""
 #: includes/Modules/Emails/Module.php:248
 #: templates/dashboard/orders.php:26
 #: templates/dashboard/quizzes.php:45
+#: assets/build/admin.js:1
 #: assets/js/frontend.js:315
 msgid "Failed"
 msgstr ""
@@ -1027,11 +1075,14 @@ msgstr ""
 #: includes/Modules/Privacy/Module.php:183
 #: templates/dashboard/instructor-courses.php:35
 #: templates/dashboard/orders.php:38
+#: assets/build/admin.js:1
+#: assets/build/builder.js:1
 msgid "Status"
 msgstr ""
 
 #: includes/Modules/Privacy/Module.php:125
 #: templates/dashboard/instructor-students.php:47
+#: assets/build/admin.js:1
 msgid "Progress"
 msgstr ""
 
@@ -1045,6 +1096,7 @@ msgstr ""
 #: templates/dashboard/overview.php:43
 #: templates/dashboard/parts/enrolled-card.php:38
 #: templates/learn.php:142
+#: assets/build/admin.js:1
 #: assets/js/frontend.js:204
 msgid "Completed"
 msgstr ""
@@ -1052,6 +1104,7 @@ msgstr ""
 #: includes/Modules/Privacy/Module.php:152
 #: templates/dashboard/quizzes.php:34
 #: templates/parts/quiz-player.php:46
+#: assets/build/admin.js:1
 msgid "Score"
 msgstr ""
 
@@ -1068,6 +1121,7 @@ msgstr ""
 #: templates/dashboard/orders.php:39
 #: templates/dashboard/quizzes.php:36
 #: templates/parts/quiz-player.php:48
+#: assets/build/admin.js:1
 msgid "Date"
 msgstr ""
 
@@ -1077,12 +1131,14 @@ msgstr ""
 
 #: includes/Modules/Privacy/Module.php:175
 #: templates/dashboard/orders.php:35
+#: assets/build/admin.js:1
 msgid "Order"
 msgstr ""
 
 #: includes/Modules/Privacy/Module.php:179
 #: templates/checkout.php:108
 #: templates/dashboard/orders.php:37
+#: assets/build/admin.js:1
 msgid "Total"
 msgstr ""
 
@@ -1142,7 +1198,11 @@ msgstr ""
 msgid "Only enrolled students can review this course."
 msgstr ""
 
-#: includes/Modules/Reviews/ReviewService.php:145
+#: includes/Modules/Reviews/ReviewService.php:125
+msgid "Your review cannot be updated."
+msgstr ""
+
+#: includes/Modules/Reviews/ReviewService.php:150
 msgid "Could not save your review."
 msgstr ""
 
@@ -1170,15 +1230,15 @@ msgstr ""
 msgid "Sell courses through WooCommerce products and checkout."
 msgstr ""
 
-#: includes/Modules/WooCommerce/Module.php:250
+#: includes/Modules/WooCommerce/Module.php:252
 msgid "— None —"
 msgstr ""
 
-#: includes/Modules/WooCommerce/Module.php:258
+#: includes/Modules/WooCommerce/Module.php:260
 msgid "ShapeLMS course"
 msgstr ""
 
-#: includes/Modules/WooCommerce/Module.php:262
+#: includes/Modules/WooCommerce/Module.php:264
 msgid "Buyers are enrolled in this course when the order is paid."
 msgstr ""
 
@@ -1203,15 +1263,18 @@ msgid "True / False"
 msgstr ""
 
 #: includes/Quiz/Types/TrueFalse.php:51
+#: assets/build/builder.js:1
 msgid "True"
 msgstr ""
 
 #: includes/Quiz/Types/TrueFalse.php:55
+#: assets/build/builder.js:1
 msgid "False"
 msgstr ""
 
 #: includes/Services/CourseService.php:173
 #: templates/parts/filters.php:27
+#: assets/build/blocks.js:1
 msgid "Free"
 msgstr ""
 
@@ -1422,12 +1485,14 @@ msgstr ""
 #: templates/archive-course.php:45
 #: templates/learn.php:135
 #: templates/parts/quiz-player.php:64
+#: assets/build/admin.js:1
 msgid "Previous"
 msgstr ""
 
 #: templates/archive-course.php:46
 #: templates/learn.php:147
 #: templates/parts/quiz-player.php:65
+#: assets/build/admin.js:1
 msgid "Next"
 msgstr ""
 
@@ -1447,6 +1512,7 @@ msgstr ""
 
 #: templates/checkout.php:54
 #: templates/dashboard/login.php:19
+#: templates/instructor-register.php:37
 msgid "Log in"
 msgstr ""
 
@@ -1486,6 +1552,7 @@ msgstr ""
 
 #: templates/checkout.php:100
 #: templates/dashboard/instructor-students.php:48
+#: assets/build/admin.js:1
 msgid "Enrolled"
 msgstr ""
 
@@ -1519,6 +1586,8 @@ msgstr ""
 
 #: templates/dashboard/announcements.php:58
 #: templates/parts/qa.php:46
+#: assets/build/admin.js:1
+#: assets/build/builder.js:1
 msgid "Delete"
 msgstr ""
 
@@ -1527,6 +1596,7 @@ msgid "No announcements yet."
 msgstr ""
 
 #: templates/dashboard/courses.php:34
+#: assets/build/admin.js:1
 msgid "All"
 msgstr ""
 
@@ -1540,18 +1610,24 @@ msgid "No courses here yet."
 msgstr ""
 
 #: templates/dashboard/instructor-courses.php:19
+#: assets/build/admin.js:1
+#: assets/build/builder.js:1
 msgid "Published"
 msgstr ""
 
 #: templates/dashboard/instructor-courses.php:20
+#: assets/build/admin.js:1
+#: assets/build/builder.js:1
 msgid "Draft"
 msgstr ""
 
 #: templates/dashboard/instructor-courses.php:21
+#: assets/build/admin.js:1
 msgid "Pending review"
 msgstr ""
 
 #: templates/dashboard/instructor-courses.php:22
+#: assets/build/admin.js:1
 msgid "Private"
 msgstr ""
 
@@ -1561,14 +1637,18 @@ msgstr ""
 
 #: templates/dashboard/instructor-courses.php:37
 #: templates/parts/reviews.php:51
+#: assets/build/admin.js:1
 msgid "Rating"
 msgstr ""
 
 #: templates/dashboard/instructor-courses.php:55
+#: assets/build/admin.js:1
+#: assets/build/builder.js:1
 msgid "Edit"
 msgstr ""
 
 #: templates/dashboard/instructor-courses.php:57
+#: assets/build/admin.js:1
 msgid "View"
 msgstr ""
 
@@ -1585,6 +1665,7 @@ msgid "Sales"
 msgstr ""
 
 #: templates/dashboard/instructor-earnings.php:53
+#: assets/build/admin.js:1
 msgid "Revenue"
 msgstr ""
 
@@ -1629,11 +1710,13 @@ msgid "Forgot your password?"
 msgstr ""
 
 #: templates/dashboard/orders.php:22
+#: assets/build/admin.js:1
 msgid "Pending"
 msgstr ""
 
 #: templates/dashboard/orders.php:23
 #: templates/parts/filters.php:28
+#: assets/build/blocks.js:1
 msgid "Paid"
 msgstr ""
 
@@ -1642,6 +1725,7 @@ msgid "Refunded"
 msgstr ""
 
 #: templates/dashboard/orders.php:25
+#: assets/build/admin.js:1
 msgid "Cancelled"
 msgstr ""
 
@@ -1681,6 +1765,7 @@ msgid "%d%% complete"
 msgstr ""
 
 #: templates/dashboard/parts/enrolled-card.php:44
+#: assets/build/admin.js:1
 msgid "Continue"
 msgstr ""
 
@@ -1707,7 +1792,8 @@ msgid "Change your name, email and password in your <a href=\"%s\">account setti
 msgstr ""
 
 #: templates/dashboard/profile.php:27
-#: templates/instructor-register.php:65
+#: templates/instructor-register.php:68
+#: assets/build/admin.js:1
 msgid "Headline"
 msgstr ""
 
@@ -1732,6 +1818,7 @@ msgid "LinkedIn"
 msgstr ""
 
 #: templates/dashboard/profile.php:39
+#: assets/build/builder.js:1
 msgid "YouTube"
 msgstr ""
 
@@ -1767,6 +1854,7 @@ msgstr ""
 
 #: templates/dashboard/quizzes.php:35
 #: templates/parts/quiz-player.php:47
+#: assets/build/admin.js:1
 msgid "Result"
 msgstr ""
 
@@ -1840,33 +1928,37 @@ msgstr ""
 msgid "You are already an instructor."
 msgstr ""
 
-#: templates/instructor-register.php:50
+#: templates/instructor-register.php:36
+msgid "Please log in with your existing account to apply as an instructor."
+msgstr ""
+
+#: templates/instructor-register.php:53
 msgid "Your name"
 msgstr ""
 
-#: templates/instructor-register.php:54
+#: templates/instructor-register.php:57
 msgid "Email"
 msgstr ""
 
-#: templates/instructor-register.php:58
+#: templates/instructor-register.php:61
 msgid "Password"
 msgstr ""
 
 #. translators: %s: login url
-#: templates/instructor-register.php:61
+#: templates/instructor-register.php:64
 #, php-format
 msgid "Already have an account? <a href=\"%s\">Log in</a> first."
 msgstr ""
 
-#: templates/instructor-register.php:66
+#: templates/instructor-register.php:69
 msgid "What do you teach?"
 msgstr ""
 
-#: templates/instructor-register.php:69
+#: templates/instructor-register.php:72
 msgid "Tell us about yourself"
 msgstr ""
 
-#: templates/instructor-register.php:73
+#: templates/instructor-register.php:76
 msgid "Apply"
 msgstr ""
 
@@ -1900,31 +1992,39 @@ msgstr ""
 #: templates/parts/course-card.php:23
 #: templates/parts/filters.php:20
 #: templates/single-course.php:22
+#: assets/build/builder.js:1
 msgid "All levels"
 msgstr ""
 
 #: templates/parts/course-card.php:24
 #: templates/parts/filters.php:21
 #: templates/single-course.php:23
+#: assets/build/blocks.js:1
+#: assets/build/builder.js:1
 msgid "Beginner"
 msgstr ""
 
 #: templates/parts/course-card.php:25
 #: templates/parts/filters.php:22
 #: templates/single-course.php:24
+#: assets/build/blocks.js:1
+#: assets/build/builder.js:1
 msgid "Intermediate"
 msgstr ""
 
 #: templates/parts/course-card.php:26
 #: templates/parts/filters.php:23
 #: templates/single-course.php:25
+#: assets/build/blocks.js:1
+#: assets/build/builder.js:1
 msgid "Advanced"
 msgstr ""
 
 #. translators: %d: lessons
 #: templates/parts/course-card.php:54
 #: templates/single-course.php:102
-#, php-format
+#: assets/build/admin.js:1
+#, php-format,js-format
 msgid "%d lesson"
 msgid_plural "%d lessons"
 msgstr[0] ""
@@ -1951,15 +2051,17 @@ msgstr[1] ""
 msgid "The curriculum will be published soon."
 msgstr ""
 
-#. translators: %d: items
+#. translators: %d: number of items
 #: templates/parts/curriculum.php:31
-#, php-format
+#: assets/build/admin.js:1
+#, php-format,js-format
 msgid "%d item"
 msgid_plural "%d items"
 msgstr[0] ""
 msgstr[1] ""
 
 #: templates/parts/curriculum.php:53
+#: assets/build/builder.js:1
 msgid "Preview"
 msgstr ""
 
@@ -2026,6 +2128,8 @@ msgid "Search courses…"
 msgstr ""
 
 #: templates/parts/filters.php:47
+#: assets/build/blocks.js:1
+#: assets/build/builder.js:1
 msgid "Level"
 msgstr ""
 
@@ -2188,22 +2292,1195 @@ msgstr[1] ""
 
 #. translators: %d: quizzes
 #: templates/single-course.php:104
-#, php-format
+#: assets/build/admin.js:1
+#, php-format,js-format
 msgid "%d quiz"
 msgid_plural "%d quizzes"
 msgstr[0] ""
 msgstr[1] ""
 
 #: templates/single-course.php:115
+#: assets/build/builder.js:1
 msgid "Requirements"
 msgstr ""
 
 #: templates/single-course.php:126
+#: assets/build/builder.js:1
 msgid "Description"
 msgstr ""
 
 #: templates/single-course.php:133
+#: assets/build/builder.js:1
 msgid "Who this course is for"
+msgstr ""
+
+#. translators: 1: current page, 2: total pages
+#: assets/build/admin.js:1
+#: assets/js/frontend.js:394
+#, js-format
+msgid "Page %1$d of %2$d"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Search…"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Nothing here yet."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "No data for this period."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "enrolled in"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "completed"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "finished a quiz in"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "purchased"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "reviewed"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "applied to become an instructor"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Last 30 days at a glance."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "New course"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Finish setting up ShapeLMS"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Create the dashboard and checkout pages, choose your currency and import a demo course."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Run setup wizard"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Published courses"
+msgstr ""
+
+#. translators: %d: active students
+#: assets/build/admin.js:1
+#, js-format
+msgid "%d active"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Enrollments (30 days)"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Completions (30 days)"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Revenue (30 days)"
+msgstr ""
+
+#. translators: %s: all-time revenue
+#: assets/build/admin.js:1
+#, js-format
+msgid "%s total"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Pending instructors"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Enrollments"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Completions"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Recent activity"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "No activity yet"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Enrollments, completions and purchases will show up here."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Enroll a student"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "User"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Type at least two characters to search by name or email."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Select a course"
+msgstr ""
+
+#: assets/build/admin.js:1
+#: assets/build/builder.js:1
+msgid "Cancel"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Student enrolled."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Enroll"
+msgstr ""
+
+#. translators: %s: registration date
+#: assets/build/admin.js:1
+#, js-format
+msgid "Joined %s"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Reset all progress for this course?"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Progress reset."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Reset"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Remove this student from the course?"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Student removed from course."
+msgstr ""
+
+#: assets/build/admin.js:1
+#: assets/build/builder.js:1
+msgid "Remove"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Activity"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Attempt review"
+msgstr ""
+
+#. translators: %d: percent
+#: assets/build/admin.js:1
+#: assets/js/frontend.js:314
+#: assets/js/frontend.js:526
+#, js-format
+msgid "%d%%"
+msgstr ""
+
+#. translators: 1: score, 2: maximum score
+#: assets/build/admin.js:1
+#, js-format
+msgid "%1$s / %2$s point"
+msgid_plural "%1$s / %2$s points"
+msgstr[0] ""
+msgstr[1] ""
+
+#: assets/build/admin.js:1
+msgid "Answer:"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Correct:"
+msgstr ""
+
+#. translators: %d: order id
+#: assets/build/admin.js:1
+#, js-format
+msgid "Order #%d"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Completing enrolls the buyer; refunding or cancelling removes access."
+msgstr ""
+
+#: assets/build/admin.js:1
+#: assets/build/builder.js:1
+msgid "Close"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Order updated."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Update status"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "— Select a page —"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "On"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Off"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Send this email"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "You are all set!"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Pages were created and your settings are saved."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Create your first course"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Open the demo course"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "All settings"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Welcome"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "This wizard creates the pages ShapeLMS needs (dashboard, checkout, instructor registration), sets your currency and can import a demo course so you can see everything working."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "You can change all of this later in Settings."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "How do you want to sell courses?"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "WooCommerce (not installed)"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Add your Stripe or PayPal keys in Settings → Selling when you are ready to accept payments. Free courses work right away."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Demo content"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Import a demo course with lessons and a quiz"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "The demo course is created as a draft. Delete it whenever you like."
+msgstr ""
+
+#. translators: 1: current step, 2: total steps, 3: step title
+#: assets/build/admin.js:1
+#, js-format
+msgid "Step %1$d of %2$d: %3$s"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Back"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Finish setup"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Export courses"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Downloads courses with their curriculum and quiz questions as JSON. Enrollments are not included."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Course IDs (comma separated, empty = all)"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Export JSON"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Import courses"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Upload a JSON file exported from ShapeLMS. Courses are created as new drafts."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "That file is not valid JSON."
+msgstr ""
+
+#. translators: %d: number of courses
+#: assets/build/admin.js:1
+#, js-format
+msgid "Imported %d course."
+msgid_plural "Imported %d courses."
+msgstr[0] ""
+msgstr[1] ""
+
+#: assets/build/admin.js:1
+msgid "Choose JSON file"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Or create the bundled demo course."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Demo course created."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Import demo course"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Plugin version"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Database version"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "WordPress"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "PHP"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Pretty permalinks"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Off — lesson URLs need pretty permalinks"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Active"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Not active"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Action Scheduler"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Available (background emails)"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Not available (WP-Cron is used)"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "System"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Pages"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Missing"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Updated"
+msgstr ""
+
+#. translators: %s: course title
+#: assets/build/admin.js:1
+#, js-format
+msgid "Move \"%s\" to the trash?"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Course moved to trash."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Trash"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "All statuses"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "No courses yet. Create your first course."
+msgstr ""
+
+#: assets/build/admin.js:1
+#: assets/build/builder.js:1
+msgid "Course title"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Create and open builder"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Source"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Enroll student"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "All courses"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "No enrollments yet."
+msgstr ""
+
+#: assets/build/admin.js:1
+#: assets/js/frontend.js:309
+msgid "Review"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Delete this attempt? The student will get the attempt back."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Attempt deleted."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "No attempts yet."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Instructor updated."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Joined"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Approve"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Reject"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Block this instructor? Their courses stay published."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Block"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Approved"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Rejected"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Blocked"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "No instructors yet."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Customer"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Gateway"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Delete this order permanently? Enrollments are not changed."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Order deleted."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "No orders yet."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Export CSV"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Last 7 days"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Last 30 days"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Last 90 days"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Last year"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Completion rate"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Enrollments and completions"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Switch features on or off. Disabled modules load no code."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Add-on"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Requires:"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Enabled"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Disabled"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Module enabled. Reload to apply."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Module disabled. Reload to apply."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Settings saved."
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Save changes"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Setup wizard"
+msgstr ""
+
+#: assets/build/admin.js:1
+msgid "Import / Export"
+msgstr ""
+
+#: assets/build/blocks.js:1
+msgid "Course ID (0 = current course)"
+msgstr ""
+
+#: assets/build/blocks.js:1
+msgid "Shows for the current course on course pages. Set a course ID to use it elsewhere."
+msgstr ""
+
+#: assets/build/blocks.js:1
+msgid "Tag slug"
+msgstr ""
+
+#: assets/build/blocks.js:1
+msgid "Any"
+msgstr ""
+
+#: assets/build/blocks.js:1
+msgid "Featured courses only"
+msgstr ""
+
+#: assets/build/blocks.js:1
+msgid "LMS Dashboard"
+msgstr ""
+
+#: assets/build/blocks.js:1
+msgid "The student and instructor dashboard renders here on the front end."
+msgstr ""
+
+#: assets/build/blocks.js:1
+msgid "LMS Checkout"
+msgstr ""
+
+#: assets/build/blocks.js:1
+msgid "The checkout renders here on the front end."
+msgstr ""
+
+#: assets/build/blocks.js:1
+msgid "Instructor Registration"
+msgstr ""
+
+#: assets/build/blocks.js:1
+msgid "The instructor application form renders here on the front end."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Use this file"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Replace"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Choose"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Add item"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Course basics"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Short description"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Shown on course cards and under the title."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Course image"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Intro video URL"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "YouTube or Vimeo link shown in the enroll box."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "No categories yet. Add some under ShapeLMS → Categories."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "What students will learn"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "e.g. Build a responsive layout with CSS Grid"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "e.g. Basic HTML knowledge"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "e.g. Designers moving into front-end"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Answer options (tick the correct ones)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Correct"
+msgstr ""
+
+#. translators: %d: option number
+#: assets/build/builder.js:1
+#, js-format
+msgid "Option %d"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Add option"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Give partial credit"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Question type"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Points"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Text with blanks"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Write {blank} where a gap should appear. Then list one accepted answer per blank below; separate alternatives with |."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Extra details (optional)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Correct answer"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Accepted answers (one per line)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Case sensitive"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Answers, one line per blank (alternatives separated by |)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Explanation (shown after answering)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Save question"
+msgstr ""
+
+#. translators: %d: number of questions
+#: assets/build/builder.js:1
+#, js-format
+msgid "Questions (%d)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "(untitled)"
+msgstr ""
+
+#. translators: %s: points
+#: assets/build/builder.js:1
+#, js-format
+msgid "%s pt"
+msgid_plural "%s pts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: assets/build/builder.js:1
+msgid "Move up"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Move down"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Delete this question?"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "New question"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Add question"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Question saved."
+msgstr ""
+
+#: assets/build/builder.js:1
+#: assets/js/frontend.js:649
+msgid "Saved."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "No video"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Vimeo"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Self-hosted (MP4)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Embed code"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Video URL"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Video file URL"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Choose video"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Choose from media library"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Embed code (iframe)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Only iframes from known video hosts are kept."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Instructions"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Lesson content"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Attachments"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Add attachments"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Add files"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Draft (hidden)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Duration (minutes)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Free preview"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Anyone can open this lesson without enrolling."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Time limit (minutes, 0 = none)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Attempts allowed (0 = unlimited)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Pass mark (%)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Questions per page (0 = all)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Feedback"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "After each answer"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "At the end"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Score only"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Randomize question order"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Show correct answers in results"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Save"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Save & close"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Drag to reorder"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Topic title"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Delete topic"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "No lessons yet. Add one below."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Quiz title"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Lesson title"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Add"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "+ Lesson"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "+ Quiz"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Basics"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Curriculum"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Delete this topic and everything in it?"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Delete this item? Student progress for it will be lost."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Drag topics and lessons to reorder. Click a lesson or quiz to edit its content."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "New topic title, e.g. \"Getting started\""
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Add topic"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Edit quiz"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Edit lesson"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "URL slug"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Total duration"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Hours"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Minutes"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Leave at 0 to add up the lesson video durations automatically."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Maximum students (0 = unlimited)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Featured course"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Featured courses can be shown with the Course Grid block."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Co-instructors"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Type at least two characters to search users. Co-instructors can edit this course and see its students."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Pricing"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Free — anyone with an account can enroll"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Paid — students buy the course"
+msgstr ""
+
+#. translators: %s: currency symbol
+#: assets/build/builder.js:1
+#, js-format
+msgid "Regular price (%s)"
+msgstr ""
+
+#. translators: %s: currency symbol
+#: assets/build/builder.js:1
+#, js-format
+msgid "Sale price (%s)"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Leave 0 for no sale."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Linked to product"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Edit product"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Create a hidden WooCommerce product for this course so it can be bought through the WooCommerce checkout."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "WooCommerce product created."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Create product"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Course published."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Course submitted for review."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Course saved as draft."
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Saving…"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Unsaved changes"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Saved"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Unpublish"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Publish"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Awaiting review"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Submit for review"
+msgstr ""
+
+#: assets/build/builder.js:1
+msgid "Builder sections"
 msgstr ""
 
 #: assets/js/checkout.js:72
@@ -2252,27 +3529,10 @@ msgstr ""
 msgid "Resume quiz"
 msgstr ""
 
-#: assets/js/frontend.js:309
-msgid "Review"
-msgstr ""
-
-#. translators: %d: percent
-#: assets/js/frontend.js:314
-#: assets/js/frontend.js:526
-#, js-format
-msgid "%d%%"
-msgstr ""
-
 #. translators: 1: question number, 2: total questions
 #: assets/js/frontend.js:393
 #, js-format
 msgid "Question %1$d of %2$d"
-msgstr ""
-
-#. translators: 1: page number, 2: total pages
-#: assets/js/frontend.js:394
-#, js-format
-msgid "Page %1$d of %2$d"
 msgstr ""
 
 #. translators: %s: points
@@ -2345,10 +3605,6 @@ msgstr ""
 
 #: assets/js/frontend.js:572
 msgid "(no answer)"
-msgstr ""
-
-#: assets/js/frontend.js:649
-msgid "Saved."
 msgstr ""
 
 #: blocks/checkout/block.json

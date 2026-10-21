@@ -3,7 +3,7 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 import { Button, Modal } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { get, del, errorMessage } from '../../shared/api';
 import { usePagedList } from '../../shared/hooks';
 import { PageHeader, Card, Toolbar, DataTable, Pagination, Badge, ErrorNotice, Loading, formatDate } from '../../shared/components';
@@ -22,7 +22,7 @@ function AttemptModal( { id, onClose } ) {
 				<>
 					<p>
 						<Badge tone={ data.passed ? 'success' : 'danger' }>{ data.passed ? __( 'Passed', 'shapelms' ) : __( 'Failed', 'shapelms' ) }</Badge>{ ' ' }
-						<strong>{ data.percentage }%</strong> · { data.score } / { data.max_score } { __( 'points', 'shapelms' ) }
+						<strong>{ sprintf( /* translators: %d: percent */ __( '%d%%', 'shapelms' ), data.percentage ) }</strong> · { sprintf( /* translators: 1: score, 2: maximum score */ _n( '%1$s / %2$s point', '%1$s / %2$s points', data.max_score, 'shapelms' ), data.score, data.max_score ) }
 					</p>
 					{ ( data.questions || [] ).map( ( q, i ) => (
 						<div key={ q.id } className={ `shapelms-review-q is-${ q.is_correct ? 'correct' : 'incorrect' }` }>

@@ -33,7 +33,7 @@ function EnrollModal( { onClose, onDone } ) {
 
 	const submit = () => {
 		setBusy( true );
-		post( 'enrollments', { user_id: userId, course_id: parseInt( courseId, 10 ) } )
+		post( 'enrollments', { user_id: userId, email: ( users.find( ( u ) => u.id === userId ) || {} ).email || '', course_id: parseInt( courseId, 10 ) } )
 			.then( () => {
 				success( __( 'Student enrolled.', 'shapelms' ) );
 				onDone();

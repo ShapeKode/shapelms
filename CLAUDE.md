@@ -4,7 +4,7 @@ WordPress LMS plugin. Free core on wordpress.org (`shapelms`). Pro plugin (`shap
 
 ## Stack
 - PHP 7.4+ (tested on 8.1–8.5), namespace `ShapeLMS\`, PSR-4 from `includes/`, Composer autoload with a built-in fallback.
-- WordPress 6.5+, WooCommerce optional.
+- WordPress 6.6+, WooCommerce optional.
 - Admin app and course builder: React with `@wordpress/scripts`, `@wordpress/components`, `@wordpress/data`. JS source in `src/`, built to `assets/build/`.
 - Front end: PHP templates in `templates/` (overridable from `theme/shapelms/`) + small vanilla JS in `assets/js/`.
 - Action Scheduler is used when present (WooCommerce ships it); otherwise WP-Cron.

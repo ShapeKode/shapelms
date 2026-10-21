@@ -166,7 +166,7 @@ class QuizService {
 	public function start( $user_id, $quiz_id ) {
 		$course_id = Curriculum::course_id_for( $quiz_id );
 
-		if ( ! $course_id || PostTypes::QUIZ !== get_post_type( $quiz_id ) ) {
+		if ( ! $course_id || PostTypes::QUIZ !== get_post_type( $quiz_id ) || 'publish' !== get_post_status( $quiz_id ) ) {
 			return new \WP_Error( 'shapelms_invalid_quiz', __( 'Quiz not found.', 'shapelms' ), array( 'status' => 404 ) );
 		}
 

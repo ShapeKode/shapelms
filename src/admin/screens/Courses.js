@@ -3,7 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 import { Button, Modal, TextControl } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { post, del, errorMessage } from '../../shared/api';
 import { usePagedList, useDebounce } from '../../shared/hooks';
 import { PageHeader, Card, Toolbar, DataTable, Pagination, Badge, ErrorNotice, formatDate } from '../../shared/components';
@@ -72,7 +72,7 @@ export default function Courses( { config } ) {
 		},
 		{ key: 'status', label: __( 'Status', 'shapelms' ), render: ( row ) => <Badge tone={ statusTone[ row.status ] || 'neutral' }>{ statusLabel[ row.status ] || row.status }</Badge> },
 		{ key: 'price', label: __( 'Price', 'shapelms' ), render: ( row ) => row.price_html },
-		{ key: 'lessons', label: __( 'Lessons', 'shapelms' ), render: ( row ) => `${ row.lessons } / ${ row.quizzes } ${ __( 'quizzes', 'shapelms' ) }` },
+		{ key: 'lessons', label: __( 'Lessons', 'shapelms' ), render: ( row ) => sprintf( /* translators: %d: lessons */ _n( '%d lesson', '%d lessons', row.lessons, 'shapelms' ), row.lessons ) + ' / ' + sprintf( /* translators: %d: quizzes */ _n( '%d quiz', '%d quizzes', row.quizzes, 'shapelms' ), row.quizzes ) },
 		{ key: 'students', label: __( 'Students', 'shapelms' ) },
 		{ key: 'rating', label: __( 'Rating', 'shapelms' ), render: ( row ) => ( row.rating.count ? `${ row.rating.average.toFixed( 1 ) } ★ (${ row.rating.count })` : '—' ) },
 		{ key: 'modified', label: __( 'Updated', 'shapelms' ), render: ( row ) => formatDate( row.modified ) },

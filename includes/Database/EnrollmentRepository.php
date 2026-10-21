@@ -103,7 +103,7 @@ class EnrollmentRepository extends Repository {
 		}
 
 		$placeholders = implode( ', ', array_fill( 0, count( $course_ids ), '%d' ) );
-		$table        = $this->table();
+		$table        = esc_sql( $this->table() );
 
 		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare( "SELECT course_id, COUNT(*) AS total FROM {$table} WHERE status IN ('active','completed') AND course_id IN ({$placeholders}) GROUP BY course_id", ...$course_ids ) // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
@@ -139,7 +139,7 @@ class EnrollmentRepository extends Repository {
 			)
 		);
 
-		$table = $this->table();
+		$table = esc_sql( $this->table() );
 		$where = array( '1=1' );
 
 		if ( $args['course_id'] ) {

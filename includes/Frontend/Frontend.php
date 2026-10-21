@@ -55,11 +55,13 @@ class Frontend {
 	 */
 	public function register() {
 		add_filter( 'template_include', array( $this, 'template_include' ), 20 );
+		add_action( 'template_redirect', array( $this, 'deny_item_listings' ), 0 );
 		add_action( 'template_redirect', array( $this, 'guard_items' ) );
 		add_action( 'template_redirect', array( $this, 'record_item_start' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ) );
 		add_filter( 'body_class', array( $this, 'body_class' ) );
 		add_action( 'pre_get_posts', array( $this, 'archive_query' ) );
+		add_action( 'pre_get_posts', array( $this, 'block_item_listings' ) );
 		add_filter( 'shapelms_save_settings', array( ThemeCss::class, 'regenerate' ), 20 );
 	}
 
@@ -242,6 +244,55 @@ class Frontend {
 		}
 
 		return $classes;
+	}
+
+	/**
+	 * Lessons, quizzes, topics and questions are only ever viewed one at a time through the guarded
+	 * single view: archives, feeds and ?post_type= listings would leak paid content.
+	 *
+	 * @param \WP_Query $query Query.
+	 * @return void
+	 */
+	public function block_item_listings( $query ) {
+		if ( is_admin() || ! $query->is_main_query() || $query->is_singular() ) {
+			return;
+		}
+
+		$types = array_filter( (array) $query->get( 'post_type' ) );
+
+		if ( array_intersect( $types, array( PostTypes::LESSON, PostTypes::QUIZ, PostTypes::TOPIC, PostTypes::QUESTION ) ) ) {
+			$query->set( 'post__in', array( 0 ) );
+			$query->set_404();
+		}
+	}
+
+	/**
+	 * Sends a real 404 for lesson/quiz/topic/question listings and feeds (core would answer 200 with no posts).
+	 *
+	 * @return void
+	 */
+	public function deny_item_listings() {
+		if ( is_admin() || is_singular() ) {
+			return;
+		}
+
+		$types = array_filter( (array) get_query_var( 'post_type' ) );
+
+		if ( ! array_intersect( $types, array( PostTypes::LESSON, PostTypes::QUIZ, PostTypes::TOPIC, PostTypes::QUESTION ) ) ) {
+			return;
+		}
+
+		global $wp_query;
+
+		$wp_query->set_404();
+		status_header( 404 );
+		nocache_headers();
+
+		$template = get_404_template();
+		if ( $template ) {
+			include $template;
+		}
+		exit;
 	}
 
 	/**

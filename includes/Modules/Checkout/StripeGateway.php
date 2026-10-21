@@ -308,17 +308,21 @@ class StripeGateway implements GatewayInterface {
 				);
 
 			case 'charge.refunded':
-				$intent_id = isset( $object['payment_intent'] ) ? sanitize_text_field( $object['payment_intent'] ) : '';
-				$order     = $intent_id ? shapelms()->get( \ShapeLMS\Database\OrderRepository::class )->find_by_transaction( $intent_id ) : null;
+				$intent_id      = isset( $object['payment_intent'] ) ? sanitize_text_field( $object['payment_intent'] ) : '';
+				$order          = $intent_id ? shapelms()->get( \ShapeLMS\Database\OrderRepository::class )->find_by_transaction( $intent_id ) : null;
+				$fully_refunded = ! empty( $object['refunded'] ) || ( isset( $object['amount_refunded'], $object['amount'] ) && (int) $object['amount_refunded'] >= (int) $object['amount'] );
+
 				return array(
-					'order_id'       => $order ? (int) $order->id : 0,
+					'order_id'       => $order && $fully_refunded ? (int) $order->id : 0,
 					'transaction_id' => $intent_id,
 					'action'         => 'refund',
 				);
 
 			case 'payment_intent.payment_failed':
+				$site = isset( $object['metadata']['site'] ) ? (string) $object['metadata']['site'] : '';
+
 				return array(
-					'order_id'       => $order_id,
+					'order_id'       => home_url() === $site ? $order_id : 0,
 					'transaction_id' => '',
 					'action'         => 'fail',
 				);

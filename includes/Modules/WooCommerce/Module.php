@@ -179,7 +179,9 @@ class Module extends AbstractModule {
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'create_product' ),
 				'permission_callback' => static function ( $request ) {
-					return current_user_can( 'shapelms_edit_course', (int) $request->get_param( 'course_id' ) );
+					$course_id = (int) $request->get_param( 'course_id' );
+
+					return PostTypes::COURSE === get_post_type( $course_id ) && current_user_can( 'shapelms_edit_course', $course_id );
 				},
 				'args'                => array(
 					'course_id' => array(

@@ -85,7 +85,7 @@ class ActivityLogRepository extends Repository {
 	public function daily_counts( $event, $from, $to, $course_id = 0 ) {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql( $this->table() );
 		$sql   = $wpdb->prepare(
 			"SELECT DATE(created_at) AS day, COUNT(*) AS total FROM {$table} WHERE event = %s AND created_at >= %s AND created_at <= %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			sanitize_key( $event ),
@@ -99,7 +99,7 @@ class ActivityLogRepository extends Repository {
 
 		$sql .= ' GROUP BY DATE(created_at) ORDER BY day ASC';
 
-		$rows   = (array) $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
+		$rows   = (array) $wpdb->get_results( $sql ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
 		$counts = array();
 		foreach ( $rows as $row ) {
 			$counts[ (string) $row->day ] = (int) $row->total;
@@ -118,7 +118,7 @@ class ActivityLogRepository extends Repository {
 	public function recent( $limit = 20, array $events = array() ) {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql( $this->table() );
 		$where = '1=1';
 
 		if ( $events ) {
@@ -144,7 +144,7 @@ class ActivityLogRepository extends Repository {
 	public function for_user( $user_id, $limit = 50 ) {
 		global $wpdb;
 
-		$table = $this->table();
+		$table = esc_sql( $this->table() );
 
 		return (array) $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(

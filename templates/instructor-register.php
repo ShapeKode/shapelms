@@ -32,6 +32,9 @@ $shapelms_status     = $shapelms_user_id ? InstructorService::status( $shapelms_
 		<a class="shapelms-btn shapelms-btn--primary" href="<?php echo esc_url( \ShapeLMS\Frontend\Dashboard::url( 'instructor-courses' ) ); ?>"><?php esc_html_e( 'My courses', 'shapelms' ); ?></a>
 	<?php elseif ( 'blocked' === $shapelms_status ) : ?>
 		<p class="shapelms-notice"><?php esc_html_e( 'Instructor access is not available for this account.', 'shapelms' ); ?></p>
+	<?php elseif ( ! $shapelms_user_id && ! get_option( 'users_can_register' ) && ! apply_filters( 'shapelms_allow_instructor_signup', false ) ) : ?>
+		<p class="shapelms-notice"><?php esc_html_e( 'Please log in with your existing account to apply as an instructor.', 'shapelms' ); ?></p>
+		<a class="shapelms-btn shapelms-btn--primary" href="<?php echo esc_url( wp_login_url( (string) get_permalink() ) ); ?>"><?php esc_html_e( 'Log in', 'shapelms' ); ?></a>
 	<?php else : ?>
 		<?php if ( $shapelms_errors ) : ?>
 			<div class="shapelms-notice shapelms-notice--error">

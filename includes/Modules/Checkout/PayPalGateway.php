@@ -101,7 +101,7 @@ class PayPalGateway implements GatewayInterface {
 			$this->base() . '/v1/oauth2/token',
 			array(
 				'headers' => array(
-					'Authorization' => 'Basic ' . base64_encode( $this->client_id() . ':' . Settings::get( 'commerce', 'paypal_secret', '' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+					'Authorization' => 'Basic ' . base64_encode( $this->client_id() . ':' . Settings::get( 'commerce', 'paypal_secret', '' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- HTTP Basic auth header required by PayPal OAuth.
 					'Content-Type'  => 'application/x-www-form-urlencoded',
 				),
 				'body'    => 'grant_type=client_credentials',

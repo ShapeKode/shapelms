@@ -187,11 +187,15 @@ class Menu {
 	 * @return void
 	 */
 	public function activation_redirect() {
-		if ( ! get_transient( 'shapelms_activation_redirect' ) || wp_doing_ajax() || is_network_admin() || isset( $_GET['activate-multi'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only flag set by core.
+		if ( ! get_transient( 'shapelms_activation_redirect' ) || wp_doing_ajax() || is_network_admin() ) {
 			return;
 		}
 
 		delete_transient( 'shapelms_activation_redirect' );
+
+		if ( isset( $_GET['activate-multi'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only flag set by core.
+			return;
+		}
 
 		if ( ! current_user_can( Capabilities::MANAGE ) || get_option( 'shapelms_setup_complete' ) ) {
 			return;

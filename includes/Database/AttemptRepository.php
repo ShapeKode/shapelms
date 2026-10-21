@@ -132,7 +132,7 @@ class AttemptRepository extends Repository {
 	public function answers( $attempt_id ) {
 		global $wpdb;
 
-		$table = shapelms_table( 'attempt_answers' );
+		$table = esc_sql( shapelms_table( 'attempt_answers' ) );
 		$rows  = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE attempt_id = %d", (int) $attempt_id ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		$map = array();
@@ -155,7 +155,7 @@ class AttemptRepository extends Repository {
 	public function save_answer( $attempt_id, $question_id, $answer, array $grade ) {
 		global $wpdb;
 
-		$table = shapelms_table( 'attempt_answers' );
+		$table = esc_sql( shapelms_table( 'attempt_answers' ) );
 		$data  = array(
 			'attempt_id'  => (int) $attempt_id,
 			'question_id' => (int) $question_id,
@@ -211,7 +211,7 @@ class AttemptRepository extends Repository {
 			)
 		);
 
-		$table = $this->table();
+		$table = esc_sql( $this->table() );
 		$where = array( "a.status != 'in_progress'" );
 
 		foreach ( array( 'quiz_id', 'course_id', 'user_id' ) as $column ) {

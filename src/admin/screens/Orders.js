@@ -3,7 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 import { Button, Modal, SelectControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { post, del, errorMessage } from '../../shared/api';
 import { usePagedList, useDebounce } from '../../shared/hooks';
 import { PageHeader, Card, Toolbar, DataTable, Pagination, Badge, ErrorNotice, formatDate } from '../../shared/components';
@@ -29,7 +29,7 @@ function OrderModal( { order, onClose, onChange } ) {
 	};
 
 	return (
-		<Modal title={ `${ __( 'Order', 'shapelms' ) } #${ order.id }` } onRequestClose={ onClose } size="medium">
+		<Modal title={ sprintf( /* translators: %d: order id */ __( 'Order #%d', 'shapelms' ), order.id ) } onRequestClose={ onClose } size="medium">
 			<p><strong>{ order.billing_name }</strong> · { order.billing_email }</p>
 			<p className="shapelms-muted">{ order.gateway } · { order.transaction_id || '—' } · { formatDate( order.created_at ) }</p>
 			<table className="shapelms-admin-table">

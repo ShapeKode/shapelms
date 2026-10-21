@@ -3,7 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 import { Button, TextControl, TextareaControl, SelectControl, ToggleControl } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { post, patch, del, errorMessage } from '../../shared/api';
 import { success, error as notifyError } from '../../admin/notices';
 
@@ -146,7 +146,7 @@ export default function QuestionsEditor( { quizId, initial, types } ) {
 					<span className="shapelms-muted">{ i + 1 }.</span>
 					<button type="button" className="shapelms-curriculum-builder__item-title" onClick={ () => setEditing( q ) }>{ q.title || __( '(untitled)', 'shapelms' ) }</button>
 					<span className="shapelms-badge is-neutral">{ types[ q.type ] || q.type }</span>
-					<span className="shapelms-muted">{ q.points } { __( 'pts', 'shapelms' ) }</span>
+					<span className="shapelms-muted">{ sprintf( /* translators: %s: points */ _n( '%s pt', '%s pts', q.points, 'shapelms' ), q.points ) }</span>
 					<Button size="small" variant="tertiary" icon="arrow-up-alt2" label={ __( 'Move up', 'shapelms' ) } onClick={ () => move( i, -1 ) } disabled={ i === 0 } />
 					<Button size="small" variant="tertiary" icon="arrow-down-alt2" label={ __( 'Move down', 'shapelms' ) } onClick={ () => move( i, 1 ) } disabled={ i === questions.length - 1 } />
 					<Button size="small" variant="tertiary" isDestructive icon="trash" label={ __( 'Delete', 'shapelms' ) } onClick={ () => remove( q ) } />

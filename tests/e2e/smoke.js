@@ -4,7 +4,7 @@
  *
  * Usage:
  *   npm i -D playwright && npx playwright install chromium
- *   SHAPELMS_URL=http://localhost:10160 SHAPELMS_ADMIN=admin:pass SHAPELMS_STUDENT=student:pass node tests/e2e/smoke.js
+ *   SHAPELMS_URL=http://localhost:10160 SHAPELMS_ADMIN=admin:pass SHAPELMS_STUDENT=student:pass SHAPELMS_COURSE_ID=138 node tests/e2e/smoke.js
  *
  * Expects a published course with slug "getting-started-demo" (the bundled demo course)
  * and writes screenshots to tests/e2e/shots/.
@@ -47,7 +47,7 @@ function watch( page, label ) {
 	page.on( 'pageerror', ( err ) => problems.push( `[${ label }] pageerror: ${ String( err ).slice( 0, 300 ) }` ) );
 	page.on( 'response', ( res ) => {
 		const u = res.url();
-		if ( res.status() >= 400 && /shapelms|wp-json/.test( u ) && ! /favicon/.test( u ) ) {
+		if ( res.status() >= 400 && ! /favicon|gravatar|youtube|googleapis/.test( u ) ) {
 			problems.push( `[${ label }] HTTP ${ res.status() } ${ u.replace( BASE, '' ) }` );
 		}
 	} );
@@ -98,6 +98,18 @@ async function shot( page, name ) {
 		problems.push( '[admin] settings: editing a number field did not enable Save' );
 	}
 
+	const courseStatus = async ( label ) => {
+		const status = await a.evaluate( async ( id ) => {
+			const r = await fetch( `/wp-json/shapelms/v1/courses/${ id }` );
+			return ( await r.json() ).status;
+		}, COURSE_ID );
+		console.log( `course ${ COURSE_ID } status ${ label }:`, status );
+		if ( status !== 'publish' ) {
+			problems.push( `[admin] course ${ COURSE_ID } is "${ status }" ${ label } (expected publish)` );
+		}
+	};
+	await courseStatus( 'before builder' );
+
 	// ---- Builder ----
 	await a.goto( `${ BASE }/wp-admin/post.php?post=${ COURSE_ID }&action=edit` );
 	await a.waitForTimeout( 2500 );
@@ -141,6 +153,8 @@ async function shot( page, name ) {
 	await a.click( '.shapelms-builder__nav button:has-text("Pricing")' );
 	await a.waitForTimeout( 600 );
 	await shot( a, 'builder-pricing' );
+	await a.waitForTimeout( 2000 );
+	await courseStatus( 'after builder' );
 
 	// ---- Student front end ----
 	const student = await browser.newContext( { viewport: { width: 1280, height: 900 } } );

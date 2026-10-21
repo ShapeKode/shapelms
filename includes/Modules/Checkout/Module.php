@@ -202,7 +202,7 @@ class Module extends AbstractModule {
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'webhook' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => '__return_true', // Public by design: each gateway verifies the provider's signature (Stripe HMAC, PayPal verify endpoint) before anything is acted on.
 			)
 		);
 	}
@@ -281,6 +281,10 @@ class Module extends AbstractModule {
 			);
 		}
 
+		if ( ! in_array( $order->status, array( 'pending', 'failed' ), true ) ) {
+			return new WP_Error( 'shapelms_order_closed', __( 'This order can no longer be paid.', 'shapelms' ), array( 'status' => 409 ) );
+		}
+
 		$gateways = $this->enabled_gateways();
 		if ( ! isset( $gateways[ $order->gateway ] ) ) {
 			return new WP_Error( 'shapelms_invalid_gateway', __( 'Payment method not available.', 'shapelms' ), array( 'status' => 400 ) );
@@ -326,7 +330,10 @@ class Module extends AbstractModule {
 		if ( $result['order_id'] ) {
 			switch ( $result['action'] ) {
 				case 'complete':
-					$service->complete( $result['order_id'], $result['transaction_id'] );
+					$order = shapelms()->get( OrderRepository::class )->find( $result['order_id'] );
+					if ( $order && in_array( $order->status, array( 'pending', 'failed' ), true ) ) {
+						$service->complete( $result['order_id'], $result['transaction_id'] );
+					}
 					break;
 				case 'refund':
 					$service->revoke( $result['order_id'], 'refunded' );

@@ -3,7 +3,7 @@
  */
 import { useState } from '@wordpress/element';
 import { TextControl, RadioControl, Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { post, errorMessage } from '../../shared/api';
 import { success, error as notifyError } from '../../admin/notices';
 
@@ -37,8 +37,8 @@ export default function PricingTab( { course, update, setCourse, config } ) {
 
 			{ paid && (
 				<div className="shapelms-builder__row">
-					<TextControl type="number" label={ `${ __( 'Regular price', 'shapelms' ) } (${ config.currency })` } value={ course.meta.price || 0 } min={ 0 } step={ 0.01 } onChange={ ( v ) => update( { meta: { price: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
-					<TextControl type="number" label={ `${ __( 'Sale price', 'shapelms' ) } (${ config.currency })` } help={ __( 'Leave 0 for no sale.', 'shapelms' ) } value={ course.meta.sale_price || 0 } min={ 0 } step={ 0.01 } onChange={ ( v ) => update( { meta: { sale_price: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
+					<TextControl type="number" label={ sprintf( /* translators: %s: currency symbol */ __( 'Regular price (%s)', 'shapelms' ), config.currency ) } value={ course.meta.price || 0 } min={ 0 } step={ 0.01 } onChange={ ( v ) => update( { meta: { price: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
+					<TextControl type="number" label={ sprintf( /* translators: %s: currency symbol */ __( 'Sale price (%s)', 'shapelms' ), config.currency ) } help={ __( 'Leave 0 for no sale.', 'shapelms' ) } value={ course.meta.sale_price || 0 } min={ 0 } step={ 0.01 } onChange={ ( v ) => update( { meta: { sale_price: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
 				</div>
 			) }
 

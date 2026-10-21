@@ -49,7 +49,7 @@ abstract class Migration {
 	 * @return void
 	 */
 	protected function create_table( $table, $body ) {
-		$name = shapelms_table( $table );
+		$name = esc_sql( shapelms_table( $table ) );
 
 		dbDelta( "CREATE TABLE {$name} (\n{$body}\n) {$this->charset_collate()};" );
 	}
@@ -63,7 +63,7 @@ abstract class Migration {
 	protected function drop_table( $table ) {
 		global $wpdb;
 
-		$name = shapelms_table( $table );
+		$name = esc_sql( shapelms_table( $table ) );
 
 		$wpdb->query( "DROP TABLE IF EXISTS {$name}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}

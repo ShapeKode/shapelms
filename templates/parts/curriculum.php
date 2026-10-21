@@ -28,7 +28,7 @@ $shapelms_statuses   = $shapelms_can_access ? shapelms()->get( \ShapeLMS\Service
 		<details class="shapelms-curriculum__topic" <?php echo 0 === $shapelms_index ? 'open' : ''; ?>>
 			<summary class="shapelms-curriculum__summary">
 				<span class="shapelms-curriculum__topic-title"><?php echo esc_html( $shapelms_topic['title'] ); ?></span>
-				<span class="shapelms-curriculum__count"><?php echo esc_html( sprintf( /* translators: %d: items */ _n( '%d item', '%d items', count( $shapelms_topic['items'] ), 'shapelms' ), count( $shapelms_topic['items'] ) ) ); ?></span>
+				<span class="shapelms-curriculum__count"><?php echo esc_html( sprintf( /* translators: %d: number of items */ _n( '%d item', '%d items', count( $shapelms_topic['items'] ), 'shapelms' ), count( $shapelms_topic['items'] ) ) ); ?></span>
 			</summary>
 
 			<?php if ( ! empty( $shapelms_topic['summary'] ) ) : ?>

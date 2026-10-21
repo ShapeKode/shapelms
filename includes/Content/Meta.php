@@ -333,10 +333,6 @@ class Meta {
 
 		$clean = wp_kses( (string) $value, $allowed );
 
-		if ( ! preg_match_all( '#<iframe[^>]*\ssrc=["\'](https?://[^"\']+)["\']#i', $clean, $matches ) ) {
-			return '';
-		}
-
 		/**
 		 * Filters the hosts allowed in lesson embed codes.
 		 *
@@ -344,24 +340,33 @@ class Meta {
 		 */
 		$hosts = apply_filters( 'shapelms_allowed_embed_hosts', array( 'youtube.com', 'youtube-nocookie.com', 'youtu.be', 'vimeo.com', 'player.vimeo.com', 'wistia.com', 'wistia.net', 'loom.com', 'bunny.net', 'mediadelivery.net', 'dailymotion.com', 'vidyard.com' ) );
 
-		foreach ( $matches[1] as $src ) {
-			$host    = wp_parse_url( $src, PHP_URL_HOST );
-			$host    = is_string( $host ) ? strtolower( $host ) : '';
-			$allowed = false;
+		$tags  = new \WP_HTML_Tag_Processor( $clean );
+		$found = false;
 
-			foreach ( $hosts as $allowed_host ) {
-				if ( $host === $allowed_host || substr( $host, -strlen( '.' . $allowed_host ) ) === '.' . $allowed_host ) {
-					$allowed = true;
-					break;
+		while ( $tags->next_tag( array( 'tag_name' => 'IFRAME' ) ) ) {
+			$src    = (string) $tags->get_attribute( 'src' );
+			$scheme = wp_parse_url( $src, PHP_URL_SCHEME );
+			$host   = strtolower( (string) wp_parse_url( $src, PHP_URL_HOST ) );
+			$ok     = 'https' === $scheme && false === strpos( $src, '\\' ) && '' !== $host;
+
+			if ( $ok ) {
+				$ok = false;
+				foreach ( $hosts as $allowed_host ) {
+					if ( $host === $allowed_host || substr( $host, -strlen( '.' . $allowed_host ) ) === '.' . $allowed_host ) {
+						$ok = true;
+						break;
+					}
 				}
 			}
 
-			if ( ! $allowed ) {
+			if ( ! $ok ) {
 				return '';
 			}
+
+			$found = true;
 		}
 
-		return $clean;
+		return $found ? $clean : '';
 	}
 
 	/**

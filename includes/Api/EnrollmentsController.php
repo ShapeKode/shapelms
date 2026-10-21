@@ -58,6 +58,11 @@ class EnrollmentsController extends RestController {
 				'args'                => array(
 					'course_id' => $this->id_arg(),
 					'user_id'   => $this->id_arg( false ),
+					'email'     => array(
+						'type'              => 'string',
+						'default'           => '',
+						'sanitize_callback' => 'sanitize_email',
+					),
 				),
 			)
 		);
@@ -123,6 +128,17 @@ class EnrollmentsController extends RestController {
 			if ( ! current_user_can( 'shapelms_edit_course', $course_id ) ) {
 				return $this->forbidden();
 			}
+
+			// Instructors must know the student's email; only managers may enroll by bare user id.
+			if ( ! current_user_can( 'manage_shapelms' ) ) {
+				$email  = sanitize_email( (string) $request->get_param( 'email' ) );
+				$target = $email ? get_user_by( 'email', $email ) : false;
+
+				if ( ! $target || (int) $target->ID !== $user_id ) {
+					return $this->forbidden();
+				}
+			}
+
 			$result = $this->enrollment->enroll( $user_id, $course_id, 'manual' );
 		} else {
 			$result = $this->enrollment->enroll_free( get_current_user_id(), $course_id );

@@ -391,7 +391,7 @@
 
 			counter.textContent = state.perPage === 1
 				? sprintf( /* translators: 1: question number, 2: total questions */ __( 'Question %1$d of %2$d', 'shapelms' ), state.page + 1, state.questions.length )
-				: sprintf( /* translators: 1: page number, 2: total pages */ __( 'Page %1$d of %2$d', 'shapelms' ), state.page + 1, pageCount() );
+				: sprintf( /* translators: 1: current page, 2: total pages */ __( 'Page %1$d of %2$d', 'shapelms' ), state.page + 1, pageCount() );
 
 			prevBtn.hidden = state.page === 0;
 			nextBtn.hidden = state.page >= pageCount() - 1;
