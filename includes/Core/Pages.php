@@ -64,6 +64,7 @@ class Pages {
 		}
 
 		update_option( 'shapelms_pages', $pages );
+		Settings::flush();
 	}
 
 	/**
@@ -73,9 +74,12 @@ class Pages {
 	 * @return int
 	 */
 	public static function get_id( $key ) {
-		$pages = get_option( 'shapelms_pages', array() );
+		$page_id = (int) Settings::get( 'general', $key . '_page', 0 );
 
-		$page_id = isset( $pages[ $key ] ) ? (int) $pages[ $key ] : 0;
+		if ( ! $page_id ) {
+			$pages   = get_option( 'shapelms_pages', array() );
+			$page_id = isset( $pages[ $key ] ) ? (int) $pages[ $key ] : 0;
+		}
 
 		/**
 		 * Filters an LMS page id.

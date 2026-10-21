@@ -1,30 +1,36 @@
 /**
- * Thin REST helpers on top of @wordpress/api-fetch.
+ * Thin REST helpers on top of @wordpress/api-fetch. All paths are relative to shapelms/v1.
  */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
+const NAMESPACE = '/shapelms/v1/';
+
+function route( path ) {
+	return NAMESPACE + String( path ).replace( /^\/+/, '' );
+}
+
 export function get( path, query = {} ) {
-	return apiFetch( { path: addQueryArgs( path, query ) } );
+	return apiFetch( { path: addQueryArgs( route( path ), query ) } );
 }
 
 export function post( path, data = {} ) {
-	return apiFetch( { path, method: 'POST', data } );
+	return apiFetch( { path: route( path ), method: 'POST', data } );
 }
 
 export function patch( path, data = {} ) {
-	return apiFetch( { path, method: 'PUT', data } );
+	return apiFetch( { path: route( path ), method: 'PUT', data } );
 }
 
 export function del( path ) {
-	return apiFetch( { path, method: 'DELETE' } );
+	return apiFetch( { path: route( path ), method: 'DELETE' } );
 }
 
 /**
  * Paginated GET that returns { items, total, pages }.
  */
 export function list( path, query = {} ) {
-	return apiFetch( { path: addQueryArgs( path, query ), parse: false } ).then( async ( response ) => {
+	return apiFetch( { path: addQueryArgs( route( path ), query ), parse: false } ).then( async ( response ) => {
 		const json = await response.json();
 		if ( ! response.ok ) {
 			throw json;

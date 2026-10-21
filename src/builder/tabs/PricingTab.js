@@ -2,7 +2,7 @@
  * Builder: pricing.
  */
 import { useState } from '@wordpress/element';
-import { RadioControl, Button, __experimentalNumberControl as NumberControl } from '@wordpress/components';
+import { TextControl, RadioControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { post, errorMessage } from '../../shared/api';
 import { success, error as notifyError } from '../../admin/notices';
@@ -37,8 +37,8 @@ export default function PricingTab( { course, update, setCourse, config } ) {
 
 			{ paid && (
 				<div className="shapelms-builder__row">
-					<NumberControl label={ `${ __( 'Regular price', 'shapelms' ) } (${ config.currency })` } value={ course.meta.price || 0 } min={ 0 } step={ 0.01 } onChange={ ( v ) => update( { meta: { price: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
-					<NumberControl label={ `${ __( 'Sale price', 'shapelms' ) } (${ config.currency })` } help={ __( 'Leave 0 for no sale.', 'shapelms' ) } value={ course.meta.sale_price || 0 } min={ 0 } step={ 0.01 } onChange={ ( v ) => update( { meta: { sale_price: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
+					<TextControl type="number" label={ `${ __( 'Regular price', 'shapelms' ) } (${ config.currency })` } value={ course.meta.price || 0 } min={ 0 } step={ 0.01 } onChange={ ( v ) => update( { meta: { price: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
+					<TextControl type="number" label={ `${ __( 'Sale price', 'shapelms' ) } (${ config.currency })` } help={ __( 'Leave 0 for no sale.', 'shapelms' ) } value={ course.meta.sale_price || 0 } min={ 0 } step={ 0.01 } onChange={ ( v ) => update( { meta: { sale_price: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
 				</div>
 			) }
 

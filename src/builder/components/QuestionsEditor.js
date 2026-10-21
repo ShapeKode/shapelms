@@ -2,7 +2,7 @@
  * Questions editor inside the quiz editor.
  */
 import { useState } from '@wordpress/element';
-import { Button, TextControl, TextareaControl, SelectControl, ToggleControl, __experimentalNumberControl as NumberControl } from '@wordpress/components';
+import { Button, TextControl, TextareaControl, SelectControl, ToggleControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { post, patch, del, errorMessage } from '../../shared/api';
 import { success, error as notifyError } from '../../admin/notices';
@@ -51,7 +51,7 @@ function QuestionForm( { question, types, onChange, onSave, onCancel, busy } ) {
 		<div className="shapelms-questions__editor">
 			<div className="shapelms-builder__row">
 				<SelectControl label={ __( 'Question type', 'shapelms' ) } value={ question.type } options={ Object.entries( types ).map( ( [ value, label ] ) => ( { value, label } ) ) } onChange={ ( type ) => onChange( { type, correct: type === 'true_false' ? [ 'true' ] : [] } ) } __nextHasNoMarginBottom />
-				<NumberControl label={ __( 'Points', 'shapelms' ) } value={ question.points } min={ 0 } step={ 0.5 } onChange={ ( v ) => onChange( { points: Number( v ) || 0 } ) } __nextHasNoMarginBottom />
+				<TextControl type="number" label={ __( 'Points', 'shapelms' ) } value={ question.points } min={ 0 } step={ 0.5 } onChange={ ( v ) => onChange( { points: Number( v ) || 0 } ) } __nextHasNoMarginBottom />
 			</div>
 
 			<TextControl label={ __( 'Question', 'shapelms' ) } value={ question.title } onChange={ ( title ) => onChange( { title } ) } __nextHasNoMarginBottom />

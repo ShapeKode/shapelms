@@ -25,7 +25,7 @@ $shapelms_html = '';
 switch ( $shapelms_source ) {
 	case 'youtube':
 	case 'vimeo':
-		$shapelms_html = $shapelms_url ? (string) wp_oembed_get( $shapelms_url ) : '';
+		$shapelms_html = $shapelms_url ? \ShapeLMS\Frontend\VideoEmbed::html( $shapelms_url, get_the_title( $shapelms_lesson_id ) ) : '';
 		break;
 
 	case 'html5':
@@ -49,5 +49,5 @@ if ( ! $shapelms_html ) {
 }
 ?>
 <div class="shapelms-video shapelms-video--<?php echo esc_attr( $shapelms_source ); ?>">
-	<?php echo $shapelms_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- oEmbed / wp_video_shortcode / kses-sanitized iframe. ?>
+	<?php echo $shapelms_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- iframe built with esc_url/esc_attr, wp_video_shortcode, or kses-sanitized embed. ?>
 </div>

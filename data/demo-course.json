@@ -36,7 +36,7 @@
 							"type": "lesson",
 							"title": "Watching a video lesson",
 							"content": "<p>Lessons can embed a YouTube or Vimeo video, play a self-hosted file, or use an embed code from another provider. The video sits above the text so students can watch and read.</p>",
-							"meta": { "video_source": "youtube", "video_url": "https://www.youtube.com/watch?v=o4v6zq6k2nM", "video_duration": 420 }
+							"meta": { "video_source": "youtube", "video_url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ", "video_duration": 420 }
 						}
 					]
 				},

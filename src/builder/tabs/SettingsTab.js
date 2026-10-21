@@ -2,7 +2,7 @@
  * Builder: settings.
  */
 import { useEffect, useState } from '@wordpress/element';
-import { TextControl, ToggleControl, FormTokenField, __experimentalNumberControl as NumberControl } from '@wordpress/components';
+import { TextControl, ToggleControl, FormTokenField } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { get } from '../../shared/api';
 import { useDebounce } from '../../shared/hooks';
@@ -37,13 +37,13 @@ export default function SettingsTab( { course, update, config } ) {
 			<div className="shapelms-list-editor">
 				<span className="shapelms-list-editor__label">{ __( 'Total duration', 'shapelms' ) }</span>
 				<div className="shapelms-builder__row">
-					<NumberControl label={ __( 'Hours', 'shapelms' ) } value={ hours } min={ 0 } onChange={ ( h ) => update( { meta: { duration: ( Number( h ) || 0 ) * 3600 + minutes * 60 } } ) } __nextHasNoMarginBottom />
-					<NumberControl label={ __( 'Minutes', 'shapelms' ) } value={ minutes } min={ 0 } max={ 59 } onChange={ ( m ) => update( { meta: { duration: hours * 3600 + ( Number( m ) || 0 ) * 60 } } ) } __nextHasNoMarginBottom />
+					<TextControl type="number" label={ __( 'Hours', 'shapelms' ) } value={ hours } min={ 0 } onChange={ ( h ) => update( { meta: { duration: ( Number( h ) || 0 ) * 3600 + minutes * 60 } } ) } __nextHasNoMarginBottom />
+					<TextControl type="number" label={ __( 'Minutes', 'shapelms' ) } value={ minutes } min={ 0 } max={ 59 } onChange={ ( m ) => update( { meta: { duration: hours * 3600 + ( Number( m ) || 0 ) * 60 } } ) } __nextHasNoMarginBottom />
 				</div>
 				<p className="shapelms-muted">{ __( 'Leave at 0 to add up the lesson video durations automatically.', 'shapelms' ) }</p>
 			</div>
 
-			<NumberControl label={ __( 'Maximum students (0 = unlimited)', 'shapelms' ) } value={ course.meta.max_students || 0 } min={ 0 } onChange={ ( v ) => update( { meta: { max_students: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
+			<TextControl type="number" label={ __( 'Maximum students (0 = unlimited)', 'shapelms' ) } value={ course.meta.max_students || 0 } min={ 0 } onChange={ ( v ) => update( { meta: { max_students: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
 
 			<ToggleControl label={ __( 'Featured course', 'shapelms' ) } help={ __( 'Featured courses can be shown with the Course Grid block.', 'shapelms' ) } checked={ !! course.meta.featured } onChange={ ( featured ) => update( { meta: { featured } } ) } __nextHasNoMarginBottom />
 

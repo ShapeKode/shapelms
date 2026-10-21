@@ -304,7 +304,7 @@ class EnrollmentService {
 
 		foreach ( $rows as $row ) {
 			$course = $this->courses->to_array( (int) $row->course_id, false );
-			if ( ! $course ) {
+			if ( ! $course || 'trash' === $course['status'] ) {
 				continue;
 			}
 			$list[] = array(

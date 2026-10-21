@@ -272,11 +272,20 @@ class Settings {
 		$stored = is_array( $stored ) ? $stored : array();
 		$all    = array();
 
+		$pages = get_option( 'shapelms_pages', array() );
+		$pages = is_array( $pages ) ? $pages : array();
+
 		foreach ( self::schema() as $section_id => $section ) {
 			foreach ( $section['fields'] as $key => $field ) {
 				$all[ $section_id ][ $key ] = isset( $stored[ $section_id ][ $key ] )
 					? $stored[ $section_id ][ $key ]
 					: $field['default'];
+
+				// Page fields fall back to the pages created by the setup wizard.
+				if ( 'page' === $field['type'] && empty( $all[ $section_id ][ $key ] ) ) {
+					$page_key                   = str_replace( '_page', '', $key );
+					$all[ $section_id ][ $key ] = isset( $pages[ $page_key ] ) ? (int) $pages[ $page_key ] : 0;
+				}
 			}
 		}
 

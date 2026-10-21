@@ -22,7 +22,14 @@ export default function ClassicEditor( { value, onChange, height = 260 } ) {
 				height,
 				toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,link,unlink,wp_more,undo,redo',
 				setup( editor ) {
+					// TinyMCE normalizes HTML on init; use that as the baseline so loading never counts as a change.
+					editor.on( 'init', () => {
+						latest.current = editor.getContent();
+					} );
 					editor.on( 'change keyup paste input', () => {
+						if ( ! editor.initialized ) {
+							return;
+						}
 						const content = editor.getContent();
 						if ( content !== latest.current ) {
 							latest.current = content;

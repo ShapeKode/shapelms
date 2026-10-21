@@ -197,9 +197,13 @@ class PostTypes {
 
 		$course_id = Curriculum::course_id_for( $post->ID );
 		$course    = $course_id ? get_post( $course_id ) : null;
-		$slug      = $course ? $course->post_name : 'course';
+		$slug      = $course ? $course->post_name : '';
 
-		return str_replace( '%shapelms_course%', $slug, $permalink );
+		if ( ! $slug && $course ) {
+			$slug = sanitize_title( $course->post_title );
+		}
+
+		return str_replace( '%shapelms_course%', $slug ? $slug : 'course', $permalink );
 	}
 
 	/**
@@ -213,6 +217,10 @@ class PostTypes {
 
 		if ( ! $post || ! in_array( $post->post_type, array( self::COURSE, self::TOPIC, self::QUIZ ), true ) ) {
 			return;
+		}
+
+		if ( self::COURSE === $post->post_type ) {
+			self::purge_course_data( (int) $post_id );
 		}
 
 		$children = get_posts(
@@ -229,6 +237,31 @@ class PostTypes {
 		foreach ( $children as $child_id ) {
 			wp_delete_post( (int) $child_id, true );
 		}
+	}
+
+	/**
+	 * Removes enrollments, progress and quiz attempts of a permanently deleted course.
+	 *
+	 * @param int $course_id Course id.
+	 * @return void
+	 */
+	public static function purge_course_data( $course_id ) {
+		$where = array( 'course_id' => (int) $course_id );
+
+		shapelms()->get( \ShapeLMS\Database\ProgressRepository::class )->delete_where( $where );
+		shapelms()->get( \ShapeLMS\Database\EnrollmentRepository::class )->delete_where( $where );
+
+		$attempts = shapelms()->get( \ShapeLMS\Database\AttemptRepository::class );
+		foreach ( $attempts->where( $where ) as $attempt ) {
+			$attempts->delete( (int) $attempt->id );
+		}
+
+		/**
+		 * Fires after a course's learning data has been purged.
+		 *
+		 * @param int $course_id Course id.
+		 */
+		do_action( 'shapelms_course_data_purged', (int) $course_id );
 	}
 
 	/**

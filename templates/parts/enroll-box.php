@@ -32,7 +32,7 @@ $shapelms_buy_url = apply_filters( 'shapelms_course_buy_url', add_query_arg( 'co
 <div class="shapelms-enroll-box" id="shapelms-enroll" <?php echo \ShapeLMS\Frontend\Frontend::data_attributes( array( 'course-id' => (string) $shapelms_id ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in the method. ?>>
 	<?php if ( $shapelms_course['intro_video'] ) : ?>
 		<div class="shapelms-enroll-box__video">
-			<?php echo wp_oembed_get( $shapelms_course['intro_video'] ) ? wp_kses_post( (string) wp_oembed_get( $shapelms_course['intro_video'] ) ) : ''; ?>
+			<?php echo \ShapeLMS\Frontend\VideoEmbed::html( $shapelms_course['intro_video'], $shapelms_course['title'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- iframe built with esc_url/esc_attr or oEmbed. ?>
 		</div>
 	<?php elseif ( $shapelms_course['image'] ) : ?>
 		<img class="shapelms-enroll-box__image" src="<?php echo esc_url( $shapelms_course['image'] ); ?>" alt="">

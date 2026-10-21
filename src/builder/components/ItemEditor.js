@@ -2,7 +2,7 @@
  * Lesson / quiz editor (modal body).
  */
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { Button, TextControl, TextareaControl, SelectControl, ToggleControl, __experimentalNumberControl as NumberControl } from '@wordpress/components';
+import { Button, TextControl, TextareaControl, SelectControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { get, patch, errorMessage } from '../../shared/api';
 import { Loading } from '../../shared/components';
@@ -127,17 +127,17 @@ export default function ItemEditor( { item, onSaved, onClose } ) {
 
 					{ ! isQuiz && (
 						<>
-							<NumberControl label={ __( 'Duration (minutes)', 'shapelms' ) } value={ Math.round( ( meta.video_duration || 0 ) / 60 ) } min={ 0 } onChange={ ( v ) => change( { meta: { video_duration: ( Number( v ) || 0 ) * 60 } } ) } __nextHasNoMarginBottom />
+							<TextControl type="number" label={ __( 'Duration (minutes)', 'shapelms' ) } value={ Math.round( ( meta.video_duration || 0 ) / 60 ) } min={ 0 } onChange={ ( v ) => change( { meta: { video_duration: ( Number( v ) || 0 ) * 60 } } ) } __nextHasNoMarginBottom />
 							<ToggleControl label={ __( 'Free preview', 'shapelms' ) } help={ __( 'Anyone can open this lesson without enrolling.', 'shapelms' ) } checked={ !! meta.preview } onChange={ ( preview ) => change( { meta: { preview } } ) } __nextHasNoMarginBottom />
 						</>
 					) }
 
 					{ isQuiz && (
 						<>
-							<NumberControl label={ __( 'Time limit (minutes, 0 = none)', 'shapelms' ) } value={ meta.time_limit || 0 } min={ 0 } onChange={ ( v ) => change( { meta: { time_limit: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
-							<NumberControl label={ __( 'Attempts allowed (0 = unlimited)', 'shapelms' ) } value={ meta.attempts_allowed || 0 } min={ 0 } onChange={ ( v ) => change( { meta: { attempts_allowed: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
-							<NumberControl label={ __( 'Pass mark (%)', 'shapelms' ) } value={ meta.pass_mark ?? 70 } min={ 0 } max={ 100 } onChange={ ( v ) => change( { meta: { pass_mark: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
-							<NumberControl label={ __( 'Questions per page (0 = all)', 'shapelms' ) } value={ meta.questions_per_page || 0 } min={ 0 } onChange={ ( v ) => change( { meta: { questions_per_page: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
+							<TextControl type="number" label={ __( 'Time limit (minutes, 0 = none)', 'shapelms' ) } value={ meta.time_limit || 0 } min={ 0 } onChange={ ( v ) => change( { meta: { time_limit: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
+							<TextControl type="number" label={ __( 'Attempts allowed (0 = unlimited)', 'shapelms' ) } value={ meta.attempts_allowed || 0 } min={ 0 } onChange={ ( v ) => change( { meta: { attempts_allowed: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
+							<TextControl type="number" label={ __( 'Pass mark (%)', 'shapelms' ) } value={ meta.pass_mark ?? 70 } min={ 0 } max={ 100 } onChange={ ( v ) => change( { meta: { pass_mark: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
+							<TextControl type="number" label={ __( 'Questions per page (0 = all)', 'shapelms' ) } value={ meta.questions_per_page || 0 } min={ 0 } onChange={ ( v ) => change( { meta: { questions_per_page: Number( v ) || 0 } } ) } __nextHasNoMarginBottom />
 							<SelectControl label={ __( 'Feedback', 'shapelms' ) } value={ meta.feedback_mode || 'end' } options={ [ { value: 'instant', label: __( 'After each answer', 'shapelms' ) }, { value: 'end', label: __( 'At the end', 'shapelms' ) }, { value: 'none', label: __( 'Score only', 'shapelms' ) } ] } onChange={ ( feedback_mode ) => change( { meta: { feedback_mode } } ) } __nextHasNoMarginBottom />
 							<ToggleControl label={ __( 'Randomize question order', 'shapelms' ) } checked={ !! meta.randomize } onChange={ ( randomize ) => change( { meta: { randomize } } ) } __nextHasNoMarginBottom />
 							<ToggleControl label={ __( 'Show correct answers in results', 'shapelms' ) } checked={ meta.show_answers !== false && meta.show_answers !== '' } onChange={ ( show_answers ) => change( { meta: { show_answers } } ) } __nextHasNoMarginBottom />

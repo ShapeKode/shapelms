@@ -23,8 +23,14 @@ export function readConfig( root ) {
 	data.courseId = parseInt( data.courseId, 10 ) || 0;
 	data.pendingInstructors = parseInt( data.pendingInstructors, 10 ) || 0;
 
-	apiFetch.use( apiFetch.createRootURLMiddleware( data.restUrl ) );
-	apiFetch.use( apiFetch.createNonceMiddleware( data.restNonce ) );
+	// WordPress registers the REST root and nonce middlewares on wp.apiFetch in the admin.
+	// Outside the admin (or if the nonce is missing) register the nonce ourselves.
+	if ( data.restNonce ) {
+		apiFetch.use( apiFetch.createNonceMiddleware( data.restNonce ) );
+	}
+	if ( ! window.wpApiSettings && data.siteUrl ) {
+		apiFetch.use( apiFetch.createRootURLMiddleware( data.siteUrl.replace( /\/$/, '' ) + '/wp-json/' ) );
+	}
 
 	cache = data;
 	return data;

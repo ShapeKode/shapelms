@@ -93,12 +93,16 @@ $shapelms_level_map = array(
 				<p class="shapelms-muted">
 					<?php
 					echo esc_html(
-						sprintf(
-							/* translators: 1: topics, 2: lessons, 3: quizzes */
-							__( '%1$d sections • %2$d lessons • %3$d quizzes', 'shapelms' ),
-							$shapelms_course['topics'],
-							$shapelms_course['lessons'],
-							$shapelms_course['quizzes']
+						implode(
+							' • ',
+							array(
+								/* translators: %d: sections */
+								sprintf( _n( '%d section', '%d sections', $shapelms_course['topics'], 'shapelms' ), $shapelms_course['topics'] ),
+								/* translators: %d: lessons */
+								sprintf( _n( '%d lesson', '%d lessons', $shapelms_course['lessons'], 'shapelms' ), $shapelms_course['lessons'] ),
+								/* translators: %d: quizzes */
+								sprintf( _n( '%d quiz', '%d quizzes', $shapelms_course['quizzes'], 'shapelms' ), $shapelms_course['quizzes'] ),
+							)
 						)
 					);
 					?>

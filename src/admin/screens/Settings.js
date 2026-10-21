@@ -2,7 +2,7 @@
  * Settings, rendered from the PHP schema.
  */
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { Button, TextControl, TextareaControl, ToggleControl, SelectControl, ColorPicker, TabPanel, Dropdown, __experimentalNumberControl as NumberControl } from '@wordpress/components';
+import { Button, TextControl, TextareaControl, ToggleControl, SelectControl, ColorPicker, TabPanel, Dropdown } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { get, post, errorMessage } from '../../shared/api';
 import { PageHeader, Card, Loading, ErrorNotice } from '../../shared/components';
@@ -14,7 +14,7 @@ function Field( { field, value, onChange, pages } ) {
 		case 'checkbox':
 			return <ToggleControl { ...common } checked={ !! value } onChange={ onChange } />;
 		case 'number':
-			return <NumberControl { ...common } value={ value } min={ field.min } max={ field.max } onChange={ ( v ) => onChange( Number( v ) ) } />;
+			return <TextControl type="number" { ...common } value={ value } min={ field.min } max={ field.max } onChange={ ( v ) => onChange( Number( v ) ) } />;
 		case 'select':
 			return <SelectControl { ...common } value={ String( value ) } options={ Object.entries( field.options || {} ).map( ( [ k, l ] ) => ( { value: k, label: l } ) ) } onChange={ onChange } />;
 		case 'page':
@@ -146,9 +146,6 @@ export default function Settings() {
 					} }
 				</TabPanel>
 			</Card>
-			<div className="shapelms-sticky-save">
-				<Button variant="primary" isBusy={ busy } disabled={ busy || ! dirty } onClick={ save }>{ __( 'Save changes', 'shapelms' ) }</Button>
-			</div>
 		</>
 	);
 }
