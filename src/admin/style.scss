@@ -17,7 +17,6 @@
 }
 
 .shapelms-admin {
-	max-width: 1400px;
 	padding-top: 12px;
 }
 
@@ -672,7 +671,8 @@
 		border-radius: var(--shapelms-radius);
 		padding: 24px;
 
-		.components-base-control {
+		.components-base-control,
+		.components-radio-control {
 			margin-bottom: 20px;
 		}
 
@@ -803,6 +803,19 @@
 		display: flex;
 		gap: 6px;
 		padding: 4px 8px 8px;
+
+		.components-base-control {
+			margin: 0;
+		}
+
+		// Title input + buttons: buttons take the input's height.
+		&.is-form {
+			align-items: stretch;
+
+			.components-button {
+				height: auto;
+			}
+		}
 	}
 
 	&__handle {

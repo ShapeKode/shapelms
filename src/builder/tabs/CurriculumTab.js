@@ -77,7 +77,7 @@ function SortableTopic( { topic, onRename, onDelete, onAddItem, onEditItem, onDe
 				</SortableContext>
 				{ ! topic.items.length && <p className="shapelms-muted" style={ { margin: '4px 8px' } }>{ __( 'No lessons yet. Add one below.', 'shapelms' ) }</p> }
 			</div>
-			<div className="shapelms-curriculum-builder__add">
+			<div className={ `shapelms-curriculum-builder__add${ adding ? ' is-form' : '' }` }>
 				{ adding ? (
 					<>
 						<TextControl value={ title } onChange={ setTitle } placeholder={ adding === 'quiz' ? __( 'Quiz title', 'shapelms' ) : ( adding === 'lesson' ? __( 'Lesson title', 'shapelms' ) : itemType( adding ).label ) } onKeyDown={ ( e ) => e.key === 'Enter' && submitAdd() } autoFocus __nextHasNoMarginBottom />
@@ -217,7 +217,7 @@ export default function CurriculumTab( { course, setCourse } ) {
 				</SortableContext>
 			</DndContext>
 
-			<div className="shapelms-curriculum-builder__add" style={ { padding: 0 } }>
+			<div className="shapelms-curriculum-builder__add is-form" style={ { padding: 0 } }>
 				<TextControl value={ newTopic } onChange={ setNewTopic } placeholder={ __( 'New topic title, e.g. "Getting started"', 'shapelms' ) } onKeyDown={ ( e ) => e.key === 'Enter' && addTopic() } __nextHasNoMarginBottom />
 				<Button variant="primary" onClick={ addTopic } disabled={ ! newTopic.trim() }>{ __( 'Add topic', 'shapelms' ) }</Button>
 			</div>

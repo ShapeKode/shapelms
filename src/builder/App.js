@@ -62,7 +62,23 @@ export default function App( { courseId, config } ) {
 		setSaving( true );
 		return patch( `courses/${ courseId }`, payload )
 			.then( ( data ) => {
-				setCourse( ( c ) => ( { ...data, curriculum: c?.curriculum || data.curriculum } ) );
+				// Re-apply edits made while this save was in flight so the response does not undo them.
+				const queued = pending.current;
+				setCourse( ( c ) => {
+					const next = {
+						...data,
+						...queued,
+						meta: { ...data.meta, ...( queued.meta || {} ) },
+						curriculum: c?.curriculum || data.curriculum,
+					};
+					if ( queued.categories ) {
+						next.category_ids = queued.categories;
+					}
+					if ( queued.tags ) {
+						next.tag_names = queued.tags;
+					}
+					return next;
+				} );
 				setSavedAt( new Date() );
 				if ( ! Object.keys( pending.current ).length ) {
 					setDirty( false );

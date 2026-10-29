@@ -680,7 +680,7 @@
 	color: var(--shapelms-muted);
 }
 
-.shapelms-filters__option {
+.shapelms-filters .shapelms-filters__option {
 	display: flex;
 	align-items: center;
 	gap: 10px;
@@ -688,6 +688,8 @@
 	margin: 0 -8px;
 	border-radius: var(--shapelms-radius);
 	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.4;
 	cursor: pointer;
 	transition: background 0.15s ease;
 }
@@ -713,7 +715,7 @@
 	font-size: 12px;
 }
 
-.shapelms-filters__option:has(input:checked) {
+.shapelms-filters .shapelms-filters__option:has(input:checked) {
 	background: rgba(var(--shapelms-primary-rgb), 0.08);
 	color: var(--shapelms-primary);
 	font-weight: 600;
