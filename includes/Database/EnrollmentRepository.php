@@ -167,7 +167,7 @@ class EnrollmentRepository extends Repository {
 
 		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} e INNER JOIN {$wpdb->users} u ON u.ID = e.user_id WHERE {$where_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
 
-		$items = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$items = $wpdb->get_results( // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- fragments are individually prepared; table and column names come from fixed whitelists.
 			$wpdb->prepare(
 				"SELECT e.*, u.display_name, u.user_email FROM {$table} e INNER JOIN {$wpdb->users} u ON u.ID = e.user_id WHERE {$where_sql} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$per_page,

@@ -56,7 +56,7 @@ class FillBlank implements QuestionTypeInterface {
 	 */
 	public function public_data( Question $question ) {
 		return array(
-			'parts'  => preg_split( '/\{blank\}/i', wp_kses_post( $question->description() ) ),
+			'parts'  => array_map( 'wp_kses_post', (array) preg_split( '/\{blank\}/i', $question->description() ) ),
 			'blanks' => $this->blank_count( $question ),
 		);
 	}
@@ -75,7 +75,7 @@ class FillBlank implements QuestionTypeInterface {
 		$empty = true;
 
 		for ( $i = 0; $i < $count; $i++ ) {
-			$value   = isset( $raw[ $i ] ) ? sanitize_text_field( (string) $raw[ $i ] ) : '';
+			$value   = isset( $raw[ $i ] ) && is_scalar( $raw[ $i ] ) ? shapelms_sanitize_plain_text( $raw[ $i ] ) : '';
 			$clean[] = mb_substr( $value, 0, 200 );
 			$empty   = $empty && '' === trim( $value );
 		}

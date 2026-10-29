@@ -88,7 +88,7 @@ class StripeGateway implements GatewayInterface {
 	 * @param string               $idempotency Idempotency key.
 	 * @return array<string, mixed>|WP_Error
 	 */
-	private function request( $method, $endpoint, array $body = array(), $idempotency = '' ) {
+	public function request( $method, $endpoint, array $body = array(), $idempotency = '' ) {
 		$headers = array(
 			'Authorization'  => 'Bearer ' . $this->secret(),
 			'Stripe-Version' => '2024-06-20',
@@ -141,7 +141,7 @@ class StripeGateway implements GatewayInterface {
 	 * @param string $currency Currency.
 	 * @return int
 	 */
-	private function minor( $amount, $currency ) {
+	public function minor( $amount, $currency ) {
 		return in_array( strtoupper( $currency ), $this->zero_decimal(), true ) ? (int) round( $amount ) : (int) round( $amount * 100 );
 	}
 
@@ -285,6 +285,13 @@ class StripeGateway implements GatewayInterface {
 		if ( ! is_array( $event ) || empty( $event['type'] ) ) {
 			return new WP_Error( 'shapelms_stripe_webhook', __( 'Invalid payload.', 'shapelms' ), array( 'status' => 400 ) );
 		}
+
+		/**
+		 * Fires for every Stripe webhook event with a valid signature.
+		 *
+		 * @param array<string, mixed> $event Event.
+		 */
+		do_action( 'shapelms_stripe_webhook_event', $event );
 
 		$object   = isset( $event['data']['object'] ) ? $event['data']['object'] : array();
 		$order_id = isset( $object['metadata']['shapelms_order_id'] ) ? (int) $object['metadata']['shapelms_order_id'] : 0;

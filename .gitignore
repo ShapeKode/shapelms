@@ -5,3 +5,21 @@
 *.log
 .phpunit.result.cache
 /languages/*.mo
+/dist/
+
+# Website brand files and the Edugon HTML template (kept locally, not in the repo)
+/brand/
+
+# Local tools, editors and OS files
+/.claude/
+.idea/
+.vscode/
+*.swp
+Thumbs.db
+.env
+.env.*
+
+# Generated output
+*.zip
+/coverage/
+/tests/tmp/

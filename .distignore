@@ -1,26 +1,57 @@
+# VCS / editor / OS
 .git
 .github
 .gitignore
+.gitattributes
 .distignore
 .editorconfig
 .idea
 .vscode
 .DS_Store
 Thumbs.db
+.wordpress-org
+
+# Website brand files (not part of the plugin)
+brand
+
+# Dev tooling and config
 .wp-env.json
+.wp-env.override.json
+.nvmrc
+.eslintrc*
+.eslintignore
+.stylelintrc*
+.prettierrc*
+.browserslistrc
 .phpunit.result.cache
+.phpunit.cache
+phpcs.xml
+phpcs.xml.dist
+.phpcs.xml.dist
+phpstan.neon
+phpstan.neon.dist
+phpstan-baseline.neon
+phpunit.xml
+phpunit.xml.dist
+playwright.config.*
+
+# Dependencies and lock files
 node_modules
-tests
 vendor
 composer.json
 composer.lock
 package-lock.json
-phpcs.xml
-phpcs.xml.dist
-phpstan.neon
-phpunit.xml.dist
+
+# Tests and docs
+tests
+docs
+bin
 CLAUDE.md
 README.md
-docs
+
+# Artifacts
 *.map
 *.log
+error_log
+*.zip
+*.sh

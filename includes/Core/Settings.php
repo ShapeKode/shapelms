@@ -46,6 +46,27 @@ class Settings {
 						'min'     => 1,
 						'max'     => 100,
 					),
+					'archive_layout'           => array(
+						'label'       => __( 'Course archive layout', 'shapelms' ),
+						'type'        => 'select',
+						'default'     => 'sidebar',
+						'options'     => array(
+							'sidebar' => __( 'With filter sidebar (left)', 'shapelms' ),
+							'top'     => __( 'No sidebar, filter bar above the courses', 'shapelms' ),
+						),
+						'description' => __( 'Where the search and filter controls appear on the course archive.', 'shapelms' ),
+					),
+					'archive_columns'          => array(
+						'label'       => __( 'Courses per row', 'shapelms' ),
+						'type'        => 'select',
+						'default'     => '3',
+						'options'     => array(
+							'2' => __( '2 columns', 'shapelms' ),
+							'3' => __( '3 columns', 'shapelms' ),
+							'4' => __( '4 columns', 'shapelms' ),
+						),
+						'description' => __( 'On large screens. Smaller screens show fewer columns automatically.', 'shapelms' ),
+					),
 					'course_slug'              => array(
 						'label'       => __( 'Course URL slug', 'shapelms' ),
 						'type'        => 'text',
@@ -66,6 +87,38 @@ class Settings {
 						'label'   => __( 'Instructor registration page', 'shapelms' ),
 						'type'    => 'page',
 						'default' => 0,
+					),
+					'login_page'               => array(
+						'label'   => __( 'Sign in page', 'shapelms' ),
+						'type'    => 'page',
+						'default' => 0,
+					),
+					'register_page'            => array(
+						'label'   => __( 'Sign up page', 'shapelms' ),
+						'type'    => 'page',
+						'default' => 0,
+					),
+					'student_registration'     => array(
+						'label'       => __( 'Allow student registration', 'shapelms' ),
+						'type'        => 'checkbox',
+						'default'     => true,
+						'description' => __( 'Lets visitors create a student account on the Sign up page. WordPress\'s own "Anyone can register" option (Settings → General) must also be on.', 'shapelms' ),
+					),
+					'auth_layout'              => array(
+						'label'       => __( 'Sign in / Sign up page layout', 'shapelms' ),
+						'type'        => 'select',
+						'default'     => 'standalone',
+						'options'     => array(
+							'standalone' => __( 'Standalone (site logo, form, no theme header)', 'shapelms' ),
+							'theme'      => __( 'Inside the theme layout', 'shapelms' ),
+						),
+						'description' => __( 'Standalone gives a clean, focused page on any theme. Choose the theme layout to keep your header and footer.', 'shapelms' ),
+					),
+					'front_login'              => array(
+						'label'       => __( 'Use the Sign in page for all login links', 'shapelms' ),
+						'type'        => 'checkbox',
+						'default'     => true,
+						'description' => __( 'Theme and WordPress login, registration and lost-password links point to the ShapeLMS pages instead of wp-login.php. Administrators can still open wp-login.php directly.', 'shapelms' ),
 					),
 					'delete_data_on_uninstall' => array(
 						'label'       => __( 'Delete all data on uninstall', 'shapelms' ),
@@ -103,6 +156,12 @@ class Settings {
 						'label'   => __( 'Require passing all quizzes to complete a course', 'shapelms' ),
 						'type'    => 'checkbox',
 						'default' => true,
+					),
+					'sequential_learning'         => array(
+						'label'       => __( 'Sequential learning', 'shapelms' ),
+						'type'        => 'checkbox',
+						'default'     => false,
+						'description' => __( 'Lock each lesson and quiz until the previous one is completed. Each course can override this in its builder settings.', 'shapelms' ),
 					),
 				),
 			),
@@ -210,6 +269,12 @@ class Settings {
 						'label'   => __( 'PayPal secret', 'shapelms' ),
 						'type'    => 'secret',
 						'default' => '',
+					),
+					'paypal_webhook_id'      => array(
+						'label'       => __( 'PayPal webhook ID', 'shapelms' ),
+						'type'        => 'text',
+						'default'     => '',
+						'description' => __( 'Webhook URL: /wp-json/shapelms/v1/webhooks/paypal. Add it in your PayPal app, then paste the webhook ID PayPal shows. Refunds are only processed when this is set.', 'shapelms' ),
 					),
 				),
 			),

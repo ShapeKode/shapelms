@@ -27,6 +27,14 @@ class WP_CLI {
 	public static function line( $message ) {}
 
 	/**
+	 * Logs a line.
+	 *
+	 * @param string $message Message.
+	 * @return void
+	 */
+	public static function log( $message ) {}
+
+	/**
 	 * @param string $message
 	 * @return void
 	 */

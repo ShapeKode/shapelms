@@ -144,6 +144,17 @@ function ImportExport( { config } ) {
 			.finally( () => setBusy( false ) );
 	};
 
+	const samplePack = () => {
+		setBusy( true );
+		post( 'tools/demo', { pack: 'courses' } )
+			.then( ( res ) => {
+				success( sprintf( /* translators: %d: number of courses */ _n( 'Created %d sample course.', 'Created %d sample courses.', res.count, 'shapelms' ), res.count ) );
+				window.open( res.archive_url, '_blank' );
+			} )
+			.catch( ( e ) => notifyError( errorMessage( e ) ) )
+			.finally( () => setBusy( false ) );
+	};
+
 	return (
 		<div className="shapelms-grid-2">
 			<Card title={ __( 'Export courses', 'shapelms' ) }>
@@ -155,8 +166,11 @@ function ImportExport( { config } ) {
 				<p>{ __( 'Upload a JSON file exported from ShapeLMS. Courses are created as new drafts.', 'shapelms' ) }</p>
 				<FormFileUpload accept="application/json" onChange={ importJson } variant="primary" disabled={ busy }>{ __( 'Choose JSON file', 'shapelms' ) }</FormFileUpload>
 				<hr />
-				<p>{ __( 'Or create the bundled demo course.', 'shapelms' ) }</p>
-				<Button variant="secondary" isBusy={ busy } onClick={ demo }>{ __( 'Import demo course', 'shapelms' ) }</Button>
+				<p>{ __( 'Or create the bundled demo course (one draft), or a sample pack of six published courses to try the archive, filters, checkout and dashboards.', 'shapelms' ) }</p>
+				<div className="shapelms-builder__row">
+					<Button variant="secondary" isBusy={ busy } onClick={ demo }>{ __( 'Import demo course', 'shapelms' ) }</Button>
+					<Button variant="secondary" isBusy={ busy } onClick={ samplePack }>{ __( 'Create 6 sample courses', 'shapelms' ) }</Button>
+				</div>
 			</Card>
 		</div>
 	);

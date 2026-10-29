@@ -121,13 +121,15 @@ class QuestionsController extends RestController {
 		$type  = isset( $types[ $type ] ) ? $type : 'single_choice';
 
 		$id = wp_insert_post(
-			array(
-				'post_type'   => PostTypes::QUESTION,
-				'post_title'  => $request->get_param( 'title' ),
-				'post_status' => 'publish',
-				'post_parent' => $quiz_id,
-				'post_author' => get_current_user_id(),
-				'menu_order'  => count( \ShapeLMS\Services\QuizService::questions( $quiz_id ) ),
+			wp_slash(
+				array(
+					'post_type'   => PostTypes::QUESTION,
+					'post_title'  => $request->get_param( 'title' ),
+					'post_status' => 'publish',
+					'post_parent' => $quiz_id,
+					'post_author' => get_current_user_id(),
+					'menu_order'  => count( \ShapeLMS\Services\QuizService::questions( $quiz_id ) ),
+				)
 			),
 			true
 		);
@@ -180,7 +182,7 @@ class QuestionsController extends RestController {
 		}
 
 		if ( count( $update ) > 1 ) {
-			$result = wp_update_post( $update, true );
+			$result = wp_update_post( wp_slash( $update ), true );
 			if ( is_wp_error( $result ) ) {
 				return $this->error( $result );
 			}
@@ -207,7 +209,7 @@ class QuestionsController extends RestController {
 				$value = max( 0, (float) $value );
 			}
 
-			update_post_meta( $id, $key, $value );
+			update_post_meta( $id, $key, wp_slash( $value ) );
 		}
 
 		clean_post_cache( $id );

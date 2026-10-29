@@ -86,7 +86,7 @@ class CurriculumController extends RestController {
 					'type'     => array(
 						'type'     => 'string',
 						'required' => true,
-						'enum'     => array( 'lesson', 'quiz' ),
+						'enum'     => array_keys( Curriculum::item_types() ),
 					),
 					'title'    => array(
 						'type'              => 'string',
@@ -152,14 +152,16 @@ class CurriculumController extends RestController {
 		}
 
 		$id = wp_insert_post(
-			array(
-				'post_type'    => PostTypes::TOPIC,
-				'post_title'   => $request->get_param( 'title' ),
-				'post_content' => $request->get_param( 'summary' ),
-				'post_status'  => 'publish',
-				'post_parent'  => $course_id,
-				'post_author'  => get_current_user_id(),
-				'menu_order'   => count( Curriculum::tree( $course_id, true ) ),
+			wp_slash(
+				array(
+					'post_type'    => PostTypes::TOPIC,
+					'post_title'   => $request->get_param( 'title' ),
+					'post_content' => $request->get_param( 'summary' ),
+					'post_status'  => 'publish',
+					'post_parent'  => $course_id,
+					'post_author'  => get_current_user_id(),
+					'menu_order'   => count( Curriculum::tree( $course_id, true ) ),
+				)
 			),
 			true
 		);
@@ -200,7 +202,7 @@ class CurriculumController extends RestController {
 			$update['post_content'] = wp_kses_post( (string) $request->get_param( 'summary' ) );
 		}
 
-		$result = wp_update_post( $update, true );
+		$result = wp_update_post( wp_slash( $update ), true );
 		if ( is_wp_error( $result ) ) {
 			return $this->error( $result );
 		}
@@ -227,11 +229,12 @@ class CurriculumController extends RestController {
 			return $this->not_found( __( 'Topic not found.', 'shapelms' ) );
 		}
 
-		$type      = 'quiz' === $request->get_param( 'type' ) ? PostTypes::QUIZ : PostTypes::LESSON;
+		$type      = Curriculum::post_type_for( (string) $request->get_param( 'type' ) );
+		$type      = $type ? $type : PostTypes::LESSON;
 		$course_id = Curriculum::course_id_for( $topic_id );
 		$siblings  = get_posts(
 			array(
-				'post_type'     => array( PostTypes::LESSON, PostTypes::QUIZ ),
+				'post_type'     => Curriculum::item_post_types(),
 				'post_parent'   => $topic_id,
 				'post_status'   => 'any',
 				'numberposts'   => -1,
@@ -241,13 +244,15 @@ class CurriculumController extends RestController {
 		);
 
 		$id = wp_insert_post(
-			array(
-				'post_type'   => $type,
-				'post_title'  => $request->get_param( 'title' ),
-				'post_status' => 'publish',
-				'post_parent' => $topic_id,
-				'post_author' => get_current_user_id(),
-				'menu_order'  => count( $siblings ),
+			wp_slash(
+				array(
+					'post_type'   => $type,
+					'post_title'  => $request->get_param( 'title' ),
+					'post_status' => 'publish',
+					'post_parent' => $topic_id,
+					'post_author' => get_current_user_id(),
+					'menu_order'  => count( $siblings ),
+				)
 			),
 			true
 		);
@@ -270,7 +275,7 @@ class CurriculumController extends RestController {
 	public function get_item( WP_REST_Request $request ) {
 		$id = (int) $request->get_param( 'id' );
 
-		if ( ! in_array( get_post_type( $id ), array( PostTypes::LESSON, PostTypes::QUIZ ), true ) ) {
+		if ( ! in_array( get_post_type( $id ), Curriculum::item_post_types(), true ) ) {
 			return $this->not_found();
 		}
 
@@ -287,7 +292,7 @@ class CurriculumController extends RestController {
 		$id        = (int) $request->get_param( 'id' );
 		$post_type = get_post_type( $id );
 
-		if ( ! in_array( $post_type, array( PostTypes::LESSON, PostTypes::QUIZ ), true ) ) {
+		if ( ! in_array( $post_type, Curriculum::item_post_types(), true ) ) {
 			return $this->not_found();
 		}
 
@@ -302,14 +307,15 @@ class CurriculumController extends RestController {
 			$update['post_status'] = $request->get_param( 'status' );
 		}
 
-		$result = wp_update_post( $update, true );
+		$result = wp_update_post( wp_slash( $update ), true );
 		if ( is_wp_error( $result ) ) {
 			return $this->error( $result );
 		}
 
 		$meta = $request->get_param( 'meta' );
 		if ( is_array( $meta ) ) {
-			$definitions = Meta::definitions()[ $post_type ];
+			$all         = Meta::definitions();
+			$definitions = isset( $all[ $post_type ] ) ? $all[ $post_type ] : array();
 			foreach ( $meta as $key => $value ) {
 				$key = '_shapelms_' . sanitize_key( str_replace( '_shapelms_', '', (string) $key ) );
 				if ( ! isset( $definitions[ $key ] ) ) {
@@ -327,7 +333,7 @@ class CurriculumController extends RestController {
 				} else {
 					$value = sanitize_text_field( (string) $value );
 				}
-				update_post_meta( $id, $key, $value );
+				update_post_meta( $id, $key, wp_slash( $value ) );
 			}
 		}
 
@@ -346,7 +352,7 @@ class CurriculumController extends RestController {
 	public function delete_item( WP_REST_Request $request ) {
 		$id = (int) $request->get_param( 'id' );
 
-		if ( ! in_array( get_post_type( $id ), array( PostTypes::TOPIC, PostTypes::LESSON, PostTypes::QUIZ ), true ) ) {
+		if ( ! in_array( get_post_type( $id ), array_merge( array( PostTypes::TOPIC ), Curriculum::item_post_types() ), true ) ) {
 			return $this->not_found();
 		}
 
@@ -384,7 +390,7 @@ class CurriculumController extends RestController {
 			$items = isset( $topic['items'] ) ? (array) $topic['items'] : array();
 			foreach ( $items as $item_index => $item_id ) {
 				$item_id = (int) $item_id;
-				if ( ! in_array( get_post_type( $item_id ), array( PostTypes::LESSON, PostTypes::QUIZ ), true ) || Curriculum::course_id_for( $item_id ) !== $course_id ) {
+				if ( ! in_array( get_post_type( $item_id ), Curriculum::item_post_types(), true ) || Curriculum::course_id_for( $item_id ) !== $course_id ) {
 					continue;
 				}
 				wp_update_post(
@@ -412,7 +418,9 @@ class CurriculumController extends RestController {
 		$post = get_post( $id );
 		$meta = array();
 
-		foreach ( Meta::definitions()[ $post->post_type ] as $key => $field ) {
+		$all = Meta::definitions();
+
+		foreach ( isset( $all[ $post->post_type ] ) ? $all[ $post->post_type ] : array() as $key => $field ) {
 			$meta[ str_replace( '_shapelms_', '', $key ) ] = get_post_meta( $id, $key, true );
 		}
 
@@ -425,7 +433,7 @@ class CurriculumController extends RestController {
 			)
 		);
 
-		if ( PostTypes::LESSON === $post->post_type && ! empty( $meta['attachments'] ) ) {
+		if ( PostTypes::QUIZ !== $post->post_type && ! empty( $meta['attachments'] ) && is_array( $meta['attachments'] ) ) {
 			$data['attachment_files'] = array();
 			foreach ( (array) $meta['attachments'] as $attachment_id ) {
 				$file                       = get_attached_file( (int) $attachment_id );

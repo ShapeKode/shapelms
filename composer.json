@@ -1,13 +1,13 @@
 {
-    "name": "themewant/shapelms",
+    "name": "shapekode/shapelms",
     "description": "ShapeLMS - a fast, modern learning management system for WordPress.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
-    "homepage": "https://themewant.com/",
+    "homepage": "https://shapekode.com/",
     "authors": [
         {
-            "name": "Themewant",
-            "homepage": "https://themewant.com/"
+            "name": "ShapeKode",
+            "homepage": "https://shapekode.com/"
         }
     ],
     "require": {

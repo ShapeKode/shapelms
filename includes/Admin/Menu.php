@@ -23,6 +23,12 @@ class Menu {
 	const SLUG = 'shapelms';
 
 	/**
+	 * Admin menu icon: assets/images/menu-icon.svg, base64-encoded so WordPress can recolour it
+	 * to match the admin colour scheme.
+	 */
+	const ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+CjxwYXRoIGZpbGw9IiNhN2FhYWQiIGQ9Ik0xMiAxLjIgMjAgNC44IDEyIDguNCA0IDQuOHoiLz4KPHJlY3QgZmlsbD0iI2E3YWFhZCIgeD0iMTkuMjUiIHk9IjQuOCIgd2lkdGg9IjEuNSIgaGVpZ2h0PSI0LjQiIHJ4PSIuNzUiLz4KPGNpcmNsZSBmaWxsPSIjYTdhYWFkIiBjeD0iMjAiIGN5PSI5LjkiIHI9IjEuMyIvPgo8cGF0aCBmaWxsPSIjYTdhYWFkIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMiAxNS42KSBzY2FsZSguNjgpIHRyYW5zbGF0ZSgtMTIgLTEyKSIgZD0iTTE4LjUgM0g5QTUuNSA1LjUgMCAwIDAgOSAxNEgxNUExLjUgMS41IDAgMCAxIDE1IDE3SDUuNUEyIDIgMCAwIDAgNS41IDIxSDE1QTUuNSA1LjUgMCAwIDAgMTUgMTBIOUExLjUgMS41IDAgMCAxIDkgN0gxOC41QTIgMiAwIDAgMCAxOC41IDNaIi8+Cjwvc3ZnPgo=';
+
+	/**
 	 * React app screens: slug suffix => [ title, capability ].
 	 *
 	 * @return array<string, array{0: string, 1: string}>
@@ -75,19 +81,77 @@ class Menu {
 			Capabilities::EDIT_COURSES,
 			self::SLUG,
 			array( $this, 'render_app' ),
-			'dashicons-welcome-learn-more',
+			self::ICON,
 			30
 		);
 
-		foreach ( self::screens() as $suffix => $screen ) {
-			$slug = $suffix ? self::SLUG . '-' . $suffix : self::SLUG;
+		$screens = self::screens();
 
-			add_submenu_page( self::SLUG, $screen[0], $screen[0], $screen[1], $slug, array( $this, 'render_app' ) );
+		/**
+		 * Submenu layout: groups of screen keys, rendered with a separator between groups.
+		 * Taxonomy screens use the "tax:" prefix. Unknown keys are ignored; screens not
+		 * listed here are appended to the last group so add-ons still show up.
+		 *
+		 * @param array<int, string[]> $groups Groups of screen keys.
+		 */
+		$groups = apply_filters(
+			'shapelms_admin_menu_groups',
+			array(
+				array( '', 'courses', 'tax:category', 'tax:tag' ),
+				array( 'orders', 'students', 'instructors', 'quizzes', 'reports' ),
+				array( 'modules', 'tools', 'settings' ),
+			)
+		);
+
+		$placed = array();
+		foreach ( $groups as $group ) {
+			foreach ( $group as $key ) {
+				$placed[ $key ] = true;
+			}
+		}
+		foreach ( array_keys( $screens ) as $key ) {
+			if ( ! isset( $placed[ $key ] ) ) {
+				$groups[ count( $groups ) - 1 ][] = $key;
+			}
 		}
 
-		add_submenu_page( self::SLUG, __( 'Add New Course', 'shapelms' ), __( 'Add New Course', 'shapelms' ), Capabilities::EDIT_COURSES, 'post-new.php?post_type=' . PostTypes::COURSE );
-		add_submenu_page( self::SLUG, __( 'Categories', 'shapelms' ), __( 'Categories', 'shapelms' ), Capabilities::MANAGE, 'edit-tags.php?taxonomy=' . Taxonomies::CATEGORY . '&post_type=' . PostTypes::COURSE );
-		add_submenu_page( self::SLUG, __( 'Tags', 'shapelms' ), __( 'Tags', 'shapelms' ), Capabilities::MANAGE, 'edit-tags.php?taxonomy=' . Taxonomies::TAG . '&post_type=' . PostTypes::COURSE );
+		$starts = array();
+		$index  = 0;
+		foreach ( $groups as $group ) {
+			$first = true;
+			foreach ( $group as $key ) {
+				$slug = '';
+				if ( 'tax:category' === $key ) {
+					$slug = 'edit-tags.php?taxonomy=' . Taxonomies::CATEGORY . '&post_type=' . PostTypes::COURSE;
+					add_submenu_page( self::SLUG, __( 'Categories', 'shapelms' ), __( 'Categories', 'shapelms' ), Capabilities::MANAGE, $slug );
+				} elseif ( 'tax:tag' === $key ) {
+					$slug = 'edit-tags.php?taxonomy=' . Taxonomies::TAG . '&post_type=' . PostTypes::COURSE;
+					add_submenu_page( self::SLUG, __( 'Tags', 'shapelms' ), __( 'Tags', 'shapelms' ), Capabilities::MANAGE, $slug );
+				} elseif ( isset( $screens[ $key ] ) ) {
+					$slug = $key ? self::SLUG . '-' . $key : self::SLUG;
+					add_submenu_page( self::SLUG, $screens[ $key ][0], $screens[ $key ][0], $screens[ $key ][1], $slug, array( $this, 'render_app' ) );
+				}
+
+				if ( $slug && $first && $index > 0 ) {
+					$starts[ $slug ] = true;
+				}
+				if ( $slug ) {
+					$first = false;
+				}
+			}
+			++$index;
+		}
+
+		// Mark the first item of every group after the first, so CSS can draw a divider above it.
+		// Core prints index 4 of a submenu entry as a class on its <li>.
+		global $submenu;
+		if ( isset( $submenu[ self::SLUG ] ) && is_array( $submenu[ self::SLUG ] ) ) {
+			foreach ( $submenu[ self::SLUG ] as $i => $item ) {
+				if ( isset( $item[2], $starts[ $item[2] ] ) ) {
+					$submenu[ self::SLUG ][ $i ][4] = trim( ( isset( $item[4] ) ? $item[4] : '' ) . ' shapelms-menu-group-start' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- adding a CSS class to our own submenu entries.
+				}
+			}
+		}
 	}
 
 	/**
@@ -97,6 +161,7 @@ class Menu {
 	 */
 	public function render_app() {
 		$screen = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : self::SLUG; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
 		$screen = str_replace( self::SLUG . '-', '', $screen );
 		$screen = self::SLUG === $screen ? 'dashboard' : $screen;
 

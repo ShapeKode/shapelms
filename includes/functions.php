@@ -123,3 +123,132 @@ function shapelms_format_duration( $seconds ) {
 function shapelms_format_price( $amount ) {
 	return \ShapeLMS\Services\CurrencyService::format( (float) $amount );
 }
+
+/**
+ * Sanitizes quiz text that is shown as plain text (answer options, accepted answers,
+ * student answers). Unlike sanitize_text_field() it keeps "<" and ">", so a quiz can
+ * ask about literal markup like "<h1>". The value is always escaped on output.
+ *
+ * @param mixed $value      Raw value.
+ * @param int   $max_length Maximum length in characters.
+ * @return string
+ */
+function shapelms_sanitize_plain_text( $value, $max_length = 1000 ) {
+	$value = wp_check_invalid_utf8( (string) $value, true );
+	$value = (string) preg_replace( '/[\x00-\x1F\x7F]+/u', ' ', $value );
+	$value = trim( (string) preg_replace( '/ {2,}/', ' ', $value ) );
+
+	return mb_substr( $value, 0, max( 1, (int) $max_length ) );
+}
+
+/**
+ * Embed HTML for a lesson's video (YouTube, Vimeo, self-hosted or raw embed), or empty.
+ *
+ * @param int  $lesson_id Lesson id.
+ * @param bool $autoplay  Autoplay (YouTube/Vimeo only, used for preview modals).
+ * @return string
+ */
+function shapelms_lesson_video_html( $lesson_id, $autoplay = false ) {
+	$source = (string) get_post_meta( $lesson_id, '_shapelms_video_source', true );
+	$url    = (string) get_post_meta( $lesson_id, '_shapelms_video_url', true );
+	$embed  = (string) get_post_meta( $lesson_id, '_shapelms_video_embed', true );
+	$html   = '';
+
+	switch ( $source ) {
+		case 'youtube':
+		case 'vimeo':
+			$html = $url ? \ShapeLMS\Frontend\VideoEmbed::html( $url, get_the_title( $lesson_id ), $autoplay ) : '';
+			break;
+
+		case 'html5':
+			if ( $url ) {
+				$html = wp_video_shortcode(
+					array(
+						'src'     => $url,
+						'preload' => 'metadata',
+					)
+				);
+			}
+			break;
+
+		case 'embed':
+			$html = \ShapeLMS\Content\Meta::sanitize_embed( $embed );
+			break;
+	}
+
+	/**
+	 * Filters the lesson video HTML.
+	 *
+	 * @param string $html      Embed HTML.
+	 * @param int    $lesson_id Lesson id.
+	 * @param string $source    Video source.
+	 */
+	return (string) apply_filters( 'shapelms_lesson_video_html', $html, (int) $lesson_id, $source );
+}
+
+/**
+ * Whether a lesson has a playable video.
+ *
+ * @param int $lesson_id Lesson id.
+ * @return bool
+ */
+function shapelms_lesson_has_video( $lesson_id ) {
+	$source = (string) get_post_meta( $lesson_id, '_shapelms_video_source', true );
+
+	if ( ! $source || 'none' === $source ) {
+		return false;
+	}
+
+	return 'embed' === $source ? '' !== (string) get_post_meta( $lesson_id, '_shapelms_video_embed', true ) : '' !== (string) get_post_meta( $lesson_id, '_shapelms_video_url', true );
+}
+
+/**
+ * URL of the front-end Sign in page (falls back to wp-login.php when the page is missing).
+ *
+ * @param string $redirect Where to go after logging in.
+ * @return string
+ */
+function shapelms_login_url( $redirect = '' ) {
+	$page_id = \ShapeLMS\Core\Pages::get_id( 'login' );
+
+	if ( ! $page_id || 'publish' !== get_post_status( $page_id ) ) {
+		return wp_login_url( $redirect );
+	}
+
+	$url = (string) get_permalink( $page_id );
+
+	return $redirect ? add_query_arg( 'redirect_to', rawurlencode( $redirect ), $url ) : $url;
+}
+
+/**
+ * URL of the front-end Sign up page (falls back to wp-login.php?action=register).
+ *
+ * @param string $redirect Where to go after signing up.
+ * @return string
+ */
+function shapelms_register_url( $redirect = '' ) {
+	$page_id = \ShapeLMS\Core\Pages::get_id( 'register' );
+
+	if ( ! $page_id || 'publish' !== get_post_status( $page_id ) ) {
+		return wp_registration_url();
+	}
+
+	$url = (string) get_permalink( $page_id );
+
+	return $redirect ? add_query_arg( 'redirect_to', rawurlencode( $redirect ), $url ) : $url;
+}
+
+/**
+ * URL of the front-end lost-password step (on the Sign in page).
+ *
+ * @return string
+ */
+function shapelms_lostpassword_url() {
+	$page_id = \ShapeLMS\Core\Pages::get_id( 'login' );
+
+	if ( ! $page_id || 'publish' !== get_post_status( $page_id ) ) {
+		return wp_lostpassword_url();
+	}
+
+	return add_query_arg( 'step', 'lost', (string) get_permalink( $page_id ) );
+}

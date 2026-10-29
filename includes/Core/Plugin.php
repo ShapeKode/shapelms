@@ -130,6 +130,7 @@ final class Plugin {
 		$this->get( \ShapeLMS\Content\Taxonomies::class )->register();
 		$this->get( \ShapeLMS\Content\Meta::class )->register();
 		$this->get( \ShapeLMS\Frontend\Frontend::class )->register();
+		$this->get( \ShapeLMS\Frontend\Auth::class )->register();
 		$this->get( \ShapeLMS\Blocks\Blocks::class )->register();
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {

@@ -45,7 +45,7 @@ foreach ( $shapelms_tabs as $shapelms_group ) {
 				<?php endforeach; ?>
 			<?php endforeach; ?>
 			<li class="is-section"></li>
-			<li><a href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Log out', 'shapelms' ); ?></a></li>
+			<li><a href="<?php echo esc_url( wp_logout_url( shapelms_login_url() ) ); ?>"><?php esc_html_e( 'Log out', 'shapelms' ); ?></a></li>
 		</ul>
 	</nav>
 

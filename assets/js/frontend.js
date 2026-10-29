@@ -30,6 +30,16 @@
 	/* Helpers                                                             */
 	/* ------------------------------------------------------------------ */
 
+	/*
+	 * Question type registry for add-ons:
+	 * window.shapelmsQuestionTypes[ typeId ] = {
+	 *   render( { question, answer, setAnswer, el, __ } ) => Element,   // the input UI
+	 *   format( question, value ) => string,                           // value shown in the review
+	 * }
+	 * setAnswer( value ) stores the answer and saves it to the server.
+	 */
+	window.shapelmsQuestionTypes = window.shapelmsQuestionTypes || {};
+
 	function config( el ) {
 		var root = el && el.closest ? el.closest( '[data-rest-url]' ) : null;
 		root = root || document.querySelector( '[data-rest-url]' );
@@ -203,6 +213,7 @@
 						button.classList.add( 'is-done' );
 						button.textContent = __( 'Completed', 'shapelms' );
 						updateProgressUi( root, res, lessonId );
+						unlockNext( root, res );
 
 						if ( res.completed ) {
 							window.location.href = res.course_url;
@@ -230,6 +241,32 @@
 				nextLink.click();
 			} else if ( e.key === 'p' && prevLink ) {
 				prevLink.click();
+			}
+		} );
+	}
+
+	function unlockNext( root, summary ) {
+		var next = root.querySelector( '[data-shapelms-next-locked]' );
+		if ( ! next ) {
+			return;
+		}
+		next.classList.remove( 'is-disabled' );
+		next.removeAttribute( 'aria-disabled' );
+		next.removeAttribute( 'title' );
+		next.removeAttribute( 'data-shapelms-next-locked' );
+		root.querySelectorAll( '.shapelms-learn__item.is-locked' ).forEach( function ( item ) {
+			var id = parseInt( item.getAttribute( 'data-item-id' ), 10 );
+			if ( ( summary.locked || [] ).indexOf( id ) === -1 ) {
+				item.classList.remove( 'is-locked' );
+				var locked = item.querySelector( '.shapelms-learn__locked' );
+				var link = item.querySelector( 'a' );
+				if ( locked && ! link && item.getAttribute( 'data-item-url' ) ) {
+					var a = document.createElement( 'a' );
+					a.href = item.getAttribute( 'data-item-url' );
+					a.innerHTML = '<span class="shapelms-learn__check" aria-hidden="true"></span>';
+					a.appendChild( locked.querySelector( '.shapelms-learn__item-title' ) );
+					locked.parentNode.replaceChild( a, locked );
+				}
 			}
 		} );
 	}
@@ -312,7 +349,7 @@
 				tbody.appendChild( el( 'tr', {}, [
 					el( 'td', { text: '#' + row.attempt_number } ),
 					el( 'td', { text: sprintf( /* translators: %d: percent */ __( '%d%%', 'shapelms' ), row.percentage ) } ),
-					el( 'td', {}, [ el( 'span', { class: 'shapelms-tag ' + ( row.passed ? 'shapelms-tag--success' : 'shapelms-tag--danger' ), text: row.passed ? __( 'Passed', 'shapelms' ) : __( 'Failed', 'shapelms' ) } ) ] ),
+					el( 'td', {}, [ el( 'span', { class: 'shapelms-tag ' + ( row.status === 'pending_review' ? '' : ( row.passed ? 'shapelms-tag--success' : 'shapelms-tag--danger' ) ), text: row.status === 'pending_review' ? __( 'Waiting for review', 'shapelms' ) : ( row.passed ? __( 'Passed', 'shapelms' ) : __( 'Failed', 'shapelms' ) ) } ) ] ),
 					el( 'td', { text: row.finished_at ? new Date( row.finished_at.replace( ' ', 'T' ) + 'Z' ).toLocaleDateString() : '' } ),
 					el( 'td', {}, [ view ] )
 				] ) );
@@ -327,7 +364,8 @@
 				state.attempt = data.attempt;
 				state.questions = data.questions;
 				state.settings = data.settings;
-				state.perPage = data.settings.questions_per_page > 0 ? data.settings.questions_per_page : 1;
+				// 0 means "all questions on one page" (as the quiz settings say).
+				state.perPage = data.settings.questions_per_page > 0 ? data.settings.questions_per_page : Math.max( 1, data.questions.length );
 				state.page = 0;
 				state.answers = {};
 				data.questions.forEach( function ( q ) {
@@ -389,6 +427,10 @@
 				form.appendChild( renderQuestion( q, startIndex + i ) );
 			} );
 
+			// Lets add-ons react to the questions now on screen (for example per-question timers).
+			// render( q ) swaps in fresh data for one question on this page and returns its new fieldset.
+			document.dispatchEvent( new window.CustomEvent( 'shapelms:quiz-page', { detail: { attemptId: state.attempt.id, form: form, questions: slice, render: rerender } } ) );
+
 			counter.textContent = state.perPage === 1
 				? sprintf( /* translators: 1: question number, 2: total questions */ __( 'Question %1$d of %2$d', 'shapelms' ), state.page + 1, state.questions.length )
 				: sprintf( /* translators: 1: current page, 2: total pages */ __( 'Page %1$d of %2$d', 'shapelms' ), state.page + 1, pageCount() );
@@ -396,6 +438,22 @@
 			prevBtn.hidden = state.page === 0;
 			nextBtn.hidden = state.page >= pageCount() - 1;
 			submitBtn.hidden = state.page < pageCount() - 1;
+		}
+
+		function rerender( q ) {
+			for ( var i = 0; i < state.questions.length; i++ ) {
+				if ( state.questions[ i ].id === q.id ) {
+					var current = form.querySelector( '[data-question-id="' + q.id + '"]' );
+					state.questions[ i ] = q;
+					if ( ! current ) {
+						return null;
+					}
+					var fresh = renderQuestion( q, i );
+					current.parentNode.replaceChild( fresh, current );
+					return fresh;
+				}
+			}
+			return null;
 		}
 
 		function renderQuestion( q, index ) {
@@ -411,8 +469,20 @@
 
 			var answer = state.answers[ q.id ];
 			var name = 'q_' + q.id;
+			var custom = window.shapelmsQuestionTypes[ q.type ];
 
-			if ( q.type === 'single_choice' || q.type === 'true_false' || q.type === 'multiple_choice' ) {
+			if ( custom && typeof custom.render === 'function' ) {
+				fieldset.appendChild( custom.render( {
+					question: q,
+					answer: answer,
+					el: el,
+					__: __,
+					setAnswer: function ( value ) {
+						state.answers[ q.id ] = value;
+						saveAnswer( q, fieldset );
+					},
+				} ) );
+			} else if ( q.type === 'single_choice' || q.type === 'true_false' || q.type === 'multiple_choice' ) {
 				var multi = q.type === 'multiple_choice';
 				( q.data.options || [] ).forEach( function ( opt ) {
 					var checked = multi ? Array.isArray( answer ) && answer.indexOf( opt.id ) !== -1 : answer === opt.id;
@@ -428,7 +498,7 @@
 						}
 						saveAnswer( q, fieldset );
 					} );
-					var label = el( 'label', { class: 'shapelms-option' }, [ input, el( 'span', { class: 'shapelms-option__text', html: opt.text } ) ] );
+					var label = el( 'label', { class: 'shapelms-option' }, [ input, el( 'span', { class: 'shapelms-option__text', text: opt.text } ) ] );
 					if ( opt.image ) {
 						label.appendChild( el( 'img', { src: opt.image, alt: '', class: 'shapelms-option__image' } ) );
 					}
@@ -468,7 +538,7 @@
 		function saveAnswer( q, fieldset ) {
 			api( learn, 'quizzes/attempts/' + state.attempt.id + '/answer', { method: 'POST', body: { question_id: q.id, answer: state.answers[ q.id ] } } )
 				.then( function ( res ) {
-					if ( state.settings.feedback_mode === 'instant' && typeof res.is_correct !== 'undefined' ) {
+					if ( state.settings.feedback_mode === 'instant' && typeof res.is_correct !== 'undefined' && res.is_correct !== null ) {
 						var box = fieldset.querySelector( '.shapelms-question__feedback' );
 						box.className = 'shapelms-question__feedback is-' + ( res.is_correct ? 'correct' : 'incorrect' );
 						box.innerHTML = '';
@@ -522,22 +592,33 @@
 			result.innerHTML = '';
 
 			var passed = data.passed;
-			result.appendChild( el( 'div', { class: 'shapelms-result ' + ( passed ? 'is-passed' : 'is-failed' ) }, [
-				el( 'div', { class: 'shapelms-result__score', text: sprintf( /* translators: %d: percent */ __( '%d%%', 'shapelms' ), data.percentage ) } ),
-				el( 'h2', { text: passed ? __( 'Congratulations, you passed!', 'shapelms' ) : __( 'You did not pass this time.', 'shapelms' ) } ),
-				el( 'p', { class: 'shapelms-muted', text: sprintf( /* translators: 1: score, 2: maximum score, 3: pass mark percent */ __( 'Score: %1$s of %2$s points. Pass mark: %3$d%%.', 'shapelms' ), data.score, data.max_score, data.settings.pass_mark ) } )
-			] ) );
+			if ( data.status === 'pending_review' ) {
+				result.appendChild( el( 'div', { class: 'shapelms-result is-pending' }, [
+					el( 'div', { class: 'shapelms-result__score', text: '…' } ),
+					el( 'h2', { text: __( 'Submitted. Waiting for review.', 'shapelms' ) } ),
+					el( 'p', { class: 'shapelms-muted', text: __( 'Some answers are graded by your instructor. Your final score appears here once they are reviewed.', 'shapelms' ) } )
+				] ) );
+			} else {
+				result.appendChild( el( 'div', { class: 'shapelms-result ' + ( passed ? 'is-passed' : 'is-failed' ) }, [
+					el( 'div', { class: 'shapelms-result__score', text: sprintf( /* translators: %d: percent */ __( '%d%%', 'shapelms' ), data.percentage ) } ),
+					el( 'h2', { text: passed ? __( 'Congratulations, you passed!', 'shapelms' ) : __( 'You did not pass this time.', 'shapelms' ) } ),
+					el( 'p', { class: 'shapelms-muted', text: sprintf( /* translators: 1: score, 2: maximum score, 3: pass mark percent */ __( 'Score: %1$s of %2$s points. Pass mark: %3$d%%.', 'shapelms' ), data.score, data.max_score, data.settings.pass_mark ) } )
+				] ) );
+			}
 
 			if ( data.questions && data.questions.length ) {
 				var list = el( 'div', { class: 'shapelms-review' } );
 				data.questions.forEach( function ( q, i ) {
-					var item = el( 'div', { class: 'shapelms-review__item is-' + ( q.is_correct ? 'correct' : 'incorrect' ) } );
+					var item = el( 'div', { class: 'shapelms-review__item is-' + ( q.is_correct === null ? 'pending' : ( q.is_correct ? 'correct' : 'incorrect' ) ) } );
 					item.appendChild( el( 'h3', { text: ( i + 1 ) + '. ' + q.title } ) );
 					item.appendChild( el( 'p', { class: 'shapelms-muted', text: sprintf( /* translators: %s: the student's answer */ __( 'Your answer: %s', 'shapelms' ), formatAnswer( q, q.answer ) ) } ) );
 					if ( q.correct ) {
 						item.appendChild( el( 'p', { text: sprintf( /* translators: %s: the correct answer */ __( 'Correct answer: %s', 'shapelms' ), formatAnswer( q, q.correct ) ) } ) );
 					}
-					item.appendChild( el( 'p', { class: 'shapelms-review__points', text: sprintf( /* translators: 1: points earned, 2: maximum points */ __( '%1$s / %2$s points', 'shapelms' ), q.points, q.max_points ) } ) );
+					item.appendChild( el( 'p', { class: 'shapelms-review__points', text: q.is_correct === null ? __( 'Waiting for review', 'shapelms' ) : sprintf( /* translators: 1: points earned, 2: maximum points */ __( '%1$s / %2$s points', 'shapelms' ), q.points, q.max_points ) } ) );
+					if ( q.feedback ) {
+						item.appendChild( el( 'div', { class: 'shapelms-review__feedback' }, [ el( 'strong', { text: __( 'Feedback: ', 'shapelms' ) } ), el( 'span', { text: q.feedback } ) ] ) );
+					}
 					if ( q.explanation ) {
 						item.appendChild( el( 'div', { class: 'shapelms-review__explanation shapelms-prose', html: q.explanation } ) );
 					}
@@ -571,6 +652,10 @@
 			if ( value === null || value === undefined || value === '' ) {
 				return __( '(no answer)', 'shapelms' );
 			}
+			var custom = window.shapelmsQuestionTypes[ q.type ];
+			if ( custom && typeof custom.format === 'function' ) {
+				return String( custom.format( q, value ) );
+			}
 			var options = ( q.data && q.data.options ) || [];
 			var list = Array.isArray( value ) ? value : [ value ];
 			return list.map( function ( v ) {
@@ -578,9 +663,8 @@
 					return o.id === v;
 				} )[ 0 ];
 				if ( opt ) {
-					var tmp = document.createElement( 'div' );
-					tmp.innerHTML = opt.text;
-					return tmp.textContent;
+					// Option text is plain text (it may be literal markup such as "<h1>").
+					return String( opt.text );
 				}
 				return String( v );
 			} ).join( ', ' );
@@ -754,6 +838,122 @@
 	/* Dashboard tabs                                                      */
 	/* ------------------------------------------------------------------ */
 
+	/* ------------------------------------------------------------------ */
+	/* Video preview modal: [data-shapelms-video="<template id>"]          */
+	/* ------------------------------------------------------------------ */
+
+	function initVideoModal() {
+		var modal = null;
+		var lastTrigger = null;
+
+		function build() {
+			modal = document.createElement( 'div' );
+			modal.className = 'shapelms-modal';
+			modal.hidden = true;
+			modal.innerHTML =
+				'<div class="shapelms-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="shapelms-modal-title">' +
+					'<div class="shapelms-modal__header">' +
+						'<h2 class="shapelms-modal__title" id="shapelms-modal-title"></h2>' +
+						'<button type="button" class="shapelms-modal__close" data-shapelms-modal-close><span class="screen-reader-text"></span><span aria-hidden="true">&times;</span></button>' +
+					'</div>' +
+					'<div class="shapelms-modal__body shapelms-video"></div>' +
+					'<div class="shapelms-modal__footer" hidden><a class="shapelms-btn shapelms-btn--secondary" href="#"></a></div>' +
+				'</div>';
+			modal.querySelector( '.shapelms-modal__close .screen-reader-text' ).textContent = __( 'Close', 'shapelms' );
+			document.body.appendChild( modal );
+
+			modal.addEventListener( 'click', function ( e ) {
+				if ( e.target === modal || e.target.closest( '[data-shapelms-modal-close]' ) ) {
+					close();
+				}
+			} );
+			document.addEventListener( 'keydown', function ( e ) {
+				if ( e.key === 'Escape' && ! modal.hidden ) {
+					close();
+				}
+			} );
+		}
+
+		function open( trigger ) {
+			var tpl = document.getElementById( trigger.getAttribute( 'data-shapelms-video' ) );
+			if ( ! tpl ) {
+				return;
+			}
+			if ( ! modal ) {
+				build();
+			}
+			lastTrigger = trigger;
+			modal.querySelector( '.shapelms-modal__title' ).textContent = trigger.getAttribute( 'data-shapelms-video-title' ) || '';
+			var body = modal.querySelector( '.shapelms-modal__body' );
+			body.innerHTML = '';
+			body.appendChild( tpl.content.cloneNode( true ) );
+
+			var footer = modal.querySelector( '.shapelms-modal__footer' );
+			var link = trigger.getAttribute( 'data-shapelms-video-link' );
+			footer.hidden = ! link;
+			if ( link ) {
+				var a = footer.querySelector( 'a' );
+				a.href = link;
+				a.textContent = __( 'Open lesson', 'shapelms' );
+			}
+
+			modal.hidden = false;
+			document.body.classList.add( 'shapelms-modal-open' );
+			modal.querySelector( '[data-shapelms-modal-close]' ).focus();
+		}
+
+		function close() {
+			if ( ! modal ) {
+				return;
+			}
+			modal.hidden = true;
+			modal.querySelector( '.shapelms-modal__body' ).innerHTML = '';
+			document.body.classList.remove( 'shapelms-modal-open' );
+			if ( lastTrigger && lastTrigger.focus ) {
+				lastTrigger.focus();
+			}
+		}
+
+		document.addEventListener( 'click', function ( e ) {
+			var trigger = e.target.closest ? e.target.closest( '[data-shapelms-video]' ) : null;
+			if ( trigger ) {
+				e.preventDefault();
+				open( trigger );
+			}
+		} );
+	}
+
+	/* ------------------------------------------------------------------ */
+	/* Archive filters: auto-apply and mobile toggle                        */
+	/* ------------------------------------------------------------------ */
+
+	function initFilters() {
+		document.querySelectorAll( 'form[data-shapelms-filters]' ).forEach( function ( form ) {
+			form.classList.add( 'has-js' );
+			form.addEventListener( 'change', function ( e ) {
+				if ( e.target && ( e.target.tagName === 'SELECT' || e.target.type === 'radio' ) ) {
+					form.submit();
+				}
+			} );
+		} );
+
+		var toggle = document.querySelector( '[data-shapelms-filters-toggle]' );
+		var panel = toggle ? document.getElementById( toggle.getAttribute( 'aria-controls' ) ) : null;
+		if ( toggle && panel ) {
+			toggle.addEventListener( 'click', function () {
+				var open = ! panel.classList.contains( 'is-open' );
+				panel.classList.toggle( 'is-open', open );
+				toggle.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
+				document.body.classList.toggle( 'shapelms-filters-open', open );
+			} );
+			panel.addEventListener( 'click', function ( e ) {
+				if ( e.target === panel ) {
+					toggle.click();
+				}
+			} );
+		}
+	}
+
 	function initTabs() {
 		document.querySelectorAll( '[data-shapelms-tabs]' ).forEach( function ( tabs ) {
 			var links = tabs.querySelectorAll( '[data-tab]' );
@@ -796,6 +996,8 @@
 		initQuiz();
 		initForms();
 		initActions();
+		initFilters();
+		initVideoModal();
 		initTabs();
 		document.dispatchEvent( new CustomEvent( 'shapelms:ready', { detail: { api: api, config: config, el: el, message: message } } ) );
 	}

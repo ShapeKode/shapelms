@@ -4,12 +4,14 @@
 import { useState } from '@wordpress/element';
 import { Button, TextControl, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 import { DndContext, PointerSensor, KeyboardSensor, useSensor, useSensors, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { post, patch, del, errorMessage } from '../../shared/api';
 import { success, error as notifyError } from '../../admin/notices';
 import ItemEditor from '../components/ItemEditor';
+import { itemTypes, itemType } from '../itemTypes';
 
 function Handle( { listeners, attributes } ) {
 	return (
@@ -25,11 +27,18 @@ function SortableItem( { item, onEdit, onDelete } ) {
 	return (
 		<div ref={ setNodeRef } style={ style } className={ `shapelms-curriculum-builder__item ${ isDragging ? 'is-dragging' : '' }` }>
 			<Handle listeners={ listeners } attributes={ attributes } />
-			<span className={ `shapelms-item-icon ${ item.type === 'quiz' ? 'is-quiz' : '' }` }>{ item.type === 'quiz' ? 'Q' : 'L' }</span>
+			<span className={ `shapelms-item-icon is-${ item.type }` } title={ itemType( item.type ).label }>{ itemType( item.type ).icon }</span>
 			<button type="button" className="shapelms-curriculum-builder__item-title" onClick={ () => onEdit( item ) }>
 				{ item.title }
 				{ item.status === 'draft' && <span className="shapelms-badge is-neutral" style={ { marginLeft: 8 } }>{ __( 'Draft', 'shapelms' ) }</span> }
 				{ item.preview && <span className="shapelms-badge is-info" style={ { marginLeft: 8 } }>{ __( 'Preview', 'shapelms' ) }</span> }
+				{
+					/**
+					 * Extra badges after the item title. Add-ons append elements: return [ ...badges, myBadge ].
+					 * Args: { item } (the curriculum item, including data added with the shapelms_curriculum_item PHP filter).
+					 */
+					applyFilters( 'shapelms.builder.itemBadges', [], { item } )
+				}
 			</button>
 			<Button size="small" variant="tertiary" onClick={ () => onEdit( item ) }>{ __( 'Edit', 'shapelms' ) }</Button>
 			<Button size="small" variant="tertiary" isDestructive icon="trash" label={ __( 'Delete', 'shapelms' ) } onClick={ () => onDelete( item ) } />
@@ -71,14 +80,15 @@ function SortableTopic( { topic, onRename, onDelete, onAddItem, onEditItem, onDe
 			<div className="shapelms-curriculum-builder__add">
 				{ adding ? (
 					<>
-						<TextControl value={ title } onChange={ setTitle } placeholder={ adding === 'quiz' ? __( 'Quiz title', 'shapelms' ) : __( 'Lesson title', 'shapelms' ) } onKeyDown={ ( e ) => e.key === 'Enter' && submitAdd() } autoFocus __nextHasNoMarginBottom />
+						<TextControl value={ title } onChange={ setTitle } placeholder={ adding === 'quiz' ? __( 'Quiz title', 'shapelms' ) : ( adding === 'lesson' ? __( 'Lesson title', 'shapelms' ) : itemType( adding ).label ) } onKeyDown={ ( e ) => e.key === 'Enter' && submitAdd() } autoFocus __nextHasNoMarginBottom />
 						<Button variant="primary" size="compact" onClick={ submitAdd }>{ __( 'Add', 'shapelms' ) }</Button>
 						<Button variant="tertiary" size="compact" onClick={ () => setAdding( null ) }>{ __( 'Cancel', 'shapelms' ) }</Button>
 					</>
 				) : (
 					<>
-						<Button variant="secondary" size="compact" onClick={ () => setAdding( 'lesson' ) }>{ __( '+ Lesson', 'shapelms' ) }</Button>
-						<Button variant="secondary" size="compact" onClick={ () => setAdding( 'quiz' ) }>{ __( '+ Quiz', 'shapelms' ) }</Button>
+						{ Object.entries( itemTypes() ).map( ( [ type, info ] ) => (
+							<Button key={ type } variant="secondary" size="compact" onClick={ () => setAdding( type ) }>{ info.add_label }</Button>
+						) ) }
 					</>
 				) }
 			</div>
@@ -213,7 +223,7 @@ export default function CurriculumTab( { course, setCourse } ) {
 			</div>
 
 			{ editing && (
-				<Modal title={ editing.type === 'quiz' ? __( 'Edit quiz', 'shapelms' ) : __( 'Edit lesson', 'shapelms' ) } onRequestClose={ () => setEditing( null ) } className="shapelms-item-editor" size="large" shouldCloseOnClickOutside={ false }>
+				<Modal title={ itemType( editing.type ).edit_label } onRequestClose={ () => setEditing( null ) } className="shapelms-item-editor" size="large" shouldCloseOnClickOutside={ false }>
 					<ItemEditor item={ editing } onSaved={ onItemSaved } onClose={ () => setEditing( null ) } />
 				</Modal>
 			) }

@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "shapelms/register",
+	"title": "LMS Sign Up",
+	"category": "shapelms",
+	"icon": "welcome-write-blog",
+	"description": "Front-end student registration form.",
+	"keywords": [
+		"register",
+		"account",
+		"lms"
+	],
+	"textdomain": "shapelms",
+	"supports": {
+		"html": false,
+		"multiple": false,
+		"align": [
+			"wide",
+			"full"
+		]
+	},
+	"editorScript": "shapelms-blocks"
+}

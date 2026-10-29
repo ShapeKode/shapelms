@@ -4,6 +4,7 @@
 import { useState } from '@wordpress/element';
 import { Button, TextControl, TextareaControl, SelectControl, ToggleControl } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 import { post, patch, del, errorMessage } from '../../shared/api';
 import { success, error as notifyError } from '../../admin/notices';
 
@@ -46,7 +47,7 @@ function OptionsEditor( { question, onChange } ) {
 	);
 }
 
-function QuestionForm( { question, types, onChange, onSave, onCancel, busy } ) {
+export function QuestionForm( { question, types, onChange, onSave, onCancel, busy } ) {
 	return (
 		<div className="shapelms-questions__editor">
 			<div className="shapelms-builder__row">
@@ -59,7 +60,16 @@ function QuestionForm( { question, types, onChange, onSave, onCancel, busy } ) {
 			{ question.type === 'fill_blank' ? (
 				<TextareaControl label={ __( 'Text with blanks', 'shapelms' ) } help={ __( 'Write {blank} where a gap should appear. Then list one accepted answer per blank below; separate alternatives with |.', 'shapelms' ) } value={ question.description || '' } onChange={ ( description ) => onChange( { description } ) } rows={ 3 } __nextHasNoMarginBottom />
 			) : (
-				<TextareaControl label={ __( 'Extra details (optional)', 'shapelms' ) } value={ question.description || '' } onChange={ ( description ) => onChange( { description } ) } rows={ 2 } __nextHasNoMarginBottom />
+				<TextareaControl
+					{ ...applyFilters(
+						'shapelms.builder.questionDescription',
+						{ label: __( 'Extra details (optional)', 'shapelms' ), help: '', rows: 2 },
+						{ question }
+					) }
+					value={ question.description || '' }
+					onChange={ ( description ) => onChange( { description } ) }
+					__nextHasNoMarginBottom
+				/>
 			) }
 
 			{ [ 'single_choice', 'multiple_choice' ].includes( question.type ) && <OptionsEditor question={ question } onChange={ onChange } /> }
@@ -81,6 +91,15 @@ function QuestionForm( { question, types, onChange, onSave, onCancel, busy } ) {
 					<ToggleControl label={ __( 'Case sensitive', 'shapelms' ) } checked={ !! question.settings?.case_sensitive } onChange={ ( case_sensitive ) => onChange( { settings: { ...question.settings, case_sensitive } } ) } __nextHasNoMarginBottom />
 				</>
 			) }
+
+			{
+				/**
+				 * Editors for question types added by add-ons. Return [ ...editors, myEditor ] for your type.
+				 * Args: { question, onChange }. Store data in options [ { id, text, image } ], correct [ strings ]
+				 * and settings { key: scalar | string[] }; those are the fields the server keeps.
+				 */
+				applyFilters( 'shapelms.builder.questionEditor', [], { question, onChange } )
+			}
 
 			<TextareaControl label={ __( 'Explanation (shown after answering)', 'shapelms' ) } value={ question.explanation || '' } onChange={ ( explanation ) => onChange( { explanation } ) } rows={ 2 } __nextHasNoMarginBottom />
 

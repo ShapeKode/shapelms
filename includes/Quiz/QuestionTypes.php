@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Holds the available question types. Pro adds more through the filter.
+ * Holds the available question types. Add-ons can register more through the shapelms_question_types filter.
  */
 class QuestionTypes {
 

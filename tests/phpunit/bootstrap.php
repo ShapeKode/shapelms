@@ -34,3 +34,5 @@ function shapelms_tests_load_plugin() {
 tests_add_filter( 'muplugins_loaded', 'shapelms_tests_load_plugin' );
 
 require "{$shapelms_tests_dir}/includes/bootstrap.php";
+
+require_once __DIR__ . '/ShapeLMS_TestCase.php';

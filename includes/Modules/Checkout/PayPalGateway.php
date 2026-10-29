@@ -132,7 +132,7 @@ class PayPalGateway implements GatewayInterface {
 	 * @param array<string, mixed> $body     JSON body.
 	 * @return array<string, mixed>|WP_Error
 	 */
-	private function request( $method, $endpoint, array $body = array() ) {
+	public function request( $method, $endpoint, array $body = array() ) {
 		$token = $this->token();
 
 		if ( is_wp_error( $token ) ) {
@@ -253,7 +253,8 @@ class PayPalGateway implements GatewayInterface {
 	 * @return array{order_id: int, transaction_id: string, action: string}|WP_Error
 	 */
 	public function webhook( WP_REST_Request $request ) {
-		$webhook_id = (string) apply_filters( 'shapelms_paypal_webhook_id', get_option( 'shapelms_paypal_webhook_id', '' ) );
+		$webhook_id = (string) Settings::get( 'commerce', 'paypal_webhook_id', '' );
+		$webhook_id = (string) apply_filters( 'shapelms_paypal_webhook_id', $webhook_id ? $webhook_id : get_option( 'shapelms_paypal_webhook_id', '' ) );
 		$event      = json_decode( $request->get_body(), true );
 
 		if ( ! is_array( $event ) || empty( $event['event_type'] ) ) {
@@ -281,6 +282,15 @@ class PayPalGateway implements GatewayInterface {
 		}
 
 		$resource = isset( $event['resource'] ) ? $event['resource'] : array();
+
+		if ( $webhook_id ) {
+			/**
+			 * Fires for every PayPal webhook event whose signature PayPal confirmed.
+			 *
+			 * @param array<string, mixed> $event Event.
+			 */
+			do_action( 'shapelms_paypal_webhook_event', $event );
+		}
 
 		if ( 'PAYMENT.CAPTURE.REFUNDED' === $event['event_type'] ) {
 			$custom = isset( $resource['custom_id'] ) ? (int) $resource['custom_id'] : 0;

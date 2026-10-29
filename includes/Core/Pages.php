@@ -35,19 +35,35 @@ class Pages {
 				'title'   => __( 'Become an Instructor', 'shapelms' ),
 				'content' => '<!-- wp:shapelms/instructor-registration /-->',
 			),
+			'login'               => array(
+				'title'   => __( 'Sign in', 'shapelms' ),
+				'content' => '<!-- wp:shapelms/login /-->',
+			),
+			'register'            => array(
+				'title'   => __( 'Sign up', 'shapelms' ),
+				'content' => '<!-- wp:shapelms/register /-->',
+			),
 		);
 	}
 
 	/**
 	 * Creates missing pages and stores their ids.
 	 *
+	 * On activation only pages that were never created are added, so a page the site owner
+	 * deleted on purpose does not come back. The setup wizard passes $recreate to restore them.
+	 *
+	 * @param bool $recreate Also recreate pages that were created before and later deleted.
 	 * @return void
 	 */
-	public static function create_pages() {
+	public static function create_pages( $recreate = false ) {
 		$pages = get_option( 'shapelms_pages', array() );
+		$pages = is_array( $pages ) ? $pages : array();
 
 		foreach ( self::definitions() as $key => $definition ) {
 			if ( ! empty( $pages[ $key ] ) && get_post_status( (int) $pages[ $key ] ) ) {
+				continue;
+			}
+			if ( array_key_exists( $key, $pages ) && ! $recreate ) {
 				continue;
 			}
 

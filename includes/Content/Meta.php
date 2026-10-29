@@ -87,6 +87,17 @@ class Meta {
 					'type'    => 'boolean',
 					'default' => false,
 				),
+				'_shapelms_progression'    => array(
+					'type'     => 'string',
+					'default'  => 'default',
+					'sanitize' => array( __CLASS__, 'sanitize_progression' ),
+				),
+				'_shapelms_prerequisites'  => array(
+					'type'     => 'array',
+					'default'  => array(),
+					'items'    => 'integer',
+					'sanitize' => array( __CLASS__, 'sanitize_int_list' ),
+				),
 			),
 			PostTypes::LESSON   => array(
 				'_shapelms_video_source'   => array(
@@ -170,7 +181,7 @@ class Meta {
 					'type'     => 'array',
 					'default'  => array(),
 					'items'    => 'string',
-					'sanitize' => array( __CLASS__, 'sanitize_string_list' ),
+					'sanitize' => array( __CLASS__, 'sanitize_answer_list' ),
 				),
 				'_shapelms_explanation' => array(
 					'type'     => 'string',
@@ -227,11 +238,41 @@ class Meta {
 	 * @return bool
 	 */
 	public function auth( $allowed, $meta_key, $post_id ) {
+		// ShapeLMS data is edited through its own API, which validates each field; XML-RPC custom fields skip that.
+		if ( defined( 'XMLRPC_REQUEST' ) && XMLRPC_REQUEST ) {
+			return false;
+		}
+
 		return current_user_can( 'edit_post', $post_id );
 	}
 
 	/**
-	 * Sanitizes a list of strings.
+	 * Sanitizes a list of quiz answers kept as plain text (literal "<h1>" stays intact).
+	 *
+	 * @param mixed $value Value.
+	 * @return string[]
+	 */
+	public static function sanitize_answer_list( $value ) {
+		if ( ! is_array( $value ) ) {
+			return array();
+		}
+
+		$clean = array();
+
+		foreach ( $value as $item ) {
+			if ( is_scalar( $item ) ) {
+				$item = shapelms_sanitize_plain_text( $item );
+				if ( '' !== $item ) {
+					$clean[] = $item;
+				}
+			}
+		}
+
+		return $clean;
+	}
+
+	/**
+	 * Sanitizes a list of plain strings.
 	 *
 	 * @param mixed $value Value.
 	 * @return string[]
@@ -275,6 +316,18 @@ class Meta {
 		$value = sanitize_key( (string) $value );
 
 		return in_array( $value, array( 'all', 'beginner', 'intermediate', 'advanced' ), true ) ? $value : 'all';
+	}
+
+	/**
+	 * Sanitizes the course progression mode (default|linear|free).
+	 *
+	 * @param mixed $value Value.
+	 * @return string
+	 */
+	public static function sanitize_progression( $value ) {
+		$value = sanitize_key( (string) $value );
+
+		return in_array( $value, array( 'default', 'linear', 'free' ), true ) ? $value : 'default';
 	}
 
 	/**
@@ -388,7 +441,7 @@ class Meta {
 			}
 			$clean[] = array(
 				'id'    => isset( $option['id'] ) ? sanitize_key( (string) $option['id'] ) : wp_generate_password( 8, false ),
-				'text'  => isset( $option['text'] ) ? wp_kses_post( (string) $option['text'] ) : '',
+				'text'  => isset( $option['text'] ) ? shapelms_sanitize_plain_text( $option['text'] ) : '',
 				'image' => isset( $option['image'] ) ? absint( $option['image'] ) : 0,
 			);
 		}
@@ -418,7 +471,7 @@ class Meta {
 			} elseif ( is_string( $item ) ) {
 				$clean[ $key ] = sanitize_text_field( $item );
 			} elseif ( is_array( $item ) ) {
-				$clean[ $key ] = self::sanitize_string_list( $item );
+				$clean[ $key ] = self::sanitize_answer_list( $item );
 			}
 		}
 

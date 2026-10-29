@@ -289,11 +289,13 @@ class CoursesController extends RestController {
 	 */
 	public function create_course( WP_REST_Request $request ) {
 		$id = wp_insert_post(
-			array(
-				'post_type'   => PostTypes::COURSE,
-				'post_title'  => $request->get_param( 'title' ),
-				'post_status' => 'draft',
-				'post_author' => get_current_user_id(),
+			wp_slash(
+				array(
+					'post_type'   => PostTypes::COURSE,
+					'post_title'  => $request->get_param( 'title' ),
+					'post_status' => 'draft',
+					'post_author' => get_current_user_id(),
+				)
 			),
 			true
 		);
@@ -320,6 +322,24 @@ class CoursesController extends RestController {
 
 		if ( ! $post || PostTypes::COURSE !== $post->post_type ) {
 			return $this->not_found();
+		}
+
+		// Only the course's author or a manager decides who else teaches it.
+		$meta = $request->get_param( 'meta' );
+		if ( is_array( $meta ) && ! $this->can_manage_instructors( $post ) ) {
+			foreach ( $meta as $key => $value ) {
+				// Same key normalisation as the save loop below, so no spelling slips past.
+				if ( '_shapelms_instructors' !== '_shapelms_' . sanitize_key( str_replace( '_shapelms_', '', (string) $key ) ) ) {
+					continue;
+				}
+				$current = array_map( 'intval', (array) get_post_meta( $id, '_shapelms_instructors', true ) );
+				$wanted  = Meta::sanitize_int_list( $value );
+				sort( $current );
+				sort( $wanted );
+				if ( $current !== $wanted ) {
+					return new \WP_Error( 'shapelms_forbidden', __( 'Only the course author can change its instructors.', 'shapelms' ), array( 'status' => 403 ) );
+				}
+			}
 		}
 
 		$update = array( 'ID' => $id );
@@ -357,13 +377,12 @@ class CoursesController extends RestController {
 		}
 
 		if ( count( $update ) > 1 ) {
-			$result = wp_update_post( $update, true );
+			$result = wp_update_post( wp_slash( $update ), true );
 			if ( is_wp_error( $result ) ) {
 				return $this->error( $result );
 			}
 		}
 
-		$meta = $request->get_param( 'meta' );
 		if ( is_array( $meta ) ) {
 			$definitions = Meta::definitions();
 			foreach ( $meta as $key => $value ) {
@@ -373,7 +392,7 @@ class CoursesController extends RestController {
 				}
 				$field = $definitions[ PostTypes::COURSE ][ $key ];
 				$value = isset( $field['sanitize'] ) ? call_user_func( $field['sanitize'], $value ) : $this->cast( $value, $field['type'] );
-				update_post_meta( $id, $key, $value );
+				update_post_meta( $id, $key, wp_slash( $value ) );
 			}
 		}
 
@@ -425,6 +444,10 @@ class CoursesController extends RestController {
 			return $this->not_found();
 		}
 
+		if ( ! current_user_can( 'delete_post', $id ) ) {
+			return $this->forbidden();
+		}
+
 		return array( 'deleted' => (bool) wp_trash_post( $id ) );
 	}
 
@@ -455,7 +478,26 @@ class CoursesController extends RestController {
 		$data['can_publish']  = current_user_can( Capabilities::MANAGE ) || (bool) shapelms_get_setting( 'instructor', 'can_publish', false );
 		$data['preview_url']  = get_preview_post_link( $post );
 
-		return $data;
+		$data['can_manage_instructors'] = $this->can_manage_instructors( $post );
+		$data['can_change_status']      = true;
+
+		/**
+		 * Filters the data the course builder loads for one course.
+		 *
+		 * @param array<string, mixed> $data      Builder data.
+		 * @param int                  $course_id Course id.
+		 */
+		return (array) apply_filters( 'shapelms_course_builder_data', $data, $id );
+	}
+
+	/**
+	 * Whether the current user may change a course's co-instructors.
+	 *
+	 * @param \WP_Post $post Course.
+	 * @return bool
+	 */
+	private function can_manage_instructors( $post ) {
+		return current_user_can( Capabilities::MANAGE ) || get_current_user_id() === (int) $post->post_author;
 	}
 
 	/**

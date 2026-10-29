@@ -47,13 +47,17 @@ $shapelms_level_map = array(
 				<?php if ( $shapelms_course['rating']['count'] > 0 ) : ?>
 					<li class="shapelms-rating">
 						<span class="shapelms-rating__star">★</span>
-						<?php echo esc_html( number_format_i18n( $shapelms_course['rating']['average'], 1 ) ); ?>
+						<strong><?php echo esc_html( number_format_i18n( $shapelms_course['rating']['average'], 1 ) ); ?></strong>
 						<small>(<?php echo esc_html( sprintf( /* translators: %d: reviews */ _n( '%d review', '%d reviews', $shapelms_course['rating']['count'], 'shapelms' ), $shapelms_course['rating']['count'] ) ); ?>)</small>
 					</li>
 				<?php endif; ?>
-				<li><?php echo esc_html( sprintf( /* translators: %d: students */ _n( '%d student', '%d students', $shapelms_course['students'], 'shapelms' ), $shapelms_course['students'] ) ); ?></li>
-				<li><?php echo esc_html( isset( $shapelms_level_map[ $shapelms_course['level'] ] ) ? $shapelms_level_map[ $shapelms_course['level'] ] : $shapelms_level_map['all'] ); ?></li>
-				<li><?php echo esc_html( sprintf( /* translators: %s: date */ __( 'Updated %s', 'shapelms' ), get_the_modified_date() ) ); ?></li>
+				<li class="shapelms-course__fact--students"><?php echo esc_html( sprintf( /* translators: %d: students */ _n( '%d student', '%d students', $shapelms_course['students'], 'shapelms' ), $shapelms_course['students'] ) ); ?></li>
+				<li class="shapelms-course__fact--lessons"><?php echo esc_html( sprintf( /* translators: %d: lessons */ _n( '%d lesson', '%d lessons', $shapelms_course['lessons'], 'shapelms' ), $shapelms_course['lessons'] ) ); ?></li>
+				<?php if ( $shapelms_course['duration'] ) : ?>
+					<li class="shapelms-course__fact--duration"><?php echo esc_html( shapelms_format_duration( $shapelms_course['duration'] ) ); ?></li>
+				<?php endif; ?>
+				<li class="shapelms-course__fact--level"><?php echo esc_html( isset( $shapelms_level_map[ $shapelms_course['level'] ] ) ? $shapelms_level_map[ $shapelms_course['level'] ] : $shapelms_level_map['all'] ); ?></li>
+				<li class="shapelms-course__fact--updated"><?php echo esc_html( sprintf( /* translators: %s: date */ __( 'Updated %s', 'shapelms' ), get_the_modified_date() ) ); ?></li>
 			</ul>
 
 			<?php if ( ! empty( $shapelms_course['instructors'] ) ) : ?>
@@ -110,10 +114,23 @@ $shapelms_level_map = array(
 				<?php shapelms_get_template( 'parts/curriculum.php', array( 'course' => $shapelms_course ) ); ?>
 			</section>
 
-			<?php if ( ! empty( $shapelms_course['requirements'] ) ) : ?>
+			<?php if ( ! empty( $shapelms_course['requirements'] ) || ! empty( $shapelms_course['prerequisites'] ) ) : ?>
 				<section class="shapelms-box">
 					<h2 class="shapelms-box__title"><?php esc_html_e( 'Requirements', 'shapelms' ); ?></h2>
 					<ul class="shapelms-list">
+						<?php foreach ( $shapelms_course['prerequisites'] as $shapelms_pre ) : ?>
+							<li class="shapelms-course__prerequisite">
+								<?php
+								echo wp_kses_post(
+									sprintf(
+										/* translators: %s: linked course title */
+										__( 'Complete the course %s first', 'shapelms' ),
+										'<a href="' . esc_url( $shapelms_pre['url'] ) . '">' . esc_html( $shapelms_pre['title'] ) . '</a>'
+									)
+								);
+								?>
+							</li>
+						<?php endforeach; ?>
 						<?php foreach ( $shapelms_course['requirements'] as $shapelms_item ) : ?>
 							<li><?php echo esc_html( $shapelms_item ); ?></li>
 						<?php endforeach; ?>
@@ -136,6 +153,33 @@ $shapelms_level_map = array(
 							<li><?php echo esc_html( $shapelms_item ); ?></li>
 						<?php endforeach; ?>
 					</ul>
+				</section>
+			<?php endif; ?>
+
+			<?php if ( ! empty( $shapelms_course['instructors'] ) ) : ?>
+				<section class="shapelms-box shapelms-course__instructor-box">
+					<h2 class="shapelms-box__title"><?php echo esc_html( _n( 'Instructor', 'Instructors', count( array_filter( $shapelms_course['instructors'] ) ), 'shapelms' ) ); ?></h2>
+					<?php foreach ( $shapelms_course['instructors'] as $shapelms_instructor ) : ?>
+						<?php
+						if ( ! $shapelms_instructor ) {
+							continue;
+						}
+						?>
+						<div class="shapelms-instructor">
+							<img class="shapelms-instructor__avatar" src="<?php echo esc_url( $shapelms_instructor['avatar'] ); ?>" alt="" width="72" height="72" loading="lazy">
+							<div class="shapelms-instructor__body">
+								<h3 class="shapelms-instructor__name"><a href="<?php echo esc_url( $shapelms_instructor['url'] ); ?>"><?php echo esc_html( $shapelms_instructor['name'] ); ?></a></h3>
+								<?php if ( ! empty( $shapelms_instructor['headline'] ) ) : ?>
+									<p class="shapelms-instructor__headline"><?php echo esc_html( $shapelms_instructor['headline'] ); ?></p>
+								<?php endif; ?>
+								<?php if ( ! empty( $shapelms_instructor['bio'] ) ) : ?>
+									<div class="shapelms-instructor__bio shapelms-prose"><?php echo wp_kses_post( wpautop( $shapelms_instructor['bio'] ) ); ?></div>
+								<?php else : ?>
+									<p class="shapelms-muted"><?php echo esc_html( sprintf( /* translators: %s: instructor name */ __( 'See all courses by %s.', 'shapelms' ), $shapelms_instructor['name'] ) ); ?></p>
+								<?php endif; ?>
+							</div>
+						</div>
+					<?php endforeach; ?>
 				</section>
 			<?php endif; ?>
 

@@ -26,7 +26,12 @@ class Activator {
 	 */
 	public static function activate( $network_wide = false ) {
 		if ( is_multisite() && $network_wide ) {
-			$site_ids = get_sites( array( 'fields' => 'ids' ) );
+			$site_ids = get_sites(
+				array(
+					'fields' => 'ids',
+					'number' => 0,
+				)
+			);
 			foreach ( $site_ids as $site_id ) {
 				switch_to_blog( (int) $site_id );
 				self::activate_single_site();

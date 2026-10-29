@@ -92,7 +92,22 @@ function shapelms_uninstall_site() {
 		delete_metadata( 'user', 0, $meta_key, '', true );
 	}
 
-	// Roles and capabilities.
+	// Roles and capabilities. Users whose only role was a ShapeLMS role get the site's default role,
+	// so nobody is left without a role.
+	$shapelms_default_role = (string) get_option( 'default_role', 'subscriber' );
+	$shapelms_role_users   = get_users(
+		array(
+			'role__in' => array( 'shapelms_instructor', 'shapelms_student' ),
+			'fields'   => 'all',
+		)
+	);
+	foreach ( $shapelms_role_users as $shapelms_user ) {
+		$shapelms_user->remove_role( 'shapelms_instructor' );
+		$shapelms_user->remove_role( 'shapelms_student' );
+		if ( empty( $shapelms_user->roles ) ) {
+			$shapelms_user->set_role( $shapelms_default_role );
+		}
+	}
 	remove_role( 'shapelms_instructor' );
 	remove_role( 'shapelms_student' );
 
@@ -116,13 +131,21 @@ function shapelms_uninstall_site() {
 		}
 	}
 
-	// Scheduled events.
-	wp_clear_scheduled_hook( 'shapelms_daily_maintenance' );
+	// Scheduled events (WP-Cron and Action Scheduler).
 	wp_clear_scheduled_hook( 'shapelms_send_queued_email' );
+	if ( function_exists( 'as_unschedule_all_actions' ) ) {
+		as_unschedule_all_actions( '', array(), 'shapelms' );
+	}
 }
 
 if ( is_multisite() ) {
-	foreach ( get_sites( array( 'fields' => 'ids' ) ) as $shapelms_site_id ) {
+	$shapelms_site_ids = get_sites(
+		array(
+			'fields' => 'ids',
+			'number' => 0,
+		)
+	);
+	foreach ( $shapelms_site_ids as $shapelms_site_id ) {
 		switch_to_blog( (int) $shapelms_site_id );
 		shapelms_uninstall_site();
 		restore_current_blog();

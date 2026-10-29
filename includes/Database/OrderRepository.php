@@ -195,10 +195,10 @@ class OrderRepository extends Repository {
 		}
 
 		$placeholders = implode( ', ', array_fill( 0, count( $course_ids ), '%d' ) );
-		$orders       = $this->table();
+		$orders       = esc_sql( $this->table() );
 		$items        = esc_sql( shapelms_table( 'order_items' ) );
 
-		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results( // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- fragments are individually prepared; table and column names come from fixed whitelists.
 			$wpdb->prepare(
 				"SELECT i.course_id, COALESCE(SUM(i.price),0) AS revenue, COUNT(*) AS sales FROM {$items} i INNER JOIN {$orders} o ON o.id = i.order_id WHERE o.status = 'completed' AND i.course_id IN ({$placeholders}) GROUP BY i.course_id", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 				...$course_ids

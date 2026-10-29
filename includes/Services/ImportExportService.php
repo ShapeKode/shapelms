@@ -196,14 +196,16 @@ class ImportExportService {
 		$status = isset( $course['status'] ) && in_array( $course['status'], array( 'publish', 'draft', 'pending', 'private' ), true ) ? $course['status'] : 'draft';
 
 		$id = wp_insert_post(
-			array(
-				'post_type'    => PostTypes::COURSE,
-				'post_title'   => sanitize_text_field( (string) $course['title'] ),
-				'post_name'    => isset( $course['slug'] ) ? sanitize_title( (string) $course['slug'] ) : '',
-				'post_content' => wp_kses_post( (string) ( $course['content'] ?? '' ) ),
-				'post_excerpt' => sanitize_textarea_field( (string) ( $course['excerpt'] ?? '' ) ),
-				'post_status'  => $status,
-				'post_author'  => (int) $author,
+			wp_slash(
+				array(
+					'post_type'    => PostTypes::COURSE,
+					'post_title'   => sanitize_text_field( (string) $course['title'] ),
+					'post_name'    => isset( $course['slug'] ) ? sanitize_title( (string) $course['slug'] ) : '',
+					'post_content' => wp_kses_post( (string) ( $course['content'] ?? '' ) ),
+					'post_excerpt' => sanitize_textarea_field( (string) ( $course['excerpt'] ?? '' ) ),
+					'post_status'  => $status,
+					'post_author'  => (int) $author,
+				)
 			)
 		);
 
@@ -230,14 +232,16 @@ class ImportExportService {
 			}
 
 			$topic_id = wp_insert_post(
-				array(
-					'post_type'    => PostTypes::TOPIC,
-					'post_title'   => sanitize_text_field( (string) $topic['title'] ),
-					'post_content' => wp_kses_post( (string) ( $topic['summary'] ?? '' ) ),
-					'post_status'  => 'publish',
-					'post_parent'  => (int) $id,
-					'post_author'  => (int) $author,
-					'menu_order'   => (int) $topic_index,
+				wp_slash(
+					array(
+						'post_type'    => PostTypes::TOPIC,
+						'post_title'   => sanitize_text_field( (string) $topic['title'] ),
+						'post_content' => wp_kses_post( (string) ( $topic['summary'] ?? '' ) ),
+						'post_status'  => 'publish',
+						'post_parent'  => (int) $id,
+						'post_author'  => (int) $author,
+						'menu_order'   => (int) $topic_index,
+					)
 				)
 			);
 
@@ -250,16 +254,19 @@ class ImportExportService {
 					continue;
 				}
 
-				$type    = isset( $item['type'] ) && 'quiz' === $item['type'] ? PostTypes::QUIZ : PostTypes::LESSON;
+				$type    = isset( $item['type'] ) ? Curriculum::post_type_for( sanitize_key( (string) $item['type'] ) ) : '';
+				$type    = $type ? $type : PostTypes::LESSON;
 				$item_id = wp_insert_post(
-					array(
-						'post_type'    => $type,
-						'post_title'   => sanitize_text_field( (string) $item['title'] ),
-						'post_content' => wp_kses_post( (string) ( $item['content'] ?? '' ) ),
-						'post_status'  => isset( $item['status'] ) && 'draft' === $item['status'] ? 'draft' : 'publish',
-						'post_parent'  => (int) $topic_id,
-						'post_author'  => (int) $author,
-						'menu_order'   => (int) $item_index,
+					wp_slash(
+						array(
+							'post_type'    => $type,
+							'post_title'   => sanitize_text_field( (string) $item['title'] ),
+							'post_content' => wp_kses_post( (string) ( $item['content'] ?? '' ) ),
+							'post_status'  => isset( $item['status'] ) && 'draft' === $item['status'] ? 'draft' : 'publish',
+							'post_parent'  => (int) $topic_id,
+							'post_author'  => (int) $author,
+							'menu_order'   => (int) $item_index,
+						)
 					)
 				);
 
@@ -275,14 +282,16 @@ class ImportExportService {
 							continue;
 						}
 						$question_id = wp_insert_post(
-							array(
-								'post_type'    => PostTypes::QUESTION,
-								'post_title'   => sanitize_text_field( (string) $question['title'] ),
-								'post_content' => wp_kses_post( (string) ( $question['description'] ?? '' ) ),
-								'post_status'  => 'publish',
-								'post_parent'  => (int) $item_id,
-								'post_author'  => (int) $author,
-								'menu_order'   => (int) $q_index,
+							wp_slash(
+								array(
+									'post_type'    => PostTypes::QUESTION,
+									'post_title'   => sanitize_text_field( (string) $question['title'] ),
+									'post_content' => wp_kses_post( (string) ( $question['description'] ?? '' ) ),
+									'post_status'  => 'publish',
+									'post_parent'  => (int) $item_id,
+									'post_author'  => (int) $author,
+									'menu_order'   => (int) $q_index,
+								)
 							)
 						);
 						if ( $question_id ) {
@@ -328,7 +337,7 @@ class ImportExportService {
 				$value = sanitize_text_field( (string) $value );
 			}
 
-			update_post_meta( $post_id, $key, $value );
+			update_post_meta( $post_id, $key, wp_slash( $value ) );
 		}
 	}
 
@@ -358,12 +367,14 @@ class ImportExportService {
 	}
 
 	/**
-	 * Installs the bundled demo course.
+	 * Installs the bundled demo content.
 	 *
-	 * @return int|\WP_Error Course id.
+	 * @param string $pack course (one draft course) or courses (the six-course sample pack).
+	 * @return int|int[]|\WP_Error Course id, or ids for the sample pack.
 	 */
-	public function install_demo() {
-		$file = SHAPELMS_DIR . 'data/demo-course.json';
+	public function install_demo( $pack = 'course' ) {
+		$pack = 'courses' === $pack ? 'courses' : 'course';
+		$file = SHAPELMS_DIR . 'data/demo-' . $pack . '.json';
 
 		if ( ! file_exists( $file ) ) {
 			return new \WP_Error( 'shapelms_demo_missing', __( 'Demo file not found.', 'shapelms' ) );
@@ -376,6 +387,10 @@ class ImportExportService {
 			return $result;
 		}
 
-		return $result ? $result[0] : new \WP_Error( 'shapelms_demo_failed', __( 'Could not import the demo course.', 'shapelms' ) );
+		if ( ! $result ) {
+			return new \WP_Error( 'shapelms_demo_failed', __( 'Could not import the demo course.', 'shapelms' ) );
+		}
+
+		return 'courses' === $pack ? $result : $result[0];
 	}
 }

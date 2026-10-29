@@ -105,6 +105,37 @@ class QuizService {
 	}
 
 	/**
+	 * Questions for a new attempt: the quiz's own questions, plus any an add-on adds (for example
+	 * random questions drawn from a question bank).
+	 *
+	 * @param int $quiz_id Quiz id.
+	 * @param int $user_id User id (0 for a preview count).
+	 * @return Question[]
+	 */
+	public static function attempt_questions( $quiz_id, $user_id = 0 ) {
+		/**
+		 * Filters the questions of a new attempt. Return Question objects; each attempt stores its own
+		 * list, so different attempts can get different questions.
+		 *
+		 * @param Question[] $questions Questions.
+		 * @param int        $quiz_id   Quiz id.
+		 * @param int        $user_id   User id.
+		 */
+		$questions = (array) apply_filters( 'shapelms_quiz_attempt_questions', self::questions( $quiz_id ), (int) $quiz_id, (int) $user_id );
+		$types     = QuestionTypes::all();
+
+		// Skip questions whose type is no longer registered (for example after its add-on was switched off).
+		return array_values(
+			array_filter(
+				$questions,
+				static function ( $question ) use ( $types ) {
+					return $question instanceof Question && isset( $types[ $question->type ] );
+				}
+			)
+		);
+	}
+
+	/**
 	 * Total points available.
 	 *
 	 * @param Question[] $questions Questions.
@@ -128,7 +159,7 @@ class QuizService {
 	 */
 	public function overview( $quiz_id, $user_id ) {
 		$settings  = self::settings( $quiz_id );
-		$questions = self::questions( $quiz_id );
+		$questions = self::attempt_questions( $quiz_id, 0 );
 		$finished  = $this->attempts->count_finished( $user_id, $quiz_id );
 		$open      = $this->attempts->open_attempt( $user_id, $quiz_id );
 		$history   = $this->attempts->for_user_quiz( $user_id, $quiz_id );
@@ -174,6 +205,10 @@ class QuizService {
 			return new \WP_Error( 'shapelms_not_enrolled', __( 'You are not enrolled in this course.', 'shapelms' ), array( 'status' => 403 ) );
 		}
 
+		if ( $this->progress->is_locked( $user_id, $course_id, $quiz_id ) ) {
+			return new \WP_Error( 'shapelms_item_locked', __( 'Complete the previous lessons before taking this quiz.', 'shapelms' ), array( 'status' => 403 ) );
+		}
+
 		$open = $this->attempts->open_attempt( $user_id, $quiz_id );
 
 		if ( $open ) {
@@ -185,7 +220,7 @@ class QuizService {
 		}
 
 		$settings  = self::settings( $quiz_id );
-		$questions = self::questions( $quiz_id );
+		$questions = self::attempt_questions( $quiz_id, (int) $user_id );
 
 		if ( empty( $questions ) ) {
 			return new \WP_Error( 'shapelms_empty_quiz', __( 'This quiz has no questions yet.', 'shapelms' ) );
@@ -268,6 +303,21 @@ class QuizService {
 			return new \WP_Error( 'shapelms_invalid_question', __( 'Question not found.', 'shapelms' ) );
 		}
 
+		/**
+		 * Filters whether an answer may be saved now (add-ons use it for per-question time limits).
+		 * Return a WP_Error to refuse it.
+		 *
+		 * @param true|\WP_Error $allowed  True to allow.
+		 * @param object         $attempt  Attempt row.
+		 * @param Question       $question Question.
+		 * @param int            $user_id  User id.
+		 */
+		$allowed = apply_filters( 'shapelms_quiz_can_answer', true, $attempt, $question, (int) $user_id );
+
+		if ( is_wp_error( $allowed ) ) {
+			return $allowed;
+		}
+
 		$type   = QuestionTypes::get( $question->type );
 		$answer = $type->sanitize_answer( $raw_answer, $question );
 		$grade  = $type->grade( $answer, $question );
@@ -321,31 +371,100 @@ class QuizService {
 	 * @return array<string, mixed>
 	 */
 	private function finish( $attempt_id, $expired = false ) {
-		$attempt   = $this->attempts->find( $attempt_id );
-		$questions = self::questions( (int) $attempt->quiz_id );
-		$answers   = $this->attempts->answers( $attempt_id );
-		$settings  = self::settings( (int) $attempt->quiz_id );
-		$score     = 0.0;
-		$max       = self::max_score( $questions );
+		$attempt = $this->attempts->find( $attempt_id );
+		$tally   = $this->tally( $attempt );
 
-		foreach ( $questions as $question ) {
-			if ( isset( $answers[ $question->id() ] ) ) {
-				$score += (float) $answers[ $question->id() ]->points;
+		// An answer a question type could not grade on its own (is_correct NULL) waits for a person.
+		if ( $tally['pending'] ) {
+			$this->attempts->update(
+				$attempt_id,
+				array(
+					'status'      => 'pending_review',
+					'score'       => $tally['score'],
+					'max_score'   => $tally['max'],
+					'percentage'  => $tally['percentage'],
+					'passed'      => 0,
+					'finished_at' => shapelms_now(),
+				)
+			);
+
+			Events::fire(
+				Events::QUIZ_PENDING_REVIEW,
+				(int) $attempt->user_id,
+				array(
+					'course_id'  => (int) $attempt->course_id,
+					'quiz_id'    => (int) $attempt->quiz_id,
+					'attempt_id' => (int) $attempt_id,
+					'object_id'  => (int) $attempt->quiz_id,
+				)
+			);
+
+			return $this->result( (int) $attempt->user_id, $attempt_id );
+		}
+
+		return $this->close( $attempt, $tally, $expired ? 'expired' : 'completed' );
+	}
+
+	/**
+	 * Score of an attempt from its saved answers.
+	 *
+	 * @param object $attempt Attempt row.
+	 * @return array{score: float, max: float, percentage: float, pending: int}
+	 */
+	private function tally( $attempt ) {
+		$order   = array_map( 'intval', (array) json_decode( (string) $attempt->question_order, true ) );
+		$answers = $this->attempts->answers( (int) $attempt->id );
+		$score   = 0.0;
+		$pending = 0;
+		$max     = 0.0;
+
+		foreach ( $order as $question_id ) {
+			$question = Question::load( $question_id );
+			if ( ! $question ) {
+				continue;
+			}
+			$max += (float) $question->points;
+			if ( isset( $answers[ $question_id ] ) ) {
+				$score += (float) $answers[ $question_id ]->points;
+				if ( null === $answers[ $question_id ]->is_correct ) {
+					++$pending;
+				}
 			}
 		}
 
-		$percentage = $max > 0 ? round( ( $score / $max ) * 100, 2 ) : 0;
+		return array(
+			'score'      => $score,
+			'max'        => $max,
+			'percentage' => $max > 0 ? round( ( $score / $max ) * 100, 2 ) : 0,
+			'pending'    => $pending,
+		);
+	}
+
+	/**
+	 * Closes an attempt with its final score and records progress.
+	 *
+	 * @param object                                                           $attempt Attempt row.
+	 * @param array{score: float, max: float, percentage: float, pending: int} $tally   Score.
+	 * @param string                                                           $status  completed|expired.
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	private function close( $attempt, array $tally, $status ) {
+		$attempt_id = (int) $attempt->id;
+		$settings   = self::settings( (int) $attempt->quiz_id );
+		$score      = $tally['score'];
+		$max        = $tally['max'];
+		$percentage = $tally['percentage'];
 		$passed     = $percentage >= $settings['pass_mark'];
 
 		$this->attempts->update(
 			$attempt_id,
 			array(
-				'status'      => $expired ? 'expired' : 'completed',
+				'status'      => $status,
 				'score'       => $score,
 				'max_score'   => $max,
 				'percentage'  => $percentage,
 				'passed'      => $passed ? 1 : 0,
-				'finished_at' => shapelms_now(),
+				'finished_at' => $attempt->finished_at ? $attempt->finished_at : shapelms_now(),
 			)
 		);
 
@@ -364,6 +483,112 @@ class QuizService {
 		);
 
 		return $this->result( (int) $attempt->user_id, $attempt_id );
+	}
+
+	/**
+	 * Grades one answer that is waiting for review. When nothing else is waiting, the attempt is
+	 * scored, closed and the quiz progress recorded. Callers check that the user may grade.
+	 *
+	 * @param int   $attempt_id  Attempt id.
+	 * @param int   $question_id Question id.
+	 * @param float $points      Points awarded (clamped to the question's points).
+	 * @return array<string, mixed>|\WP_Error The attempt result.
+	 */
+	public function grade_answer( $attempt_id, $question_id, $points ) {
+		$attempt = $this->attempts->find( $attempt_id );
+
+		if ( ! $attempt || ! in_array( $attempt->status, array( 'pending_review', 'completed', 'expired' ), true ) ) {
+			return new \WP_Error( 'shapelms_not_pending', __( 'This attempt cannot be graded.', 'shapelms' ), array( 'status' => 409 ) );
+		}
+
+		$was_closed = 'pending_review' !== $attempt->status;
+		$was_passed = (bool) (int) $attempt->passed;
+
+		$answers  = $this->attempts->answers( (int) $attempt_id );
+		$question = Question::load( $question_id );
+
+		if ( ! $question || ! isset( $answers[ (int) $question_id ] ) ) {
+			return new \WP_Error( 'shapelms_invalid_question', __( 'Question not found.', 'shapelms' ), array( 'status' => 404 ) );
+		}
+
+		$max    = (float) $question->points;
+		$points = max( 0.0, min( $max, (float) $points ) );
+
+		$this->attempts->save_answer(
+			(int) $attempt_id,
+			(int) $question_id,
+			json_decode( (string) $answers[ (int) $question_id ]->answer, true ),
+			array(
+				'is_correct' => $points >= $max,
+				'points'     => $points,
+				'max_points' => $max,
+			)
+		);
+
+		$attempt = $this->attempts->find( $attempt_id );
+		$tally   = $this->tally( $attempt );
+
+		if ( $tally['pending'] ) {
+			$this->attempts->update(
+				(int) $attempt_id,
+				array(
+					'score'      => $tally['score'],
+					'percentage' => $tally['percentage'],
+				)
+			);
+
+			return $this->result( (int) $attempt->user_id, (int) $attempt_id );
+		}
+
+		if ( ! $was_closed ) {
+			return $this->close( $attempt, $tally, 'completed' );
+		}
+
+		return $this->regrade( $attempt, $tally, $was_passed );
+	}
+
+	/**
+	 * Applies a changed grade to a finished attempt: new score and pass state, course progress
+	 * follows (a quiz no longer passed in any attempt is not complete any more).
+	 *
+	 * @param object                                                           $attempt    Attempt row.
+	 * @param array{score: float, max: float, percentage: float, pending: int} $tally      Score.
+	 * @param bool                                                             $was_passed Pass state before.
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	private function regrade( $attempt, array $tally, $was_passed ) {
+		$settings = self::settings( (int) $attempt->quiz_id );
+		$passed   = $tally['percentage'] >= $settings['pass_mark'];
+
+		$this->attempts->update(
+			(int) $attempt->id,
+			array(
+				'score'      => $tally['score'],
+				'max_score'  => $tally['max'],
+				'percentage' => $tally['percentage'],
+				'passed'     => $passed ? 1 : 0,
+			)
+		);
+
+		if ( $passed ) {
+			$this->progress->complete_quiz( (int) $attempt->user_id, (int) $attempt->quiz_id, true );
+		} elseif ( $was_passed && ! $this->attempts->has_passed( (int) $attempt->user_id, (int) $attempt->quiz_id ) && (bool) shapelms_get_setting( 'course', 'completion_requires_quizzes', true ) ) {
+			$this->progress->reopen_quiz( (int) $attempt->user_id, (int) $attempt->quiz_id );
+		}
+
+		Events::fire(
+			'shapelms_quiz_regraded',
+			(int) $attempt->user_id,
+			array(
+				'course_id'  => (int) $attempt->course_id,
+				'quiz_id'    => (int) $attempt->quiz_id,
+				'attempt_id' => (int) $attempt->id,
+				'score'      => $tally['percentage'],
+				'passed'     => $passed,
+			)
+		);
+
+		return $this->result( (int) $attempt->user_id, (int) $attempt->id );
 	}
 
 	/**
@@ -419,7 +644,13 @@ class QuizService {
 
 		$data['settings'] = $settings;
 
-		return $data;
+		/**
+		 * Filters an attempt result (add-ons can add per-question feedback).
+		 *
+		 * @param array  $data    Result.
+		 * @param object $attempt Attempt row.
+		 */
+		return apply_filters( 'shapelms_quiz_result', $data, $attempt );
 	}
 
 	/**
@@ -438,16 +669,7 @@ class QuizService {
 			if ( ! $question ) {
 				continue;
 			}
-			$type        = QuestionTypes::get( $question->type );
-			$questions[] = array(
-				'id'          => $question->id(),
-				'type'        => $question->type,
-				'title'       => $question->text(),
-				'description' => 'fill_blank' === $question->type ? '' : wp_kses_post( $question->description() ),
-				'points'      => $question->points,
-				'data'        => $type->public_data( $question ),
-				'answer'      => isset( $answers[ $question->id() ] ) ? json_decode( (string) $answers[ $question->id() ]->answer, true ) : null,
-			);
+			$questions[] = self::question_payload( $question, $attempt, isset( $answers[ $question->id() ] ) ? json_decode( (string) $answers[ $question->id() ]->answer, true ) : null );
 		}
 
 		return array(
@@ -456,6 +678,36 @@ class QuizService {
 			'questions'   => $questions,
 			'server_time' => time(),
 		);
+	}
+
+	/**
+	 * One question as the player gets it (no correct answers).
+	 *
+	 * @param Question $question Question.
+	 * @param object   $attempt  Attempt row.
+	 * @param mixed    $answer   Saved answer, if any.
+	 * @return array<string, mixed>
+	 */
+	public static function question_payload( Question $question, $attempt, $answer = null ) {
+		$type = QuestionTypes::get( $question->type );
+		$item = array(
+			'id'          => $question->id(),
+			'type'        => $question->type,
+			'title'       => $question->text(),
+			'description' => 'fill_blank' === $question->type ? '' : wp_kses_post( $question->description() ),
+			'points'      => $question->points,
+			'data'        => $type->public_data( $question ),
+			'answer'      => $answer,
+		);
+
+		/**
+		 * Filters one question in the attempt sent to the player (never add correct answers here).
+		 *
+		 * @param array<string, mixed> $item     Question data.
+		 * @param Question             $question Question.
+		 * @param object               $attempt  Attempt row.
+		 */
+		return (array) apply_filters( 'shapelms_quiz_question_payload', $item, $question, $attempt );
 	}
 
 	/**

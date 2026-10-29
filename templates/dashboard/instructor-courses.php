@@ -24,7 +24,7 @@ $shapelms_labels  = array(
 ?>
 <div class="shapelms-dashboard__head">
 	<h2><?php esc_html_e( 'My courses', 'shapelms' ); ?></h2>
-	<a class="shapelms-btn shapelms-btn--primary" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=' . \ShapeLMS\Content\PostTypes::COURSE ) ); ?>"><?php esc_html_e( 'Create course', 'shapelms' ); ?></a>
+	<a class="shapelms-btn shapelms-btn--primary" href="<?php echo esc_url( (string) apply_filters( 'shapelms_new_course_url', admin_url( 'post-new.php?post_type=' . \ShapeLMS\Content\PostTypes::COURSE ) ) ); ?>"><?php esc_html_e( 'Create course', 'shapelms' ); ?></a>
 </div>
 
 <?php if ( $shapelms_ids ) : ?>

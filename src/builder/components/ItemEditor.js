@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { Button, TextControl, TextareaControl, SelectControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 import { get, patch, errorMessage } from '../../shared/api';
 import { Loading } from '../../shared/components';
 import { success, error as notifyError } from '../../admin/notices';
@@ -46,6 +47,7 @@ export default function ItemEditor( { item, onSaved, onClose } ) {
 	}
 
 	const isQuiz = data.type === 'quiz';
+	const isLesson = data.type === 'lesson';
 	const meta = data.meta || {};
 
 	return (
@@ -54,7 +56,7 @@ export default function ItemEditor( { item, onSaved, onClose } ) {
 				<div>
 					<TextControl label={ __( 'Title', 'shapelms' ) } value={ data.title } onChange={ ( title ) => change( { title } ) } __nextHasNoMarginBottom />
 
-					{ ! isQuiz && (
+					{ isLesson && (
 						<>
 							<SelectControl
 								label={ __( 'Video', 'shapelms' ) }
@@ -85,7 +87,7 @@ export default function ItemEditor( { item, onSaved, onClose } ) {
 					) }
 
 					<div className="shapelms-list-editor">
-						<span className="shapelms-list-editor__label">{ isQuiz ? __( 'Instructions', 'shapelms' ) : __( 'Lesson content', 'shapelms' ) }</span>
+						<span className="shapelms-list-editor__label">{ isLesson ? __( 'Lesson content', 'shapelms' ) : __( 'Instructions', 'shapelms' ) }</span>
 						<ClassicEditor value={ data.content || '' } onChange={ ( content ) => change( { content } ) } height={ isQuiz ? 160 : 320 } />
 					</div>
 
@@ -120,12 +122,20 @@ export default function ItemEditor( { item, onSaved, onClose } ) {
 					) }
 
 					{ isQuiz && <QuestionsEditor quizId={ data.id } initial={ data.questions || [] } types={ data.question_types || {} } /> }
+
+					{
+						/**
+						 * Extra editor sections below the content (add-on item types put their main settings here).
+						 * Args: { item, meta, change }. Return [ ...existing, element ].
+						 */
+						applyFilters( 'shapelms.builder.itemMain', [], { item: data, meta, change } )
+					}
 				</div>
 
 				<aside className="shapelms-item-editor__side">
 					<SelectControl label={ __( 'Status', 'shapelms' ) } value={ data.status } options={ [ { value: 'publish', label: __( 'Published', 'shapelms' ) }, { value: 'draft', label: __( 'Draft (hidden)', 'shapelms' ) } ] } onChange={ ( status ) => change( { status } ) } __nextHasNoMarginBottom />
 
-					{ ! isQuiz && (
+					{ isLesson && (
 						<>
 							<TextControl type="number" label={ __( 'Duration (minutes)', 'shapelms' ) } value={ Math.round( ( meta.video_duration || 0 ) / 60 ) } min={ 0 } onChange={ ( v ) => change( { meta: { video_duration: ( Number( v ) || 0 ) * 60 } } ) } __nextHasNoMarginBottom />
 							<ToggleControl label={ __( 'Free preview', 'shapelms' ) } help={ __( 'Anyone can open this lesson without enrolling.', 'shapelms' ) } checked={ !! meta.preview } onChange={ ( preview ) => change( { meta: { preview } } ) } __nextHasNoMarginBottom />
@@ -143,6 +153,15 @@ export default function ItemEditor( { item, onSaved, onClose } ) {
 							<ToggleControl label={ __( 'Show correct answers in results', 'shapelms' ) } checked={ meta.show_answers !== false && meta.show_answers !== '' } onChange={ ( show_answers ) => change( { meta: { show_answers } } ) } __nextHasNoMarginBottom />
 						</>
 					) }
+
+					{
+						/**
+						 * Extra panels in the lesson / quiz sidebar. Add-ons append elements: return [ ...panels, myPanel ].
+						 * Args: { item, meta, change, isQuiz }. A key passed to change( { meta: { key } } ) is saved only
+						 * when it is registered through the shapelms_meta_definitions PHP filter.
+						 */
+						applyFilters( 'shapelms.builder.itemSidebar', [], { item: data, meta, change, isQuiz } )
+					}
 				</aside>
 			</div>
 

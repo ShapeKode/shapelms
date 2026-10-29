@@ -21,7 +21,7 @@ function AttemptModal( { id, onClose } ) {
 			{ data && (
 				<>
 					<p>
-						<Badge tone={ data.passed ? 'success' : 'danger' }>{ data.passed ? __( 'Passed', 'shapelms' ) : __( 'Failed', 'shapelms' ) }</Badge>{ ' ' }
+						{ data.status === 'pending_review' ? <Badge tone="info">{ __( 'Waiting for review', 'shapelms' ) }</Badge> : <Badge tone={ data.passed ? 'success' : 'danger' }>{ data.passed ? __( 'Passed', 'shapelms' ) : __( 'Failed', 'shapelms' ) }</Badge> }{ ' ' }
 						<strong>{ sprintf( /* translators: %d: percent */ __( '%d%%', 'shapelms' ), data.percentage ) }</strong> · { sprintf( /* translators: 1: score, 2: maximum score */ _n( '%1$s / %2$s point', '%1$s / %2$s points', data.max_score, 'shapelms' ), data.score, data.max_score ) }
 					</p>
 					{ ( data.questions || [] ).map( ( q, i ) => (
@@ -60,7 +60,7 @@ export default function Quizzes() {
 		{ key: 'quiz_title', label: __( 'Quiz', 'shapelms' ) },
 		{ key: 'attempt_number', label: '#' },
 		{ key: 'percentage', label: __( 'Score', 'shapelms' ), render: ( row ) => `${ row.percentage }%` },
-		{ key: 'passed', label: __( 'Result', 'shapelms' ), render: ( row ) => <Badge tone={ row.passed ? 'success' : 'danger' }>{ row.passed ? __( 'Passed', 'shapelms' ) : __( 'Failed', 'shapelms' ) }</Badge> },
+		{ key: 'passed', label: __( 'Result', 'shapelms' ), render: ( row ) => ( row.status === 'pending_review' ? <Badge tone="info">{ __( 'Waiting for review', 'shapelms' ) }</Badge> : <Badge tone={ row.passed ? 'success' : 'danger' }>{ row.passed ? __( 'Passed', 'shapelms' ) : __( 'Failed', 'shapelms' ) }</Badge> ) },
 		{ key: 'finished_at', label: __( 'Date', 'shapelms' ), render: ( row ) => formatDate( row.finished_at ) },
 		{ key: 'actions', label: '', className: 'is-actions', render: ( row ) => <><Button size="compact" variant="secondary" onClick={ () => setViewing( row.id ) }>{ __( 'Review', 'shapelms' ) }</Button><Button size="compact" variant="tertiary" isDestructive onClick={ () => remove( row ) }>{ __( 'Delete', 'shapelms' ) }</Button></> },
 	];

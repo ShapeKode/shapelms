@@ -28,7 +28,18 @@ usort(
 		return $b['id'] <=> $a['id'];
 	}
 );
-$shapelms_threads = array_slice( $shapelms_threads, 0, 50 );
+/**
+ * Filters how many questions the instructor inbox shows per page.
+ *
+ * @param int $per_page Questions per page.
+ */
+$shapelms_per_page = max( 1, (int) apply_filters( 'shapelms_dashboard_qa_per_page', 20 ) );
+$shapelms_total    = count( $shapelms_threads );
+$shapelms_pages    = (int) ceil( $shapelms_total / $shapelms_per_page );
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only pagination.
+$shapelms_paged   = isset( $_GET['qa_page'] ) ? max( 1, absint( wp_unslash( $_GET['qa_page'] ) ) ) : 1;
+$shapelms_paged   = min( $shapelms_paged, max( 1, $shapelms_pages ) );
+$shapelms_threads = array_slice( $shapelms_threads, ( $shapelms_paged - 1 ) * $shapelms_per_page, $shapelms_per_page );
 ?>
 <h2><?php esc_html_e( 'Questions from students', 'shapelms' ); ?></h2>
 
@@ -76,6 +87,27 @@ $shapelms_threads = array_slice( $shapelms_threads, 0, 50 );
 			</article>
 		<?php endforeach; ?>
 	</div>
+
+	<?php if ( $shapelms_pages > 1 ) : ?>
+		<nav class="shapelms-pagination" aria-label="<?php esc_attr_e( 'Questions pages', 'shapelms' ); ?>">
+			<div class="nav-links">
+				<?php
+				echo wp_kses_post(
+					(string) paginate_links(
+						array(
+							'base'      => add_query_arg( 'qa_page', '%#%', \ShapeLMS\Frontend\Dashboard::url( 'qa' ) ),
+							'format'    => '',
+							'current'   => $shapelms_paged,
+							'total'     => $shapelms_pages,
+							'prev_text' => '&larr; ' . esc_html__( 'Previous', 'shapelms' ),
+							'next_text' => esc_html__( 'Next', 'shapelms' ) . ' &rarr;',
+						)
+					)
+				);
+				?>
+			</div>
+		</nav>
+	<?php endif; ?>
 <?php else : ?>
 	<div class="shapelms-empty"><p><?php esc_html_e( 'No questions yet.', 'shapelms' ); ?></p></div>
 <?php endif; ?>

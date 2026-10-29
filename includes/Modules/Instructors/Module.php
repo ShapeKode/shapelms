@@ -109,6 +109,16 @@ class Module extends AbstractModule {
 		$user_id = get_current_user_id();
 
 		if ( ! $user_id ) {
+			// Honeypot: real browsers leave this empty.
+			if ( ! empty( $_POST['shapelms_website'] ) ) {
+				wp_safe_redirect( \ShapeLMS\Core\Pages::get_url( 'instructor_register' ) );
+				exit;
+			}
+
+			if ( ! \ShapeLMS\Frontend\Auth::allow( 'instructor_signup', 10, HOUR_IN_SECONDS ) ) {
+				$errors->add( 'throttled', __( 'Too many attempts. Please try again later.', 'shapelms' ) );
+			}
+
 			if ( ! get_option( 'users_can_register' ) && ! apply_filters( 'shapelms_allow_instructor_signup', false ) ) {
 				$errors->add( 'closed', __( 'Registration is closed.', 'shapelms' ) );
 			}
@@ -131,12 +141,12 @@ class Module extends AbstractModule {
 			}
 
 			if ( ! $errors->has_errors() ) {
-				$username = sanitize_user( current( explode( '@', $email ) ), true );
-				$base     = $username;
-				$i        = 1;
-				while ( username_exists( $username ) ) {
-					$username = $base . ( $i++ );
-				}
+				// Build the login from the display name, not the email, so the public author URL never exposes the address.
+				$base = sanitize_user( remove_accents( strtolower( str_replace( ' ', '', $name ) ) ), true );
+				$base = $base ? substr( $base, 0, 40 ) : 'instructor';
+				do {
+					$username = $base . '-' . strtolower( wp_generate_password( 4, false ) );
+				} while ( username_exists( $username ) );
 
 				/** This action is documented in wp-login.php */
 				do_action( 'register_post', $username, $email, $errors ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core hook.

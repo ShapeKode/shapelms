@@ -256,13 +256,15 @@ class Module extends AbstractModule {
 		}
 
 		$id = wp_insert_post(
-			array(
-				'post_type'    => self::POST_TYPE,
-				'post_title'   => $request->get_param( 'title' ),
-				'post_content' => $request->get_param( 'content' ),
-				'post_status'  => 'publish',
-				'post_parent'  => $course_id,
-				'post_author'  => get_current_user_id(),
+			wp_slash(
+				array(
+					'post_type'    => self::POST_TYPE,
+					'post_title'   => $request->get_param( 'title' ),
+					'post_content' => $request->get_param( 'content' ),
+					'post_status'  => 'publish',
+					'post_parent'  => $course_id,
+					'post_author'  => get_current_user_id(),
+				)
 			),
 			true
 		);

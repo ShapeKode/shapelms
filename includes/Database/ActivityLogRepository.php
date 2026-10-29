@@ -126,7 +126,7 @@ class ActivityLogRepository extends Repository {
 			$where        = $wpdb->prepare( "l.event IN ({$placeholders})", ...array_map( 'sanitize_key', $events ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 		}
 
-		return (array) $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return (array) $wpdb->get_results( // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- fragments are individually prepared; table and column names come from fixed whitelists.
 			$wpdb->prepare(
 				"SELECT l.*, u.display_name, p.post_title AS course_title FROM {$table} l LEFT JOIN {$wpdb->users} u ON u.ID = l.user_id LEFT JOIN {$wpdb->posts} p ON p.ID = l.course_id WHERE {$where} ORDER BY l.id DESC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				max( 1, min( 100, (int) $limit ) )

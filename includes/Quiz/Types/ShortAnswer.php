@@ -57,7 +57,7 @@ class ShortAnswer implements QuestionTypeInterface {
 	 * @return string|null
 	 */
 	public function sanitize_answer( $raw, Question $question ) {
-		$value = sanitize_text_field( is_array( $raw ) ? (string) reset( $raw ) : (string) $raw );
+		$value = shapelms_sanitize_plain_text( is_array( $raw ) ? (string) reset( $raw ) : (string) $raw );
 		$max   = isset( $question->settings['max_length'] ) ? (int) $question->settings['max_length'] : 200;
 		$value = mb_substr( $value, 0, max( 1, $max ) );
 

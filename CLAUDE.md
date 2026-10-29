@@ -28,7 +28,7 @@ WordPress LMS plugin. Free core on wordpress.org (`shapelms`). Pro plugin (`shap
 - Prefix everything: functions `shapelms_`, hooks `shapelms_`, options `shapelms_`, CSS `.shapelms-`, constants `SHAPELMS_`.
 - Every user-facing string translatable with text domain `shapelms`.
 - Assets load only on ShapeLMS screens and LMS front-end pages.
-- PHPUnit tests for services and repositories in `tests/phpunit/`.
+- PHPUnit tests for services and repositories in `tests/phpunit/`. Run them with `tests/bin/run-local.sh` (no Docker needed: it downloads the WP test library and starts a throw-away MySQL from Local's bundled binaries) or with `WP_TESTS_DIR=… composer test`.
 
 ## When you finish a task
 - Run `composer lint`, `composer phpstan`, `npm run build`.

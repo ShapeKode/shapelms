@@ -101,7 +101,7 @@ class AttemptRepository extends Repository {
 			array(
 				'user_id' => (int) $user_id,
 				'quiz_id' => (int) $quiz_id,
-				'status'  => array( 'completed', 'expired' ),
+				'status'  => array( 'completed', 'expired', 'pending_review' ),
 			)
 		);
 	}
@@ -224,8 +224,8 @@ class AttemptRepository extends Repository {
 		$per_page  = max( 1, min( 100, (int) $args['per_page'] ) );
 		$offset    = max( 0, ( (int) $args['page'] - 1 ) * $per_page );
 
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} a WHERE {$where_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
-		$items = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} a WHERE {$where_sql}" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
+		$items = $wpdb->get_results( // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- fragments are individually prepared; table and column names come from fixed whitelists.
 			$wpdb->prepare(
 				"SELECT a.*, u.display_name, u.user_email, p.post_title AS quiz_title FROM {$table} a INNER JOIN {$wpdb->users} u ON u.ID = a.user_id LEFT JOIN {$wpdb->posts} p ON p.ID = a.quiz_id WHERE {$where_sql} ORDER BY a.id DESC LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$per_page,

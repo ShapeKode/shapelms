@@ -26,8 +26,8 @@ class Commands {
 	 *
 	 * ## OPTIONS
 	 *
-	 * --user=<id|email>
-	 * : User id or email.
+	 * --student=<id|email|login>
+	 * : User id, email or username. (WP-CLI reserves --user for the acting user.)
 	 *
 	 * --course=<id>
 	 * : Course id.
@@ -37,7 +37,12 @@ class Commands {
 	 * @return void
 	 */
 	public function enroll( $args, $assoc_args ) {
-		$user = is_numeric( $assoc_args['user'] ) ? get_userdata( (int) $assoc_args['user'] ) : get_user_by( 'email', $assoc_args['user'] );
+		$who  = isset( $assoc_args['student'] ) ? (string) $assoc_args['student'] : (string) get_current_user_id();
+		$user = is_numeric( $who ) ? get_userdata( (int) $who ) : get_user_by( 'email', $who );
+
+		if ( ! $user && ! is_numeric( $who ) ) {
+			$user = get_user_by( 'login', $who );
+		}
 
 		if ( ! $user ) {
 			WP_CLI::error( 'User not found.' );
@@ -134,17 +139,34 @@ class Commands {
 	}
 
 	/**
-	 * Installs the demo course.
+	 * Installs demo content.
 	 *
+	 * ## OPTIONS
+	 *
+	 * [--all]
+	 * : Install the full sample pack (six published courses across categories, levels and prices) instead of the single draft demo course.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp shapelms demo
+	 *     wp shapelms demo --all
+	 *
+	 * @param array $args       Positional args.
+	 * @param array $assoc_args Flags.
 	 * @return void
 	 */
-	public function demo() {
-		$result = shapelms()->get( ImportExportService::class )->install_demo();
+	public function demo( $args, $assoc_args ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed
+		$pack   = ! empty( $assoc_args['all'] ) ? 'courses' : 'course';
+		$result = shapelms()->get( ImportExportService::class )->install_demo( $pack );
 
 		if ( is_wp_error( $result ) ) {
 			WP_CLI::error( $result->get_error_message() );
 		}
 
-		WP_CLI::success( 'Demo course created: ' . get_permalink( $result ) );
+		foreach ( (array) $result as $id ) {
+			WP_CLI::log( get_the_title( $id ) . ': ' . get_permalink( $id ) );
+		}
+
+		WP_CLI::success( count( (array) $result ) . ' course(s) created. Archive: ' . get_post_type_archive_link( \ShapeLMS\Content\PostTypes::COURSE ) );
 	}
 }

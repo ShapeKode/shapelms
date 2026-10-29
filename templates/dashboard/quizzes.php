@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $shapelms_attempts = shapelms()->get( \ShapeLMS\Database\AttemptRepository::class )->where(
 	array(
 		'user_id' => (int) $args['user']->ID,
-		'status'  => array( 'completed', 'expired' ),
+		'status'  => array( 'completed', 'expired', 'pending_review' ),
 	),
 	array(
 		'orderby' => 'id',
@@ -42,7 +42,13 @@ $shapelms_attempts = shapelms()->get( \ShapeLMS\Database\AttemptRepository::clas
 					<td><a href="<?php echo esc_url( (string) get_permalink( (int) $shapelms_row->quiz_id ) ); ?>"><?php echo esc_html( get_the_title( (int) $shapelms_row->quiz_id ) ); ?></a></td>
 					<td><?php echo esc_html( get_the_title( (int) $shapelms_row->course_id ) ); ?></td>
 					<td><?php echo esc_html( $shapelms_row->percentage . '%' ); ?></td>
-					<td><span class="shapelms-tag <?php echo $shapelms_row->passed ? 'shapelms-tag--success' : 'shapelms-tag--danger'; ?>"><?php echo $shapelms_row->passed ? esc_html__( 'Passed', 'shapelms' ) : esc_html__( 'Failed', 'shapelms' ); ?></span></td>
+					<td>
+						<?php if ( 'pending_review' === $shapelms_row->status ) : ?>
+							<span class="shapelms-tag"><?php esc_html_e( 'Waiting for review', 'shapelms' ); ?></span>
+						<?php else : ?>
+							<span class="shapelms-tag <?php echo $shapelms_row->passed ? 'shapelms-tag--success' : 'shapelms-tag--danger'; ?>"><?php echo $shapelms_row->passed ? esc_html__( 'Passed', 'shapelms' ) : esc_html__( 'Failed', 'shapelms' ); ?></span>
+						<?php endif; ?>
+					</td>
 					<td><?php echo esc_html( $shapelms_row->finished_at ? wp_date( get_option( 'date_format' ), strtotime( $shapelms_row->finished_at ) ) : '' ); ?></td>
 				</tr>
 			<?php endforeach; ?>

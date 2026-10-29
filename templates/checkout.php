@@ -51,9 +51,9 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 		<?php elseif ( ! is_user_logged_in() ) : ?>
 			<p class="shapelms-notice"><?php esc_html_e( 'Please log in or create an account to continue.', 'shapelms' ); ?></p>
 			<div class="shapelms-checkout__auth">
-				<a class="shapelms-btn shapelms-btn--primary" href="<?php echo esc_url( wp_login_url( (string) get_permalink() . '?course=' . implode( ',', wp_list_pluck( $shapelms_courses, 'id' ) ) ) ); ?>"><?php esc_html_e( 'Log in', 'shapelms' ); ?></a>
-				<?php if ( get_option( 'users_can_register' ) ) : ?>
-					<a class="shapelms-btn shapelms-btn--secondary" href="<?php echo esc_url( wp_registration_url() ); ?>"><?php esc_html_e( 'Create account', 'shapelms' ); ?></a>
+				<a class="shapelms-btn shapelms-btn--primary" href="<?php echo esc_url( shapelms_login_url( (string) get_permalink() . '?course=' . implode( ',', wp_list_pluck( $shapelms_courses, 'id' ) ) ) ); ?>"><?php esc_html_e( 'Log in', 'shapelms' ); ?></a>
+				<?php if ( \ShapeLMS\Frontend\Auth::is_open() ) : ?>
+					<a class="shapelms-btn shapelms-btn--secondary" href="<?php echo esc_url( shapelms_register_url( (string) get_permalink() . '?course=' . implode( ',', wp_list_pluck( $shapelms_courses, 'id' ) ) ) ); ?>"><?php esc_html_e( 'Create account', 'shapelms' ); ?></a>
 				<?php endif; ?>
 			</div>
 		<?php elseif ( ! $shapelms_ids ) : ?>

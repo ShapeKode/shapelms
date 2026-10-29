@@ -396,7 +396,15 @@ class Module extends AbstractModule {
 			$list[]                     = $course;
 		}
 
-		return $list;
+		/**
+		 * Filters the items shown on the checkout page. Add-ons can add their own items for ids that
+		 * are not courses. Each item needs: id, title, url, price_html, already_enrolled and
+		 * pricing { is_free, current }.
+		 *
+		 * @param array<int, array<string, mixed>> $list Items.
+		 * @param int[]                            $ids  Requested ids.
+		 */
+		return (array) apply_filters( 'shapelms_checkout_items', $list, array_values( $ids ) );
 	}
 
 	/**

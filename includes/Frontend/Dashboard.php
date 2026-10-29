@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use ShapeLMS\Core\Capabilities;
+use ShapeLMS\Frontend\Auth;
 
 /**
  * Collects dashboard tabs from modules and renders the dashboard shell.
@@ -116,7 +117,7 @@ class Dashboard {
 	 */
 	public static function render() {
 		if ( ! is_user_logged_in() ) {
-			return shapelms_get_template( 'dashboard/login.php', array(), false );
+			return Auth::render( 'login' );
 		}
 
 		return shapelms_get_template(

@@ -22,8 +22,7 @@ class Deactivator {
 	 * @return void
 	 */
 	public static function deactivate() {
-		wp_clear_scheduled_hook( 'shapelms_daily_maintenance' );
-		wp_clear_scheduled_hook( 'shapelms_process_queue' );
+		wp_clear_scheduled_hook( 'shapelms_send_queued_email' );
 		flush_rewrite_rules();
 	}
 }

@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $shapelms_quiz_id  = isset( $args['quiz_id'] ) ? (int) $args['quiz_id'] : get_the_ID();
 $shapelms_enrolled = ! empty( $args['enrolled'] );
 $shapelms_settings = \ShapeLMS\Services\QuizService::settings( $shapelms_quiz_id );
-$shapelms_count    = count( \ShapeLMS\Services\QuizService::questions( $shapelms_quiz_id ) );
+$shapelms_count    = count( \ShapeLMS\Services\QuizService::attempt_questions( $shapelms_quiz_id ) );
 ?>
 <?php if ( get_the_content() ) : ?>
 	<div class="shapelms-prose"><?php the_content(); ?></div>

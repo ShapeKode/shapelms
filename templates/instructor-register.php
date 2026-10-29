@@ -34,7 +34,7 @@ $shapelms_status     = $shapelms_user_id ? InstructorService::status( $shapelms_
 		<p class="shapelms-notice"><?php esc_html_e( 'Instructor access is not available for this account.', 'shapelms' ); ?></p>
 	<?php elseif ( ! $shapelms_user_id && ! get_option( 'users_can_register' ) && ! apply_filters( 'shapelms_allow_instructor_signup', false ) ) : ?>
 		<p class="shapelms-notice"><?php esc_html_e( 'Please log in with your existing account to apply as an instructor.', 'shapelms' ); ?></p>
-		<a class="shapelms-btn shapelms-btn--primary" href="<?php echo esc_url( wp_login_url( (string) get_permalink() ) ); ?>"><?php esc_html_e( 'Log in', 'shapelms' ); ?></a>
+		<a class="shapelms-btn shapelms-btn--primary" href="<?php echo esc_url( shapelms_login_url( (string) get_permalink() ) ); ?>"><?php esc_html_e( 'Log in', 'shapelms' ); ?></a>
 	<?php else : ?>
 		<?php if ( $shapelms_errors ) : ?>
 			<div class="shapelms-notice shapelms-notice--error">
@@ -49,6 +49,10 @@ $shapelms_status     = $shapelms_user_id ? InstructorService::status( $shapelms_
 			<input type="hidden" name="shapelms_instructor_register" value="1">
 
 			<?php if ( ! $shapelms_user_id ) : ?>
+				<div class="shapelms-auth__hp" aria-hidden="true">
+					<label for="shapelms-reg-website"><?php esc_html_e( 'Leave this field empty', 'shapelms' ); ?></label>
+					<input id="shapelms-reg-website" type="text" name="shapelms_website" value="" tabindex="-1" autocomplete="off">
+				</div>
 				<div class="shapelms-field">
 					<label for="shapelms-reg-name"><?php esc_html_e( 'Your name', 'shapelms' ); ?></label>
 					<input id="shapelms-reg-name" class="shapelms-input" type="text" name="name" required autocomplete="name">
@@ -61,7 +65,7 @@ $shapelms_status     = $shapelms_user_id ? InstructorService::status( $shapelms_
 					<label for="shapelms-reg-password"><?php esc_html_e( 'Password', 'shapelms' ); ?></label>
 					<input id="shapelms-reg-password" class="shapelms-input" type="password" name="password" required minlength="8" autocomplete="new-password">
 				</div>
-				<p class="shapelms-muted"><?php echo wp_kses_post( sprintf( /* translators: %s: login url */ __( 'Already have an account? <a href="%s">Log in</a> first.', 'shapelms' ), esc_url( wp_login_url( (string) get_permalink() ) ) ) ); ?></p>
+				<p class="shapelms-muted"><?php echo wp_kses_post( sprintf( /* translators: %s: login url */ __( 'Already have an account? <a href="%s">Log in</a> first.', 'shapelms' ), esc_url( shapelms_login_url( (string) get_permalink() ) ) ) ); ?></p>
 			<?php endif; ?>
 
 			<div class="shapelms-field">

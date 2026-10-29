@@ -119,6 +119,14 @@ class ToolsController extends RestController {
 				'methods'             => WP_REST_Server::CREATABLE,
 				'callback'            => array( $this, 'demo' ),
 				'permission_callback' => array( $this, 'allow_manager' ),
+				'args'                => array(
+					'pack' => array(
+						'type'              => 'string',
+						'default'           => 'course',
+						'enum'              => array( 'course', 'courses' ),
+						'sanitize_callback' => 'sanitize_key',
+					),
+				),
 			)
 		);
 	}
@@ -166,7 +174,7 @@ class ToolsController extends RestController {
 		}
 
 		if ( $request->get_param( 'create_pages' ) ) {
-			Pages::create_pages();
+			Pages::create_pages( true );
 		}
 
 		$demo = 0;
@@ -219,21 +227,29 @@ class ToolsController extends RestController {
 	}
 
 	/**
-	 * Installs the demo course.
+	 * Installs the demo course or the six-course sample pack.
 	 *
+	 * @param WP_REST_Request $request Request.
 	 * @return array<string, mixed>|\WP_Error
 	 */
-	public function demo() {
-		$result = $this->io->install_demo();
+	public function demo( WP_REST_Request $request ) {
+		$pack   = 'courses' === $request->get_param( 'pack' ) ? 'courses' : 'course';
+		$result = $this->io->install_demo( $pack );
 
 		if ( is_wp_error( $result ) ) {
 			return $this->error( $result );
 		}
 
+		$ids   = (array) $result;
+		$first = (int) $ids[0];
+
 		return array(
-			'course_id' => $result,
-			'url'       => get_permalink( $result ),
-			'edit_url'  => get_edit_post_link( $result, 'raw' ),
+			'course_id'   => $first,
+			'course_ids'  => array_map( 'intval', $ids ),
+			'count'       => count( $ids ),
+			'url'         => get_permalink( $first ),
+			'edit_url'    => get_edit_post_link( $first, 'raw' ),
+			'archive_url' => get_post_type_archive_link( \ShapeLMS\Content\PostTypes::COURSE ),
 		);
 	}
 }

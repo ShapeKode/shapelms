@@ -34,6 +34,8 @@ class Blocks {
 			'dashboard'               => array( __CLASS__, 'render_dashboard' ),
 			'checkout'                => array( __CLASS__, 'render_checkout' ),
 			'instructor-registration' => array( __CLASS__, 'render_instructor_registration' ),
+			'login'                   => array( __CLASS__, 'render_login' ),
+			'register'                => array( __CLASS__, 'render_register' ),
 		);
 	}
 
@@ -58,6 +60,8 @@ class Blocks {
 		add_shortcode( 'shapelms_dashboard', array( __CLASS__, 'render_dashboard' ) );
 		add_shortcode( 'shapelms_checkout', array( __CLASS__, 'render_checkout' ) );
 		add_shortcode( 'shapelms_instructor_registration', array( __CLASS__, 'render_instructor_registration' ) );
+		add_shortcode( 'shapelms_login', array( __CLASS__, 'render_login' ) );
+		add_shortcode( 'shapelms_register', array( __CLASS__, 'render_register' ) );
 	}
 
 	/**
@@ -279,5 +283,23 @@ class Blocks {
 	 */
 	public static function render_instructor_registration() {
 		return '<div class="shapelms shapelms-wrap">' . shapelms_get_template( 'instructor-register.php', array(), false ) . '</div>';
+	}
+
+	/**
+	 * Sign in page (also hosts the lost-password and reset-password steps).
+	 *
+	 * @return string
+	 */
+	public static function render_login() {
+		return '<div class="shapelms shapelms-wrap">' . \ShapeLMS\Frontend\Auth::render( 'login' ) . '</div>';
+	}
+
+	/**
+	 * Sign up page.
+	 *
+	 * @return string
+	 */
+	public static function render_register() {
+		return '<div class="shapelms shapelms-wrap">' . \ShapeLMS\Frontend\Auth::render( 'register' ) . '</div>';
 	}
 }

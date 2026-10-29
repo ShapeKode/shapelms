@@ -14,7 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 the_post();
 
 $shapelms_item_id   = get_the_ID();
-$shapelms_is_quiz   = \ShapeLMS\Content\PostTypes::QUIZ === get_post_type();
+$shapelms_item_type = \ShapeLMS\Content\Curriculum::type_of( (string) get_post_type() );
+$shapelms_item_type = $shapelms_item_type ? $shapelms_item_type : 'lesson';
+$shapelms_is_quiz   = 'quiz' === $shapelms_item_type;
+$shapelms_is_lesson = 'lesson' === $shapelms_item_type;
 $shapelms_course_id = \ShapeLMS\Content\Curriculum::course_id_for( $shapelms_item_id );
 $shapelms_tree      = \ShapeLMS\Content\Curriculum::tree( $shapelms_course_id );
 $shapelms_neighbors = \ShapeLMS\Content\Curriculum::neighbors( $shapelms_course_id, $shapelms_item_id );
@@ -23,7 +26,12 @@ $shapelms_enrolled  = $shapelms_user_id && shapelms()->get( \ShapeLMS\Services\E
 $shapelms_summary   = $shapelms_user_id ? shapelms()->get( \ShapeLMS\Services\ProgressService::class )->summary( $shapelms_user_id, $shapelms_course_id ) : null;
 $shapelms_statuses  = $shapelms_summary ? $shapelms_summary['statuses'] : array();
 $shapelms_done      = isset( $shapelms_statuses[ $shapelms_item_id ] ) && 'completed' === $shapelms_statuses[ $shapelms_item_id ];
+$shapelms_locked    = $shapelms_summary ? $shapelms_summary['locked'] : array();
+$shapelms_lock_msgs = $shapelms_summary ? $shapelms_summary['lock_messages'] : array();
+$shapelms_next_lock = $shapelms_neighbors['next'] && in_array( (int) $shapelms_neighbors['next'], $shapelms_locked, true );
 $shapelms_autoplay  = (bool) shapelms_get_setting( 'course', 'autoplay_next', true );
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only flag set by the lock redirect.
+$shapelms_was_lock = isset( $_GET['shapelms_locked'] );
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -40,7 +48,7 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 	array(
 		'course-id' => (string) $shapelms_course_id,
 		'item-id'   => (string) $shapelms_item_id,
-		'item-type' => $shapelms_is_quiz ? 'quiz' : 'lesson',
+		'item-type' => $shapelms_item_type,
 		'next-url'  => $shapelms_neighbors['next'] ? (string) get_permalink( $shapelms_neighbors['next'] ) : '',
 		'autoplay'  => $shapelms_autoplay ? '1' : '0',
 	)
@@ -85,9 +93,10 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 							<?php foreach ( $shapelms_topic['items'] as $shapelms_item ) : ?>
 								<?php
 								$shapelms_item_done = isset( $shapelms_statuses[ $shapelms_item['id'] ] ) && 'completed' === $shapelms_statuses[ $shapelms_item['id'] ];
-								$shapelms_can_open  = $shapelms_enrolled || ! empty( $shapelms_item['preview'] ) || current_user_can( 'shapelms_edit_course', $shapelms_course_id );
+								$shapelms_item_lock = in_array( (int) $shapelms_item['id'], $shapelms_locked, true );
+								$shapelms_can_open  = ! $shapelms_item_lock && ( $shapelms_enrolled || ! empty( $shapelms_item['preview'] ) || current_user_can( 'shapelms_edit_course', $shapelms_course_id ) );
 								?>
-								<li class="shapelms-learn__item shapelms-learn__item--<?php echo esc_attr( $shapelms_item['type'] ); ?><?php echo $shapelms_item_done ? ' is-done' : ''; ?><?php echo (int) $shapelms_item['id'] === $shapelms_item_id ? ' is-current' : ''; ?>" data-item-id="<?php echo esc_attr( (string) $shapelms_item['id'] ); ?>">
+								<li class="shapelms-learn__item shapelms-learn__item--<?php echo esc_attr( $shapelms_item['type'] ); ?><?php echo $shapelms_item_done ? ' is-done' : ''; ?><?php echo $shapelms_item_lock ? ' is-locked' : ''; ?><?php echo (int) $shapelms_item['id'] === $shapelms_item_id ? ' is-current' : ''; ?>" data-item-id="<?php echo esc_attr( (string) $shapelms_item['id'] ); ?>"<?php echo $shapelms_item_lock && $shapelms_enrolled ? ' data-item-url="' . esc_url( $shapelms_item['url'] ) . '"' : ''; ?>>
 									<?php if ( $shapelms_can_open ) : ?>
 										<a href="<?php echo esc_url( $shapelms_item['url'] ); ?>" <?php echo (int) $shapelms_item['id'] === $shapelms_item_id ? 'aria-current="page"' : ''; ?>>
 											<span class="shapelms-learn__check" aria-hidden="true"></span>
@@ -97,7 +106,10 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 											<?php endif; ?>
 										</a>
 									<?php else : ?>
-										<span class="shapelms-learn__locked"><?php echo esc_html( $shapelms_item['title'] ); ?></span>
+										<span class="shapelms-learn__locked" title="<?php echo $shapelms_item_lock ? esc_attr( $shapelms_lock_msgs[ (int) $shapelms_item['id'] ] ?? '' ) : esc_attr__( 'Enroll to unlock', 'shapelms' ); ?>">
+											<span class="shapelms-learn__lock-icon" aria-hidden="true"></span>
+											<span class="shapelms-learn__item-title"><?php echo esc_html( $shapelms_item['title'] ); ?></span>
+										</span>
 									<?php endif; ?>
 								</li>
 							<?php endforeach; ?>
@@ -109,6 +121,9 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 
 		<main class="shapelms-learn__main">
 			<article class="shapelms-learn__content">
+				<?php if ( $shapelms_was_lock ) : ?>
+					<p class="shapelms-notice"><?php esc_html_e( 'That lesson is not available yet.', 'shapelms' ); ?></p>
+				<?php endif; ?>
 				<h1 class="shapelms-learn__title"><?php the_title(); ?></h1>
 
 				<?php if ( $shapelms_is_quiz ) : ?>
@@ -121,13 +136,35 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 						)
 					);
 					?>
-				<?php else : ?>
+				<?php elseif ( $shapelms_is_lesson ) : ?>
 					<?php shapelms_get_template( 'parts/video.php', array( 'lesson_id' => $shapelms_item_id ) ); ?>
 
 					<div class="shapelms-prose"><?php the_content(); ?></div>
 
 					<?php shapelms_get_template( 'parts/attachments.php', array( 'lesson_id' => $shapelms_item_id ) ); ?>
+				<?php else : ?>
+					<?php
+					/**
+					 * Renders the content of an add-on item type (for example an assignment).
+					 *
+					 * @param int    $item_id   Item id.
+					 * @param string $type      Item type.
+					 * @param int    $course_id Course id.
+					 * @param bool   $enrolled  Whether the viewer is enrolled.
+					 */
+					do_action( 'shapelms_learn_item_content', $shapelms_item_id, $shapelms_item_type, $shapelms_course_id, $shapelms_enrolled );
+					?>
 				<?php endif; ?>
+
+				<?php
+				/**
+				 * Fires at the end of the lesson / quiz content, above the Previous / Next bar.
+				 *
+				 * @param int $item_id   Item id.
+				 * @param int $course_id Course id.
+				 */
+				do_action( 'shapelms_learn_content_after', $shapelms_item_id, $shapelms_course_id );
+				?>
 			</article>
 
 			<footer class="shapelms-learn__footer">
@@ -137,13 +174,19 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 					<span></span>
 				<?php endif; ?>
 
-				<?php if ( ! $shapelms_is_quiz && $shapelms_enrolled ) : ?>
-					<button type="button" class="shapelms-btn shapelms-btn--primary<?php echo $shapelms_done ? ' is-done' : ''; ?>" data-shapelms-complete="<?php echo esc_attr( (string) $shapelms_item_id ); ?>" <?php disabled( $shapelms_done ); ?>>
+				<?php if ( $shapelms_is_lesson && $shapelms_enrolled ) : ?>
+					<?php
+					$shapelms_can_complete = $shapelms_done ? true : shapelms()->get( \ShapeLMS\Services\ProgressService::class )->can_complete_lesson( $shapelms_user_id, $shapelms_item_id );
+					$shapelms_blocked      = is_wp_error( $shapelms_can_complete );
+					?>
+					<button type="button" class="shapelms-btn shapelms-btn--primary<?php echo $shapelms_done ? ' is-done' : ''; ?>" data-shapelms-complete="<?php echo esc_attr( (string) $shapelms_item_id ); ?>" <?php disabled( $shapelms_done || $shapelms_blocked ); ?><?php echo $shapelms_blocked ? ' title="' . esc_attr( $shapelms_can_complete->get_error_message() ) . '"' : ''; ?>>
 						<?php echo $shapelms_done ? esc_html__( 'Completed', 'shapelms' ) : esc_html__( 'Mark as complete', 'shapelms' ); ?>
 					</button>
 				<?php endif; ?>
 
-				<?php if ( $shapelms_neighbors['next'] ) : ?>
+				<?php if ( $shapelms_next_lock ) : ?>
+					<a class="shapelms-btn shapelms-btn--secondary is-disabled" href="<?php echo esc_url( (string) get_permalink( $shapelms_neighbors['next'] ) ); ?>" aria-disabled="true" data-shapelms-next-locked title="<?php echo esc_attr( $shapelms_lock_msgs[ (int) $shapelms_neighbors['next'] ] ?? __( 'Complete this lesson to continue', 'shapelms' ) ); ?>"><?php esc_html_e( 'Next', 'shapelms' ); ?> &rarr;</a>
+				<?php elseif ( $shapelms_neighbors['next'] ) : ?>
 					<a class="shapelms-btn shapelms-btn--secondary" href="<?php echo esc_url( (string) get_permalink( $shapelms_neighbors['next'] ) ); ?>"><?php esc_html_e( 'Next', 'shapelms' ); ?> &rarr;</a>
 				<?php else : ?>
 					<a class="shapelms-btn shapelms-btn--secondary" href="<?php echo esc_url( (string) get_permalink( $shapelms_course_id ) ); ?>"><?php esc_html_e( 'Back to course', 'shapelms' ); ?></a>

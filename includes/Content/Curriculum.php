@@ -24,6 +24,110 @@ class Curriculum {
 	private static $trees = array();
 
 	/**
+	 * Cached item types (after init).
+	 *
+	 * @var array<string, array{post_type: string, label: string, icon: string, add_label: string, edit_label: string}>|null
+	 */
+	private static $types = null;
+
+	/**
+	 * Curriculum item types: type => { post_type, label, icon }. Lessons and quizzes are built in;
+	 * add-ons can register more (for example assignments) on the shapelms_curriculum_item_types filter.
+	 *
+	 * @return array<string, array{post_type: string, label: string, icon: string, add_label: string, edit_label: string}>
+	 */
+	public static function item_types() {
+		if ( null !== self::$types ) {
+			return self::$types;
+		}
+
+		$builtin = array(
+			'lesson' => array(
+				'post_type'  => PostTypes::LESSON,
+				'label'      => __( 'Lesson', 'shapelms' ),
+				'icon'       => 'L',
+				'add_label'  => __( '+ Lesson', 'shapelms' ),
+				'edit_label' => __( 'Edit lesson', 'shapelms' ),
+			),
+			'quiz'   => array(
+				'post_type'  => PostTypes::QUIZ,
+				'label'      => __( 'Quiz', 'shapelms' ),
+				'icon'       => 'Q',
+				'add_label'  => __( '+ Quiz', 'shapelms' ),
+				'edit_label' => __( 'Edit quiz', 'shapelms' ),
+			),
+		);
+
+		/**
+		 * Filters the curriculum item types. Each entry needs a registered post_type; the
+		 * built-in lesson and quiz entries cannot be changed.
+		 *
+		 * @param array $types type => { post_type, label, icon, add_label, edit_label }.
+		 */
+		$types = (array) apply_filters( 'shapelms_curriculum_item_types', $builtin );
+		$clean = $builtin;
+
+		foreach ( $types as $type => $config ) {
+			$type = sanitize_key( (string) $type );
+			if ( isset( $builtin[ $type ] ) || ! is_array( $config ) || empty( $config['post_type'] ) || ! post_type_exists( (string) $config['post_type'] ) ) {
+				continue;
+			}
+			$label          = isset( $config['label'] ) ? (string) $config['label'] : $type;
+			$clean[ $type ] = array(
+				'post_type'  => (string) $config['post_type'],
+				'label'      => $label,
+				'icon'       => isset( $config['icon'] ) ? mb_substr( (string) $config['icon'], 0, 2 ) : mb_substr( $label, 0, 1 ),
+				'add_label'  => isset( $config['add_label'] ) ? (string) $config['add_label'] : '+ ' . $label,
+				'edit_label' => isset( $config['edit_label'] ) ? (string) $config['edit_label'] : $label,
+			);
+		}
+
+		// Post types are registered on init; only remember the list once they all exist.
+		if ( did_action( 'init' ) ) {
+			self::$types = $clean;
+		}
+
+		return $clean;
+	}
+
+	/**
+	 * Post types of all curriculum items.
+	 *
+	 * @return string[]
+	 */
+	public static function item_post_types() {
+		return array_values( wp_list_pluck( self::item_types(), 'post_type' ) );
+	}
+
+	/**
+	 * Item type ("lesson", "quiz", ...) of a post type, or '' if it is not a curriculum item.
+	 *
+	 * @param string $post_type Post type.
+	 * @return string
+	 */
+	public static function type_of( $post_type ) {
+		foreach ( self::item_types() as $type => $config ) {
+			if ( $config['post_type'] === $post_type ) {
+				return (string) $type;
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Post type for an item type, or '' if unknown.
+	 *
+	 * @param string $type Item type.
+	 * @return string
+	 */
+	public static function post_type_for( $type ) {
+		$types = self::item_types();
+
+		return isset( $types[ $type ] ) ? $types[ $type ]['post_type'] : '';
+	}
+
+	/**
 	 * Returns the course id for any item (topic, lesson, quiz, question).
 	 *
 	 * @param int $post_id Post id.
@@ -86,7 +190,7 @@ class Curriculum {
 		if ( $topic_ids ) {
 			$items = get_posts(
 				array(
-					'post_type'       => array( PostTypes::LESSON, PostTypes::QUIZ ),
+					'post_type'       => self::item_post_types(),
 					'post_parent__in' => array_map( 'intval', $topic_ids ),
 					'post_status'     => $status,
 					'numberposts'     => -1,
@@ -201,7 +305,7 @@ class Curriculum {
 			foreach ( $topic['items'] as $item ) {
 				if ( 'quiz' === $item['type'] ) {
 					++$quizzes;
-				} else {
+				} elseif ( 'lesson' === $item['type'] ) {
 					++$lessons;
 				}
 			}
@@ -242,23 +346,31 @@ class Curriculum {
 	 * @return array<string, mixed>
 	 */
 	public static function item_to_array( $post ) {
-		$is_quiz = PostTypes::QUIZ === $post->post_type;
+		$type      = self::type_of( $post->post_type );
+		$type      = $type ? $type : 'lesson';
+		$is_lesson = 'lesson' === $type;
 
 		$data = array(
 			'id'       => (int) $post->ID,
-			'type'     => $is_quiz ? 'quiz' : 'lesson',
+			'type'     => $type,
 			'title'    => $post->post_title,
 			'status'   => $post->post_status,
 			'url'      => get_permalink( $post ),
-			'preview'  => ! $is_quiz && (bool) get_post_meta( $post->ID, '_shapelms_preview', true ),
-			'duration' => $is_quiz ? 0 : (int) get_post_meta( $post->ID, '_shapelms_video_duration', true ),
+			'preview'  => $is_lesson && (bool) get_post_meta( $post->ID, '_shapelms_preview', true ),
+			'duration' => $is_lesson ? (int) get_post_meta( $post->ID, '_shapelms_video_duration', true ) : 0,
 		);
 
-		if ( ! $is_quiz ) {
+		if ( $is_lesson ) {
 			$data['video_source'] = (string) get_post_meta( $post->ID, '_shapelms_video_source', true );
 		}
 
-		return $data;
+		/**
+		 * Filters the data of a lesson or quiz in the curriculum (course page, learn page, builder list).
+		 *
+		 * @param array    $data Item data.
+		 * @param \WP_Post $post Lesson or quiz post.
+		 */
+		return (array) apply_filters( 'shapelms_curriculum_item', $data, $post );
 	}
 
 	/**

@@ -84,7 +84,16 @@ class EnrollmentService {
 			return false;
 		}
 
-		return true;
+		/**
+		 * Filters an active enrollment. Add-ons that grant time-limited access can
+		 * check that the access they gave still applies.
+		 *
+		 * @param bool   $enrolled  Whether the enrollment counts.
+		 * @param object $row       Enrollment row.
+		 * @param int    $user_id   User id.
+		 * @param int    $course_id Course id.
+		 */
+		return (bool) apply_filters( 'shapelms_is_enrolled', true, $row, (int) $user_id, (int) $course_id );
 	}
 
 	/**
@@ -104,7 +113,7 @@ class EnrollmentService {
 		}
 
 		/**
-		 * Filters whether a user can access a course. Membership add-ons hook here.
+		 * Filters whether a user can access a course. Add-ons that grant access in other ways hook here.
 		 *
 		 * @param bool $can       Current decision.
 		 * @param int  $user_id   User id.
@@ -139,11 +148,55 @@ class EnrollmentService {
 		$existing = $this->get( $user_id, $course_id );
 
 		if ( $existing && in_array( $existing->status, array( 'active', 'completed' ), true ) ) {
+			if ( ! $existing->expires_at || strtotime( $existing->expires_at ) >= time() ) {
+				return (int) $existing->id;
+			}
+
+			// Time-limited access that ran out: reopen it for the new source and keep the progress.
+			$this->enrollments->update(
+				(int) $existing->id,
+				array(
+					'expires_at'       => null,
+					'source'           => sanitize_key( $source ),
+					'order_id'         => (int) $order_id,
+					'last_activity_at' => shapelms_now(),
+				)
+			);
+
+			Events::fire(
+				Events::COURSE_ENROLLED,
+				$user_id,
+				array(
+					'course_id' => $course_id,
+					'source'    => $source,
+					'order_id'  => (int) $order_id,
+				)
+			);
+
 			return (int) $existing->id;
 		}
 
-		if ( 'manual' !== $source && 'import' !== $source && $this->courses->is_full( $course_id ) ) {
+		// Admin, import and paid enrollments skip the capacity and prerequisite checks:
+		// paid orders were already checked when the order was created, and a buyer who has paid must get access.
+		$self_service = 'manual' !== $source && 'import' !== $source && ! $order_id;
+
+		if ( $self_service && $this->courses->is_full( $course_id ) ) {
 			return new \WP_Error( 'shapelms_course_full', __( 'This course is full.', 'shapelms' ) );
+		}
+
+		if ( $self_service ) {
+			$missing = $this->missing_prerequisites( $user_id, $course_id );
+			if ( $missing ) {
+				return new \WP_Error(
+					'shapelms_prerequisites',
+					sprintf(
+						/* translators: %s: course titles */
+						__( 'Complete these courses first: %s', 'shapelms' ),
+						implode( ', ', array_map( 'get_the_title', $missing ) )
+					),
+					array( 'courses' => $missing )
+				);
+			}
 		}
 
 		$data = array(
@@ -185,6 +238,53 @@ class EnrollmentService {
 		);
 
 		return $id;
+	}
+
+	/**
+	 * Published courses that must be completed before enrolling.
+	 *
+	 * @param int $course_id Course id.
+	 * @return int[]
+	 */
+	public static function prerequisites( $course_id ) {
+		$ids = get_post_meta( $course_id, '_shapelms_prerequisites', true );
+		$ids = is_array( $ids ) ? array_map( 'intval', $ids ) : array();
+		$out = array();
+
+		foreach ( array_unique( $ids ) as $id ) {
+			if ( $id && $id !== (int) $course_id && CourseService::is_course( $id ) && 'publish' === get_post_status( $id ) ) {
+				$out[] = $id;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Prerequisite courses the user has not completed yet.
+	 *
+	 * @param int $user_id   User id.
+	 * @param int $course_id Course id.
+	 * @return int[]
+	 */
+	public function missing_prerequisites( $user_id, $course_id ) {
+		$missing = array();
+
+		foreach ( self::prerequisites( $course_id ) as $id ) {
+			$row = $this->get( $user_id, $id );
+			if ( ! $row || 'completed' !== $row->status ) {
+				$missing[] = $id;
+			}
+		}
+
+		/**
+		 * Filters the prerequisite courses a user still has to complete.
+		 *
+		 * @param int[] $missing   Course ids.
+		 * @param int   $user_id   User id.
+		 * @param int   $course_id Course being enrolled in.
+		 */
+		return apply_filters( 'shapelms_missing_prerequisites', $missing, $user_id, $course_id );
 	}
 
 	/**
@@ -307,6 +407,10 @@ class EnrollmentService {
 		$list = array();
 
 		foreach ( $rows as $row ) {
+			// Time-limited access that has ended is not listed as current learning.
+			if ( $row->expires_at && strtotime( $row->expires_at ) < time() ) {
+				continue;
+			}
 			$course = $this->courses->to_array( (int) $row->course_id, false );
 			if ( ! $course || 'trash' === $course['status'] ) {
 				continue;

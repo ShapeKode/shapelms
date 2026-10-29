@@ -54,21 +54,22 @@ class VideoEmbed {
 	/**
 	 * Iframe HTML for a YouTube or Vimeo URL, or empty when the URL is not recognised.
 	 *
-	 * @param string $url   URL.
-	 * @param string $title Accessible title.
+	 * @param string $url      URL.
+	 * @param string $title    Accessible title.
+	 * @param bool   $autoplay Start playing as soon as the player loads (for modals opened by a click).
 	 * @return string
 	 */
-	public static function iframe( $url, $title = '' ) {
+	public static function iframe( $url, $title = '', $autoplay = false ) {
 		$src = '';
 
 		$youtube = self::youtube_id( $url );
 		if ( $youtube ) {
-			$src = 'https://www.youtube-nocookie.com/embed/' . rawurlencode( $youtube ) . '?rel=0&modestbranding=1';
+			$src = 'https://www.youtube-nocookie.com/embed/' . rawurlencode( $youtube ) . '?rel=0&modestbranding=1' . ( $autoplay ? '&autoplay=1' : '' );
 		}
 
 		$vimeo = self::vimeo_id( $url );
 		if ( ! $src && $vimeo ) {
-			$src = 'https://player.vimeo.com/video/' . rawurlencode( $vimeo ) . '?dnt=1';
+			$src = 'https://player.vimeo.com/video/' . rawurlencode( $vimeo ) . '?dnt=1' . ( $autoplay ? '&autoplay=1' : '' );
 		}
 
 		if ( ! $src ) {
@@ -85,19 +86,27 @@ class VideoEmbed {
 	/**
 	 * Best-effort embed HTML: direct iframe for YouTube/Vimeo, otherwise oEmbed.
 	 *
-	 * @param string $url   URL.
-	 * @param string $title Accessible title.
+	 * @param string $url      URL.
+	 * @param string $title    Accessible title.
+	 * @param bool   $autoplay Autoplay (YouTube/Vimeo only).
 	 * @return string
 	 */
-	public static function html( $url, $title = '' ) {
-		$iframe = self::iframe( $url, $title );
+	public static function html( $url, $title = '', $autoplay = false ) {
+		$iframe = self::iframe( $url, $title, $autoplay );
 
 		if ( $iframe ) {
 			return $iframe;
 		}
 
-		$oembed = wp_oembed_get( $url );
+		// Cache the provider lookup so the server does not call the provider on every page view.
+		$cache_key = 'shapelms_oembed_' . md5( $url );
+		$oembed    = get_transient( $cache_key );
 
-		return $oembed ? (string) $oembed : '';
+		if ( false === $oembed ) {
+			$oembed = (string) wp_oembed_get( $url );
+			set_transient( $cache_key, $oembed, $oembed ? DAY_IN_SECONDS : HOUR_IN_SECONDS );
+		}
+
+		return (string) $oembed;
 	}
 }

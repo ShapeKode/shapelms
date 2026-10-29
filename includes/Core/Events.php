@@ -38,6 +38,7 @@ class Events {
 	const COURSE_COMPLETED    = 'shapelms_course_completed';
 	const QUIZ_STARTED        = 'shapelms_quiz_started';
 	const QUIZ_FINISHED       = 'shapelms_quiz_finished';
+	const QUIZ_PENDING_REVIEW = 'shapelms_quiz_pending_review';
 	const ORDER_COMPLETED     = 'shapelms_order_completed';
 	const ORDER_REFUNDED      = 'shapelms_order_refunded';
 	const REVIEW_SUBMITTED    = 'shapelms_review_submitted';

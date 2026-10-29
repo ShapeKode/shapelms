@@ -63,6 +63,36 @@ class OrderService {
 		$subtotal = 0.0;
 
 		foreach ( array_unique( array_map( 'intval', $course_ids ) ) as $course_id ) {
+			/**
+			 * Lets an add-on sell something other than a single course (for example a bundle).
+			 *
+			 * Return null to use the default course handling, false to skip the id, a WP_Error to stop
+			 * the order, or an item { course_id, title, price }. The item's course_id is stored on the
+			 * order line; use the shapelms_order_item_course_ids filter to say which courses it grants.
+			 *
+			 * @param array|false|\WP_Error|null $item    Item.
+			 * @param int                        $id      Requested id.
+			 * @param int                        $user_id Buyer.
+			 */
+			$custom = apply_filters( 'shapelms_order_item', null, $course_id, (int) $user_id );
+
+			if ( is_wp_error( $custom ) ) {
+				return $custom;
+			}
+			if ( false === $custom ) {
+				continue;
+			}
+			if ( is_array( $custom ) ) {
+				$price     = max( 0.0, (float) ( $custom['price'] ?? 0 ) );
+				$items[]   = array(
+					'course_id' => isset( $custom['course_id'] ) ? (int) $custom['course_id'] : $course_id,
+					'title'     => sanitize_text_field( (string) ( $custom['title'] ?? get_the_title( $course_id ) ) ),
+					'price'     => $price,
+				);
+				$subtotal += $price;
+				continue;
+			}
+
 			if ( ! CourseService::is_course( $course_id ) || 'publish' !== get_post_status( $course_id ) ) {
 				continue;
 			}
@@ -72,6 +102,18 @@ class OrderService {
 			$pricing = CourseService::pricing( $course_id );
 			if ( $pricing['is_free'] ) {
 				continue;
+			}
+			$missing = $this->enrollment->missing_prerequisites( $user_id, $course_id );
+			if ( $missing ) {
+				return new \WP_Error(
+					'shapelms_prerequisites',
+					sprintf(
+						/* translators: 1: course title, 2: prerequisite titles */
+						__( '%1$s requires you to complete these courses first: %2$s', 'shapelms' ),
+						get_the_title( $course_id ),
+						implode( ', ', array_map( 'get_the_title', $missing ) )
+					)
+				);
 			}
 			$items[]   = array(
 				'course_id' => $course_id,
@@ -159,7 +201,20 @@ class OrderService {
 		);
 
 		foreach ( $this->orders->items( (int) $order->id ) as $item ) {
-			$this->enrollment->enroll( (int) $order->user_id, (int) $item->course_id, 'order', (int) $order->id );
+			/**
+			 * Courses an order line grants. By default the line's own course.
+			 *
+			 * @param int[]  $course_ids Course ids.
+			 * @param object $item       Order item row.
+			 * @param object $order      Order row.
+			 */
+			$grant = (array) apply_filters( 'shapelms_order_item_course_ids', array( (int) $item->course_id ), $item, $order );
+
+			foreach ( array_unique( array_map( 'intval', $grant ) ) as $grant_id ) {
+				if ( $grant_id > 0 ) {
+					$this->enrollment->enroll( (int) $order->user_id, $grant_id, 'order', (int) $order->id );
+				}
+			}
 		}
 
 		Events::fire(
@@ -200,6 +255,15 @@ class OrderService {
 		);
 
 		$this->enrollment->revoke_order( (int) $order->id );
+
+		/**
+		 * Fires after an order is refunded, cancelled or failed and its course access was removed.
+		 * Add-ons that granted something else for the order remove it here.
+		 *
+		 * @param object $order  Order row (before the status change).
+		 * @param string $status refunded|cancelled|failed.
+		 */
+		do_action( 'shapelms_order_revoked', $order, $status );
 
 		if ( 'refunded' === $status ) {
 			Events::fire( Events::ORDER_REFUNDED, (int) $order->user_id, array( 'order_id' => (int) $order->id ) );

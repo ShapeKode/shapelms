@@ -44,8 +44,7 @@ class PostTypes {
 	 * @return void
 	 */
 	public static function register_static() {
-		$slug = sanitize_title( (string) Settings::get( 'general', 'course_slug', 'courses' ) );
-		$slug = $slug ? $slug : 'courses';
+		$slug = self::course_slug();
 
 		register_post_type(
 			self::COURSE,
@@ -169,7 +168,7 @@ class PostTypes {
 	 * @return string
 	 */
 	public function item_permalink( $permalink, $post ) {
-		if ( ! in_array( $post->post_type, array( self::LESSON, self::QUIZ ), true ) ) {
+		if ( ! in_array( $post->post_type, Curriculum::item_post_types(), true ) ) {
 			return $permalink;
 		}
 
@@ -204,7 +203,7 @@ class PostTypes {
 		$children = get_posts(
 			array(
 				'post_parent'   => $post_id,
-				'post_type'     => array( self::TOPIC, self::LESSON, self::QUIZ, self::QUESTION ),
+				'post_type'     => array_merge( array( self::TOPIC, self::QUESTION ), Curriculum::item_post_types() ),
 				'post_status'   => 'any',
 				'numberposts'   => -1,
 				'fields'        => 'ids',
@@ -274,6 +273,17 @@ class PostTypes {
 	 * @return string[]
 	 */
 	public static function all() {
-		return array( self::COURSE, self::TOPIC, self::LESSON, self::QUIZ, self::QUESTION );
+		return array_values( array_unique( array_merge( array( self::COURSE, self::TOPIC, self::QUESTION ), Curriculum::item_post_types() ) ) );
+	}
+
+	/**
+	 * Course URL base ("courses" by default). Item URLs live under it: /courses/{course}/{items}/{slug}/.
+	 *
+	 * @return string
+	 */
+	public static function course_slug() {
+		$slug = sanitize_title( (string) Settings::get( 'general', 'course_slug', 'courses' ) );
+
+		return $slug ? $slug : 'courses';
 	}
 }

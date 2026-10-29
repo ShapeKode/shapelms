@@ -58,9 +58,19 @@ class Assets {
 	 * @return void
 	 */
 	public function enqueue() {
-		$kind = $this->screen_kind();
+		// Tiny stylesheet for the admin menu separators; it has to load on every admin screen because the menu does.
+		wp_enqueue_style( 'shapelms-admin-menu', SHAPELMS_URL . 'assets/css/admin-menu.css', array(), SHAPELMS_VERSION );
 
-		if ( ! $kind ) {
+		/**
+		 * Filters which ShapeLMS bundle a screen loads: '' (none), 'app' or 'builder'. Add-on screens
+		 * that reuse builder components (such as the question editor) return 'builder'.
+		 *
+		 * @param string          $kind   Screen kind.
+		 * @param \WP_Screen|null $screen Current screen.
+		 */
+		$kind = (string) apply_filters( 'shapelms_admin_screen_kind', $this->screen_kind(), get_current_screen() );
+
+		if ( ! in_array( $kind, array( 'app', 'builder' ), true ) ) {
 			return;
 		}
 
@@ -92,6 +102,14 @@ class Assets {
 			$asset['version']
 		);
 		wp_style_add_data( $handle, 'rtl', 'replace' );
+
+		/**
+		 * Fires after ShapeLMS admin assets are enqueued, so add-ons can enqueue theirs.
+		 *
+		 * @param string $kind   admin|builder.
+		 * @param string $handle Script handle add-on scripts can depend on.
+		 */
+		do_action( 'shapelms_admin_enqueue', $kind, $handle );
 	}
 
 	/**
@@ -124,18 +142,20 @@ class Assets {
 	 */
 	public static function data_attributes() {
 		$data = array(
-			'rest-url'    => esc_url_raw( rest_url( 'shapelms/v1/' ) ),
-			'rest-nonce'  => wp_create_nonce( 'wp_rest' ),
-			'admin-url'   => admin_url(),
-			'site-url'    => home_url( '/' ),
-			'can-manage'  => current_user_can( Capabilities::MANAGE ) ? '1' : '0',
-			'user-id'     => (string) get_current_user_id(),
-			'currency'    => \ShapeLMS\Services\CurrencyService::symbol(),
-			'version'     => SHAPELMS_VERSION,
-			'course-type' => PostTypes::COURSE,
-			'new-course'  => admin_url( 'post-new.php?post_type=' . PostTypes::COURSE ),
-			'setup-done'  => get_option( 'shapelms_setup_complete' ) ? '1' : '0',
-			'primary'     => (string) Settings::get( 'design', 'primary_color', '#3b5bdb' ),
+			'rest-url'           => esc_url_raw( rest_url( 'shapelms/v1/' ) ),
+			'rest-nonce'         => wp_create_nonce( 'wp_rest' ),
+			'admin-url'          => admin_url(),
+			'site-url'           => home_url( '/' ),
+			'can-manage'         => current_user_can( Capabilities::MANAGE ) ? '1' : '0',
+			'sequential-default' => shapelms_get_setting( 'course', 'sequential_learning', false ) ? '1' : '0',
+			'user-id'            => (string) get_current_user_id(),
+			'currency'           => \ShapeLMS\Services\CurrencyService::symbol(),
+			'version'            => SHAPELMS_VERSION,
+			'course-type'        => PostTypes::COURSE,
+			'new-course'         => admin_url( 'post-new.php?post_type=' . PostTypes::COURSE ),
+			'setup-done'         => get_option( 'shapelms_setup_complete' ) ? '1' : '0',
+			'primary'            => (string) Settings::get( 'design', 'primary_color', '#3b5bdb' ),
+			'item-types'         => (string) wp_json_encode( \ShapeLMS\Content\Curriculum::item_types() ),
 		);
 
 		/**

@@ -1,0 +1,21 @@
+/**
+ * ShapeLMS admin menu: a divider above the first item of each submenu group.
+ * Loaded on every admin screen (the menu is everywhere); nothing else lives here.
+ */
+
+#adminmenu .wp-submenu li.shapelms-menu-group-start {
+	margin-top: 6px;
+	padding-top: 6px;
+	border-top: 1px solid rgba(240, 246, 252, 0.16);
+}
+
+#adminmenu .wp-has-current-submenu .wp-submenu li.shapelms-menu-group-start,
+#adminmenu .opensub .wp-submenu li.shapelms-menu-group-start {
+	margin-left: 12px;
+	margin-right: 12px;
+}
+
+#adminmenu .wp-submenu li.shapelms-menu-group-start a {
+	margin-left: -12px;
+	margin-right: -12px;
+}

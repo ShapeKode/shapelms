@@ -182,6 +182,18 @@ class CourseService {
 			'date'           => get_post_time( 'c', true, $post ),
 			'modified'       => get_post_modified_time( 'c', true, $post ),
 			'woo_product_id' => (int) get_post_meta( $post->ID, '_shapelms_woo_product_id', true ),
+			'progression'    => (string) get_post_meta( $post->ID, '_shapelms_progression', true ),
+			'sequential'     => ProgressService::is_sequential( $post->ID ),
+			'prerequisites'  => array_map(
+				static function ( $id ) {
+					return array(
+						'id'    => (int) $id,
+						'title' => get_the_title( $id ),
+						'url'   => (string) get_permalink( $id ),
+					);
+				},
+				EnrollmentService::prerequisites( $post->ID )
+			),
 		);
 
 		if ( $with_tree ) {

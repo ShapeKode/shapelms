@@ -18,6 +18,7 @@ export function readConfig( root ) {
 		}
 	} );
 	data.canManage = data.canManage === '1';
+	data.sequentialDefault = data.sequentialDefault === '1';
 	data.setupDone = data.setupDone === '1';
 	data.userId = parseInt( data.userId, 10 ) || 0;
 	data.courseId = parseInt( data.courseId, 10 ) || 0;

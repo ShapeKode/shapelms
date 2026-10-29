@@ -58,6 +58,8 @@ class Frontend {
 		add_action( 'template_redirect', array( $this, 'deny_item_listings' ), 0 );
 		add_action( 'template_redirect', array( $this, 'guard_items' ) );
 		add_action( 'template_redirect', array( $this, 'record_item_start' ) );
+		add_action( 'template_redirect', array( $this, 'remember_checkout' ) );
+		add_action( 'template_redirect', array( $this, 'auto_enroll_after_login' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ) );
 		add_filter( 'body_class', array( $this, 'body_class' ) );
 		add_action( 'pre_get_posts', array( $this, 'archive_query' ) );
@@ -71,7 +73,7 @@ class Frontend {
 	 * @return bool
 	 */
 	public static function is_lms_page() {
-		if ( is_singular( array( PostTypes::COURSE, PostTypes::LESSON, PostTypes::QUIZ ) ) ) {
+		if ( is_singular( array_merge( array( PostTypes::COURSE ), Curriculum::item_post_types() ) ) ) {
 			return true;
 		}
 
@@ -79,14 +81,14 @@ class Frontend {
 			return true;
 		}
 
-		foreach ( array( 'dashboard', 'checkout', 'instructor_register' ) as $key ) {
+		foreach ( array( 'dashboard', 'checkout', 'instructor_register', 'login', 'register' ) as $key ) {
 			if ( Pages::is_page( $key ) ) {
 				return true;
 			}
 		}
 
 		if ( is_singular() ) {
-			foreach ( array( 'shapelms/course-grid', 'shapelms/dashboard', 'shapelms/checkout', 'shapelms/instructor-registration', 'shapelms/enroll-button' ) as $block ) {
+			foreach ( array( 'shapelms/course-grid', 'shapelms/dashboard', 'shapelms/checkout', 'shapelms/instructor-registration', 'shapelms/enroll-button', 'shapelms/login', 'shapelms/register' ) as $block ) {
 				if ( has_block( $block ) ) {
 					return true;
 				}
@@ -112,10 +114,12 @@ class Frontend {
 
 		if ( is_singular( PostTypes::COURSE ) ) {
 			$file = 'single-course.php';
-		} elseif ( is_singular( array( PostTypes::LESSON, PostTypes::QUIZ ) ) ) {
+		} elseif ( is_singular( Curriculum::item_post_types() ) ) {
 			$file = 'learn.php';
 		} elseif ( is_post_type_archive( PostTypes::COURSE ) || is_tax( array( Taxonomies::CATEGORY, Taxonomies::TAG ) ) ) {
 			$file = 'archive-course.php';
+		} elseif ( ( Pages::is_page( 'login' ) || Pages::is_page( 'register' ) ) && 'theme' !== shapelms_get_setting( 'general', 'auth_layout', 'standalone' ) ) {
+			$file = 'auth-page.php';
 		}
 
 		if ( ! $file ) {
@@ -128,12 +132,40 @@ class Frontend {
 	}
 
 	/**
+	 * Active archive filters from the query string (sanitized, empty values dropped).
+	 *
+	 * @return array<string, string> Keys: s, level, price, orderby, category.
+	 */
+	public static function active_filters() {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only GET filters.
+		$filters = array(
+			's'       => isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '',
+			'level'   => isset( $_GET['level'] ) ? sanitize_key( wp_unslash( $_GET['level'] ) ) : '',
+			'price'   => isset( $_GET['price'] ) ? sanitize_key( wp_unslash( $_GET['price'] ) ) : '',
+			'orderby' => isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : '',
+		);
+		// phpcs:enable
+
+		$taxonomy = get_taxonomy( Taxonomies::CATEGORY );
+		if ( $taxonomy && $taxonomy->query_var ) {
+			$filters['category'] = sanitize_title( (string) get_query_var( (string) $taxonomy->query_var ) );
+		}
+
+		return array_filter(
+			$filters,
+			static function ( $value ) {
+				return '' !== $value;
+			}
+		);
+	}
+
+	/**
 	 * Redirects users who cannot access a lesson or quiz.
 	 *
 	 * @return void
 	 */
 	public function guard_items() {
-		if ( ! is_singular( array( PostTypes::LESSON, PostTypes::QUIZ ) ) ) {
+		if ( ! is_singular( Curriculum::item_post_types() ) ) {
 			return;
 		}
 
@@ -148,6 +180,14 @@ class Frontend {
 		$user_id = get_current_user_id();
 
 		if ( $user_id && $this->enrollment->can_access( $user_id, $course_id ) ) {
+			if ( $this->progress->is_locked( $user_id, $course_id, $item_id ) ) {
+				$resume = $this->progress->resume_item( $user_id, $course_id );
+				if ( ! $resume || $resume === $item_id || $this->progress->is_locked( $user_id, $course_id, $resume ) ) {
+					$resume = $course_id;
+				}
+				wp_safe_redirect( add_query_arg( 'shapelms_locked', '1', (string) get_permalink( $resume ) ) );
+				exit;
+			}
 			return;
 		}
 
@@ -158,11 +198,67 @@ class Frontend {
 		}
 
 		if ( ! $user_id ) {
-			wp_safe_redirect( wp_login_url( (string) get_permalink( $item_id ) ) );
+			wp_safe_redirect( shapelms_login_url( (string) get_permalink( $item_id ) ) );
 			exit;
 		}
 
 		wp_safe_redirect( (string) get_permalink( $course_id ) );
+		exit;
+	}
+
+	/**
+	 * A logged-out visitor on the checkout page: remember it, so signing in from anywhere
+	 * (even a theme menu link) brings them straight back to buy the course.
+	 *
+	 * @return void
+	 */
+	public function remember_checkout() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only.
+		if ( is_user_logged_in() || ! Pages::is_page( 'checkout' ) || empty( $_GET['course'] ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only.
+		Auth::remember_return( add_query_arg( 'course', sanitize_text_field( wp_unslash( $_GET['course'] ) ), Pages::get_url( 'checkout' ) ) );
+	}
+
+	/**
+	 * Finishes a free enrollment the visitor started before signing in ("Log in to enroll").
+	 *
+	 * The course page is opened with ?shapelms_enroll=1 after login. Free courses enroll
+	 * straight away and open the first lesson; paid courses go to checkout.
+	 *
+	 * @return void
+	 */
+	public function auto_enroll_after_login() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- the visitor asked to enroll before logging in; only free, published courses are affected.
+		if ( ! is_singular( PostTypes::COURSE ) || ! is_user_logged_in() || empty( $_GET['shapelms_enroll'] ) ) {
+			return;
+		}
+
+		$course_id = get_queried_object_id();
+		$user_id   = get_current_user_id();
+		$clean_url = (string) get_permalink( $course_id );
+
+		if ( $this->enrollment->can_access( $user_id, $course_id ) ) {
+			wp_safe_redirect( $clean_url );
+			exit;
+		}
+
+		if ( ! \ShapeLMS\Services\CourseService::pricing( $course_id )['is_free'] ) {
+			wp_safe_redirect( add_query_arg( 'course', $course_id, Pages::get_url( 'checkout' ) ) );
+			exit;
+		}
+
+		$result = $this->enrollment->enroll_free( $user_id, $course_id );
+
+		if ( is_wp_error( $result ) ) {
+			wp_safe_redirect( $clean_url );
+			exit;
+		}
+
+		$next = $this->progress->resume_item( $user_id, $course_id );
+		wp_safe_redirect( $next ? (string) get_permalink( $next ) : $clean_url );
 		exit;
 	}
 
@@ -172,7 +268,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function record_item_start() {
-		if ( is_singular( array( PostTypes::LESSON, PostTypes::QUIZ ) ) && is_user_logged_in() ) {
+		if ( is_singular( Curriculum::item_post_types() ) && is_user_logged_in() ) {
 			$this->progress->start( get_current_user_id(), get_queried_object_id() );
 		}
 	}
@@ -215,7 +311,7 @@ class Frontend {
 			array(
 				'rest-url'   => esc_url_raw( rest_url( 'shapelms/v1/' ) ),
 				'rest-nonce' => wp_create_nonce( 'wp_rest' ),
-				'login-url'  => wp_login_url( (string) get_permalink() ),
+				'login-url'  => shapelms_login_url( (string) get_permalink() ),
 				'logged-in'  => is_user_logged_in() ? '1' : '0',
 			),
 			$extra
@@ -239,8 +335,11 @@ class Frontend {
 		if ( self::is_lms_page() ) {
 			$classes[] = 'shapelms';
 		}
-		if ( is_singular( array( PostTypes::LESSON, PostTypes::QUIZ ) ) ) {
+		if ( is_singular( Curriculum::item_post_types() ) ) {
 			$classes[] = 'shapelms-learn';
+		}
+		if ( Pages::is_page( 'login' ) || Pages::is_page( 'register' ) ) {
+			$classes[] = 'shapelms-auth-page';
 		}
 
 		return $classes;
@@ -260,7 +359,7 @@ class Frontend {
 
 		$types = array_filter( (array) $query->get( 'post_type' ) );
 
-		if ( array_intersect( $types, array( PostTypes::LESSON, PostTypes::QUIZ, PostTypes::TOPIC, PostTypes::QUESTION ) ) ) {
+		if ( array_intersect( $types, array_merge( array( PostTypes::TOPIC, PostTypes::QUESTION ), Curriculum::item_post_types() ) ) ) {
 			$query->set( 'post__in', array( 0 ) );
 			$query->set_404();
 		}
@@ -278,7 +377,7 @@ class Frontend {
 
 		$types = array_filter( (array) get_query_var( 'post_type' ) );
 
-		if ( ! array_intersect( $types, array( PostTypes::LESSON, PostTypes::QUIZ, PostTypes::TOPIC, PostTypes::QUESTION ) ) ) {
+		if ( ! array_intersect( $types, array_merge( array( PostTypes::TOPIC, PostTypes::QUESTION ), Curriculum::item_post_types() ) ) ) {
 			return;
 		}
 
@@ -325,6 +424,9 @@ class Frontend {
 			$query->set( 'meta_key', '_shapelms_price' ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			$query->set( 'orderby', 'meta_value_num' );
 			$query->set( 'order', 'ASC' );
+		} elseif ( 'popular' === $orderby ) {
+			$query->set( 'orderby', 'comment_count' );
+			$query->set( 'order', 'DESC' );
 		}
 
 		$meta = array();

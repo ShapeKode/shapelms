@@ -1,0 +1,1303 @@
+{
+	"format": 1,
+	"plugin": "shapelms",
+	"courses": [
+		{
+			"title": "HTML & CSS for Absolute Beginners",
+			"slug": "html-css-beginners",
+			"status": "publish",
+			"excerpt": "Build your first web page from scratch. No experience needed.",
+			"content": "<p>Learn how the web is put together. You will write real HTML and CSS, understand how browsers render pages and publish a small personal site by the end.</p><p>Every lesson has a short video and a hands-on exercise.</p>",
+			"meta": {
+				"level": "beginner",
+				"requirements": [
+					"A computer with a browser",
+					"A text editor such as VS Code"
+				],
+				"outcomes": [
+					"Write semantic HTML",
+					"Style pages with CSS",
+					"Build a responsive layout",
+					"Publish a page online"
+				],
+				"audience": [
+					"Complete beginners",
+					"Designers who want to code"
+				],
+				"price_type": "free",
+				"price": 0,
+				"sale_price": 0,
+				"max_students": 0,
+				"featured": true,
+				"intro_video": "https://www.youtube.com/watch?v=aqz-KE-bpKQ"
+			},
+			"categories": [
+				"Web Development"
+			],
+			"tags": [
+				"html",
+				"css",
+				"beginner"
+			],
+			"topics": [
+				{
+					"title": "Getting set up",
+					"summary": "Tools and your first file.",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "What is a web page?",
+							"content": "<p>A web page is a text file the browser reads. HTML gives it structure, CSS gives it style and JavaScript gives it behaviour.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": true,
+								"video_duration": 300,
+								"video_url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Installing a code editor",
+							"content": "<p>Download VS Code, open a folder and create <code>index.html</code>.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": false,
+								"video_duration": 420,
+								"video_url": "https://www.youtube.com/watch?v=ysz5S6PUM-U"
+							}
+						}
+					]
+				},
+				{
+					"title": "HTML essentials",
+					"summary": "Structure your content.",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "Headings, paragraphs and links",
+							"content": "<p>Use <code>h1</code> to <code>h6</code> for headings, <code>p</code> for paragraphs and <code>a</code> for links.</p>",
+							"meta": {
+								"video_source": "vimeo",
+								"preview": false,
+								"video_duration": 540,
+								"video_url": "https://vimeo.com/76979871"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Images and lists",
+							"content": "<p>Add images with <code>img</code> and lists with <code>ul</code>, <code>ol</code> and <code>li</code>.</p>",
+							"meta": {
+								"video_source": "none",
+								"preview": false,
+								"video_duration": 0
+							}
+						},
+						{
+							"type": "quiz",
+							"title": "HTML check",
+							"content": "<p>Three quick questions on HTML basics.</p>",
+							"meta": {
+								"time_limit": 10,
+								"attempts_allowed": 0,
+								"pass_mark": 60,
+								"randomize": false,
+								"feedback_mode": "instant",
+								"show_answers": true,
+								"questions_per_page": 1
+							},
+							"questions": [
+								{
+									"title": "Which element holds the main heading of a page?",
+									"type": "single_choice",
+									"points": 1,
+									"options": [
+										{
+											"id": "a",
+											"text": "<p>"
+										},
+										{
+											"id": "b",
+											"text": "<h1>"
+										},
+										{
+											"id": "c",
+											"text": "<div>"
+										}
+									],
+									"correct": [
+										"b"
+									],
+									"explanation": "h1 is the top-level heading."
+								},
+								{
+									"title": "Which of these are valid list elements?",
+									"type": "multiple_choice",
+									"points": 2,
+									"options": [
+										{
+											"id": "a",
+											"text": "<ul>"
+										},
+										{
+											"id": "b",
+											"text": "<ol>"
+										},
+										{
+											"id": "c",
+											"text": "<li>"
+										},
+										{
+											"id": "d",
+											"text": "<list>"
+										}
+									],
+									"correct": [
+										"a",
+										"b",
+										"c"
+									],
+									"explanation": "There is no <list> element.",
+									"settings": {
+										"partial_credit": true
+									}
+								},
+								{
+									"title": "Every opening tag must have a closing tag.",
+									"type": "true_false",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"false"
+									],
+									"explanation": "Void elements such as img and br have no closing tag."
+								}
+							]
+						}
+					]
+				},
+				{
+					"title": "CSS essentials",
+					"summary": "Make it look good.",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "Selectors and the box model",
+							"content": "<p>Every element is a box with content, padding, border and margin.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": false,
+								"video_duration": 600,
+								"video_url": "https://www.youtube.com/watch?v=LXb3EKWsInQ"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Flexbox layouts",
+							"content": "<p>Flexbox arranges items in a row or column and distributes space between them.</p>",
+							"meta": {
+								"video_source": "vimeo",
+								"preview": false,
+								"video_duration": 720,
+								"video_url": "https://vimeo.com/22439234"
+							}
+						},
+						{
+							"type": "quiz",
+							"title": "Final quiz",
+							"content": "<p>Pass this to complete the course.</p>",
+							"meta": {
+								"time_limit": 10,
+								"attempts_allowed": 0,
+								"pass_mark": 70,
+								"randomize": false,
+								"feedback_mode": "instant",
+								"show_answers": true,
+								"questions_per_page": 1
+							},
+							"questions": [
+								{
+									"title": "The CSS property that sets the space inside a border is ____.",
+									"type": "fill_blank",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"padding"
+									],
+									"explanation": "Padding sits between content and border."
+								},
+								{
+									"title": "Name the CSS property that turns an element into a flex container.",
+									"type": "short_answer",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"display",
+										"display: flex",
+										"display:flex"
+									],
+									"explanation": "display: flex creates a flex container."
+								},
+								{
+									"title": "Which selector targets elements with class \"card\"?",
+									"type": "single_choice",
+									"points": 1,
+									"options": [
+										{
+											"id": "a",
+											"text": "#card"
+										},
+										{
+											"id": "b",
+											"text": ".card"
+										},
+										{
+											"id": "c",
+											"text": "card"
+										}
+									],
+									"correct": [
+										"b"
+									],
+									"explanation": "A leading dot selects by class."
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "JavaScript Fundamentals",
+			"slug": "javascript-fundamentals",
+			"status": "publish",
+			"excerpt": "Variables, functions, the DOM and fetch. The language of the browser, explained simply.",
+			"content": "<p>This course takes you from zero to writing interactive pages. You will build a to-do app, a weather widget and a small game.</p>",
+			"meta": {
+				"level": "intermediate",
+				"requirements": [
+					"Basic HTML and CSS"
+				],
+				"outcomes": [
+					"Understand variables, types and functions",
+					"Manipulate the DOM",
+					"Call an API with fetch",
+					"Debug with the browser console"
+				],
+				"audience": [
+					"Front-end beginners",
+					"Designers moving into development"
+				],
+				"price_type": "paid",
+				"price": 49,
+				"sale_price": 29,
+				"max_students": 0,
+				"featured": true,
+				"intro_video": "https://www.youtube.com/watch?v=ysz5S6PUM-U"
+			},
+			"categories": [
+				"Web Development"
+			],
+			"tags": [
+				"javascript",
+				"frontend"
+			],
+			"topics": [
+				{
+					"title": "Language basics",
+					"summary": "",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "Variables and types",
+							"content": "<p>Use <code>const</code> by default and <code>let</code> when the value changes.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": true,
+								"video_duration": 480,
+								"video_url": "https://www.youtube.com/watch?v=ysz5S6PUM-U"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Functions and scope",
+							"content": "<p>Functions package behaviour. Arrow functions keep the surrounding <code>this</code>.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": false,
+								"video_duration": 660,
+								"video_url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Arrays and objects",
+							"content": "<p>Arrays hold ordered lists; objects hold named values.</p>",
+							"meta": {
+								"video_source": "none",
+								"preview": false,
+								"video_duration": 0
+							}
+						},
+						{
+							"type": "quiz",
+							"title": "Basics quiz",
+							"content": "<p>Check your understanding before moving on.</p>",
+							"meta": {
+								"time_limit": 10,
+								"attempts_allowed": 0,
+								"pass_mark": 60,
+								"randomize": false,
+								"feedback_mode": "instant",
+								"show_answers": true,
+								"questions_per_page": 1
+							},
+							"questions": [
+								{
+									"title": "Which keyword declares a value that cannot be reassigned?",
+									"type": "single_choice",
+									"points": 1,
+									"options": [
+										{
+											"id": "a",
+											"text": "let"
+										},
+										{
+											"id": "b",
+											"text": "var"
+										},
+										{
+											"id": "c",
+											"text": "const"
+										}
+									],
+									"correct": [
+										"c"
+									],
+									"explanation": "const prevents reassignment."
+								},
+								{
+									"title": "Arrays in JavaScript are zero-indexed.",
+									"type": "true_false",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"true"
+									],
+									"explanation": "The first element is at index 0."
+								},
+								{
+									"title": "Which are primitive types?",
+									"type": "multiple_choice",
+									"points": 2,
+									"options": [
+										{
+											"id": "a",
+											"text": "string"
+										},
+										{
+											"id": "b",
+											"text": "number"
+										},
+										{
+											"id": "c",
+											"text": "object"
+										},
+										{
+											"id": "d",
+											"text": "boolean"
+										}
+									],
+									"correct": [
+										"a",
+										"b",
+										"d"
+									],
+									"explanation": "object is not a primitive.",
+									"settings": {
+										"partial_credit": true
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"title": "The browser",
+					"summary": "",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "Selecting and changing elements",
+							"content": "<p><code>document.querySelector</code> finds elements; change text with <code>textContent</code>.</p>",
+							"meta": {
+								"video_source": "vimeo",
+								"preview": false,
+								"video_duration": 720,
+								"video_url": "https://vimeo.com/76979871"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Events",
+							"content": "<p>Listen with <code>addEventListener</code> and react to clicks, input and submit.</p>",
+							"meta": {
+								"video_source": "vimeo",
+								"preview": false,
+								"video_duration": 600,
+								"video_url": "https://vimeo.com/22439234"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Fetching data",
+							"content": "<p><code>fetch()</code> returns a promise. Use <code>async</code>/<code>await</code> to read JSON.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": false,
+								"video_duration": 900,
+								"video_url": "https://www.youtube.com/watch?v=LXb3EKWsInQ"
+							}
+						},
+						{
+							"type": "quiz",
+							"title": "Final exam",
+							"content": "<p>Pass with 70% to earn course completion.</p>",
+							"meta": {
+								"time_limit": 15,
+								"attempts_allowed": 3,
+								"pass_mark": 70,
+								"randomize": false,
+								"feedback_mode": "instant",
+								"show_answers": true,
+								"questions_per_page": 1
+							},
+							"questions": [
+								{
+									"title": "Which method adds an event listener to an element?",
+									"type": "short_answer",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"addEventListener",
+										"addeventlistener"
+									],
+									"explanation": "element.addEventListener(type, handler)."
+								},
+								{
+									"title": "fetch() returns a ____.",
+									"type": "fill_blank",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"promise",
+										"Promise"
+									],
+									"explanation": "Promises resolve with the response."
+								},
+								{
+									"title": "What does querySelector return when nothing matches?",
+									"type": "single_choice",
+									"points": 1,
+									"options": [
+										{
+											"id": "a",
+											"text": "undefined"
+										},
+										{
+											"id": "b",
+											"text": "null"
+										},
+										{
+											"id": "c",
+											"text": "an empty array"
+										}
+									],
+									"correct": [
+										"b"
+									],
+									"explanation": "It returns null."
+								},
+								{
+									"title": "await can only be used inside an async function or at the top level of a module.",
+									"type": "true_false",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"true"
+									],
+									"explanation": "That is the rule in modern JavaScript."
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "UI Design with Figma",
+			"slug": "ui-design-figma",
+			"status": "publish",
+			"excerpt": "Design clean, modern interfaces and hand them off to developers.",
+			"content": "<p>From frames and auto layout to components and prototypes. You will design a complete mobile app screen set and a design system.</p>",
+			"meta": {
+				"level": "beginner",
+				"requirements": [
+					"A free Figma account"
+				],
+				"outcomes": [
+					"Use auto layout and constraints",
+					"Build reusable components",
+					"Create clickable prototypes",
+					"Hand off specs to developers"
+				],
+				"audience": [
+					"Aspiring product designers",
+					"Developers who want to design"
+				],
+				"price_type": "paid",
+				"price": 79,
+				"sale_price": 0,
+				"max_students": 0,
+				"featured": false,
+				"intro_video": "https://vimeo.com/76979871"
+			},
+			"categories": [
+				"Design"
+			],
+			"tags": [
+				"figma",
+				"ui",
+				"design"
+			],
+			"topics": [
+				{
+					"title": "Figma basics",
+					"summary": "",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "Frames, shapes and text",
+							"content": "<p>Frames are containers. Everything you design lives inside a frame.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": true,
+								"video_duration": 420,
+								"video_url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Auto layout",
+							"content": "<p>Auto layout makes frames resize with their content, like flexbox.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": false,
+								"video_duration": 780,
+								"video_url": "https://www.youtube.com/watch?v=ysz5S6PUM-U"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Colour and type styles",
+							"content": "<p>Define styles once and reuse them everywhere.</p>",
+							"meta": {
+								"video_source": "none",
+								"preview": false,
+								"video_duration": 0
+							}
+						}
+					]
+				},
+				{
+					"title": "Components and prototypes",
+					"summary": "",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "Building a button component",
+							"content": "<p>Create variants for primary, secondary and disabled states.</p>",
+							"meta": {
+								"video_source": "vimeo",
+								"preview": false,
+								"video_duration": 660,
+								"video_url": "https://vimeo.com/76979871"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Prototyping a flow",
+							"content": "<p>Connect frames with interactions and present your prototype.</p>",
+							"meta": {
+								"video_source": "vimeo",
+								"preview": false,
+								"video_duration": 540,
+								"video_url": "https://vimeo.com/22439234"
+							}
+						},
+						{
+							"type": "quiz",
+							"title": "Design quiz",
+							"content": "<p>A short check of key concepts.</p>",
+							"meta": {
+								"time_limit": 10,
+								"attempts_allowed": 0,
+								"pass_mark": 60,
+								"randomize": false,
+								"feedback_mode": "instant",
+								"show_answers": true,
+								"questions_per_page": 1
+							},
+							"questions": [
+								{
+									"title": "What does auto layout most resemble in CSS?",
+									"type": "single_choice",
+									"points": 1,
+									"options": [
+										{
+											"id": "a",
+											"text": "Grid"
+										},
+										{
+											"id": "b",
+											"text": "Flexbox"
+										},
+										{
+											"id": "c",
+											"text": "Floats"
+										}
+									],
+									"correct": [
+										"b"
+									],
+									"explanation": "Auto layout behaves like flexbox."
+								},
+								{
+									"title": "Component variants let one component have multiple states.",
+									"type": "true_false",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"true"
+									],
+									"explanation": "Variants group related states."
+								},
+								{
+									"title": "Which of these are good reasons to use styles?",
+									"type": "multiple_choice",
+									"points": 2,
+									"options": [
+										{
+											"id": "a",
+											"text": "Consistency"
+										},
+										{
+											"id": "b",
+											"text": "Faster changes"
+										},
+										{
+											"id": "c",
+											"text": "Larger file size"
+										}
+									],
+									"correct": [
+										"a",
+										"b"
+									],
+									"explanation": "Styles do not increase file size meaningfully.",
+									"settings": {
+										"partial_credit": true
+									}
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "Digital Marketing Essentials",
+			"slug": "digital-marketing-essentials",
+			"status": "publish",
+			"excerpt": "SEO, email, social and paid ads. A practical playbook for small businesses.",
+			"content": "<p>Learn the channels that matter, how to measure them and how to build a simple quarterly plan that actually gets executed.</p>",
+			"meta": {
+				"level": "all",
+				"requirements": [],
+				"outcomes": [
+					"Write a one-page marketing plan",
+					"Set up Google Search Console and Analytics",
+					"Run a basic email campaign",
+					"Judge whether paid ads are worth it"
+				],
+				"audience": [
+					"Small business owners",
+					"Freelancers",
+					"Junior marketers"
+				],
+				"price_type": "free",
+				"price": 0,
+				"sale_price": 0,
+				"max_students": 0,
+				"featured": false,
+				"intro_video": "https://www.youtube.com/watch?v=LXb3EKWsInQ"
+			},
+			"categories": [
+				"Marketing"
+			],
+			"tags": [
+				"seo",
+				"email",
+				"ads"
+			],
+			"topics": [
+				{
+					"title": "Foundations",
+					"summary": "",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "Who is your customer?",
+							"content": "<p>Everything starts with a clear picture of who you serve and what they search for.</p>",
+							"meta": {
+								"video_source": "none",
+								"preview": true,
+								"video_duration": 0
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "The marketing funnel",
+							"content": "<p>Awareness, consideration, decision. Each stage needs different content.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": false,
+								"video_duration": 480,
+								"video_url": "https://www.youtube.com/watch?v=LXb3EKWsInQ"
+							}
+						}
+					]
+				},
+				{
+					"title": "Channels",
+					"summary": "",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "SEO in one hour",
+							"content": "<p>Titles, headings, internal links and page speed cover most of what matters.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": false,
+								"video_duration": 900,
+								"video_url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Email that gets opened",
+							"content": "<p>Short subject lines, one call to action, send on a schedule.</p>",
+							"meta": {
+								"video_source": "vimeo",
+								"preview": false,
+								"video_duration": 600,
+								"video_url": "https://vimeo.com/22439234"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Paid ads: when and how",
+							"content": "<p>Start small, measure cost per lead, stop what does not work.</p>",
+							"meta": {
+								"video_source": "none",
+								"preview": false,
+								"video_duration": 0
+							}
+						},
+						{
+							"type": "quiz",
+							"title": "Marketing quiz",
+							"content": "<p>Five questions, 60% to pass.</p>",
+							"meta": {
+								"time_limit": 10,
+								"attempts_allowed": 0,
+								"pass_mark": 60,
+								"randomize": false,
+								"feedback_mode": "instant",
+								"show_answers": true,
+								"questions_per_page": 1
+							},
+							"questions": [
+								{
+									"title": "Which funnel stage comes first?",
+									"type": "single_choice",
+									"points": 1,
+									"options": [
+										{
+											"id": "a",
+											"text": "Decision"
+										},
+										{
+											"id": "b",
+											"text": "Consideration"
+										},
+										{
+											"id": "c",
+											"text": "Awareness"
+										}
+									],
+									"correct": [
+										"c"
+									],
+									"explanation": "Awareness is the top of the funnel."
+								},
+								{
+									"title": "Page speed affects search rankings.",
+									"type": "true_false",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"true"
+									],
+									"explanation": "Speed is a ranking signal."
+								},
+								{
+									"title": "What metric tells you how much each lead costs from an ad campaign?",
+									"type": "short_answer",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"cost per lead",
+										"CPL",
+										"cpl"
+									],
+									"explanation": "Cost per lead (CPL)."
+								},
+								{
+									"title": "Good email practice includes:",
+									"type": "multiple_choice",
+									"points": 2,
+									"options": [
+										{
+											"id": "a",
+											"text": "One clear call to action"
+										},
+										{
+											"id": "b",
+											"text": "Ten different links"
+										},
+										{
+											"id": "c",
+											"text": "A consistent schedule"
+										}
+									],
+									"correct": [
+										"a",
+										"c"
+									],
+									"explanation": "Keep emails focused.",
+									"settings": {
+										"partial_credit": true
+									}
+								},
+								{
+									"title": "Google ____ Console shows which search queries bring visitors.",
+									"type": "fill_blank",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"Search",
+										"search"
+									],
+									"explanation": "Google Search Console."
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "Photography: From Auto to Manual",
+			"slug": "photography-auto-to-manual",
+			"status": "publish",
+			"excerpt": "Take control of your camera. Aperture, shutter speed and ISO explained with real examples.",
+			"content": "<p>Stop guessing and start choosing. This course explains the exposure triangle and gives you assignments to practise each setting.</p>",
+			"meta": {
+				"level": "beginner",
+				"requirements": [
+					"Any camera with a manual mode, including many phones"
+				],
+				"outcomes": [
+					"Expose correctly in manual mode",
+					"Control depth of field",
+					"Freeze or blur motion on purpose",
+					"Shoot in low light"
+				],
+				"audience": [
+					"Hobby photographers",
+					"Content creators"
+				],
+				"price_type": "paid",
+				"price": 39,
+				"sale_price": 0,
+				"max_students": 50,
+				"featured": true,
+				"intro_video": "https://vimeo.com/22439234"
+			},
+			"categories": [
+				"Photography"
+			],
+			"tags": [
+				"camera",
+				"creative"
+			],
+			"topics": [
+				{
+					"title": "The exposure triangle",
+					"summary": "",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "Aperture",
+							"content": "<p>A wide aperture (small f-number) lets in more light and blurs the background.</p>",
+							"meta": {
+								"video_source": "vimeo",
+								"preview": true,
+								"video_duration": 540,
+								"video_url": "https://vimeo.com/76979871"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Shutter speed",
+							"content": "<p>Fast shutter freezes motion; slow shutter blurs it and needs a tripod.</p>",
+							"meta": {
+								"video_source": "vimeo",
+								"preview": false,
+								"video_duration": 480,
+								"video_url": "https://vimeo.com/22439234"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "ISO",
+							"content": "<p>Higher ISO brightens the image but adds noise.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": false,
+								"video_duration": 420,
+								"video_url": "https://www.youtube.com/watch?v=ysz5S6PUM-U"
+							}
+						},
+						{
+							"type": "quiz",
+							"title": "Exposure quiz",
+							"content": "<p>Make sure the triangle makes sense before you go on.</p>",
+							"meta": {
+								"time_limit": 10,
+								"attempts_allowed": 0,
+								"pass_mark": 60,
+								"randomize": false,
+								"feedback_mode": "instant",
+								"show_answers": true,
+								"questions_per_page": 1
+							},
+							"questions": [
+								{
+									"title": "Which setting mostly controls background blur?",
+									"type": "single_choice",
+									"points": 1,
+									"options": [
+										{
+											"id": "a",
+											"text": "ISO"
+										},
+										{
+											"id": "b",
+											"text": "Shutter speed"
+										},
+										{
+											"id": "c",
+											"text": "Aperture"
+										}
+									],
+									"correct": [
+										"c"
+									],
+									"explanation": "Aperture controls depth of field."
+								},
+								{
+									"title": "A higher ISO number makes the image darker.",
+									"type": "true_false",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"false"
+									],
+									"explanation": "Higher ISO makes it brighter."
+								},
+								{
+									"title": "A ____ shutter speed freezes motion.",
+									"type": "fill_blank",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"fast",
+										"faster",
+										"short"
+									],
+									"explanation": "Fast shutter speeds freeze action."
+								}
+							]
+						}
+					]
+				},
+				{
+					"title": "Assignments",
+					"summary": "Go out and shoot.",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "Assignment: portraits at f/2",
+							"content": "<p>Shoot five portraits with the widest aperture you have.</p>",
+							"meta": {
+								"video_source": "none",
+								"preview": false,
+								"video_duration": 0
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Assignment: motion",
+							"content": "<p>Capture the same moving subject at 1/1000 and 1/15.</p>",
+							"meta": {
+								"video_source": "none",
+								"preview": false,
+								"video_duration": 0
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"title": "Start a Business in 30 Days",
+			"slug": "start-a-business-30-days",
+			"status": "publish",
+			"excerpt": "From idea to first paying customer with a simple, repeatable plan.",
+			"content": "<p>A step-by-step program. Each lesson is one day of work. Complete them in order and you will have validated an idea, built a simple offer and made your first sale.</p>",
+			"meta": {
+				"level": "advanced",
+				"requirements": [
+					"An idea, or the willingness to find one"
+				],
+				"outcomes": [
+					"Validate an idea with real conversations",
+					"Price and package an offer",
+					"Build a one-page site",
+					"Land your first customer"
+				],
+				"audience": [
+					"First-time founders",
+					"Freelancers going full time"
+				],
+				"price_type": "paid",
+				"price": 99,
+				"sale_price": 59,
+				"max_students": 0,
+				"featured": false,
+				"progression": "linear",
+				"intro_video": "https://www.youtube.com/watch?v=aqz-KE-bpKQ"
+			},
+			"categories": [
+				"Business"
+			],
+			"tags": [
+				"startup",
+				"founder"
+			],
+			"topics": [
+				{
+					"title": "Week 1: Validate",
+					"summary": "Talk to people before you build.",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "Day 1: Pick a problem",
+							"content": "<p>Write down ten problems you have seen people pay to solve.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": true,
+								"video_duration": 360,
+								"video_url": "https://www.youtube.com/watch?v=LXb3EKWsInQ"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Day 2: Ten conversations",
+							"content": "<p>Interview ten potential customers. Listen more than you talk.</p>",
+							"meta": {
+								"video_source": "none",
+								"preview": false,
+								"video_duration": 0
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Day 3: Define the offer",
+							"content": "<p>One sentence: who it is for, what it does, what it costs.</p>",
+							"meta": {
+								"video_source": "none",
+								"preview": false,
+								"video_duration": 0
+							}
+						},
+						{
+							"type": "quiz",
+							"title": "Week 1 checkpoint",
+							"content": "<p>You need to pass this before week 2 unlocks.</p>",
+							"meta": {
+								"time_limit": 10,
+								"attempts_allowed": 0,
+								"pass_mark": 100,
+								"randomize": false,
+								"feedback_mode": "instant",
+								"show_answers": true,
+								"questions_per_page": 1
+							},
+							"questions": [
+								{
+									"title": "You should build the product before talking to customers.",
+									"type": "true_false",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"false"
+									],
+									"explanation": "Validate first, build second."
+								},
+								{
+									"title": "How many customer conversations does day 2 ask for?",
+									"type": "single_choice",
+									"points": 1,
+									"options": [
+										{
+											"id": "a",
+											"text": "Three"
+										},
+										{
+											"id": "b",
+											"text": "Ten"
+										},
+										{
+											"id": "c",
+											"text": "Fifty"
+										}
+									],
+									"correct": [
+										"b"
+									],
+									"explanation": "Ten is enough to spot patterns."
+								}
+							]
+						}
+					]
+				},
+				{
+					"title": "Week 2: Build and sell",
+					"summary": "",
+					"items": [
+						{
+							"type": "lesson",
+							"title": "Day 4: One-page site",
+							"content": "<p>Headline, three benefits, price, button. Nothing else.</p>",
+							"meta": {
+								"video_source": "vimeo",
+								"preview": false,
+								"video_duration": 540,
+								"video_url": "https://vimeo.com/76979871"
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Day 5: First outreach",
+							"content": "<p>Email the ten people you interviewed with your offer.</p>",
+							"meta": {
+								"video_source": "none",
+								"preview": false,
+								"video_duration": 0
+							}
+						},
+						{
+							"type": "lesson",
+							"title": "Day 6: Close the sale",
+							"content": "<p>Follow up twice. Ask for the order.</p>",
+							"meta": {
+								"video_source": "youtube",
+								"preview": false,
+								"video_duration": 420,
+								"video_url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ"
+							}
+						},
+						{
+							"type": "quiz",
+							"title": "Final checkpoint",
+							"content": "<p>Finish strong.</p>",
+							"meta": {
+								"time_limit": 10,
+								"attempts_allowed": 0,
+								"pass_mark": 60,
+								"randomize": false,
+								"feedback_mode": "instant",
+								"show_answers": true,
+								"questions_per_page": 1
+							},
+							"questions": [
+								{
+									"title": "What is the single most important element on a one-page site?",
+									"type": "short_answer",
+									"points": 1,
+									"options": [],
+									"correct": [
+										"headline",
+										"the headline",
+										"a headline"
+									],
+									"explanation": "The headline does most of the work."
+								},
+								{
+									"title": "Good outreach emails are:",
+									"type": "multiple_choice",
+									"points": 2,
+									"options": [
+										{
+											"id": "a",
+											"text": "Short"
+										},
+										{
+											"id": "b",
+											"text": "Personal"
+										},
+										{
+											"id": "c",
+											"text": "Sent to everyone at once"
+										}
+									],
+									"correct": [
+										"a",
+										"b"
+									],
+									"explanation": "Mass emails get ignored.",
+									"settings": {
+										"partial_credit": true
+									}
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

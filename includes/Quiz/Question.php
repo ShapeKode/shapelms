@@ -138,8 +138,8 @@ class Question {
 		foreach ( $this->options as $option ) {
 			$list[] = array(
 				'id'    => (string) ( $option['id'] ?? '' ),
-				'text'  => (string) ( $option['text'] ?? '' ),
-				'image' => ! empty( $option['image'] ) ? wp_get_attachment_image_url( (int) $option['image'], 'medium' ) : '',
+				'text'  => shapelms_sanitize_plain_text( $option['text'] ?? '' ),
+				'image' => ! empty( $option['image'] ) ? (string) wp_get_attachment_image_url( (int) $option['image'], 'medium' ) : '',
 			);
 		}
 

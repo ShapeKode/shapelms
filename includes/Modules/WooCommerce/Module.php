@@ -84,9 +84,21 @@ class Module extends AbstractModule {
 		foreach ( $order->get_items() as $item ) {
 			$product_id = (int) $item->get_product_id();
 			$course_id  = (int) get_post_meta( $product_id, self::PRODUCT_META, true );
+			$found      = $course_id && PostTypes::COURSE === get_post_type( $course_id ) ? array( $course_id ) : array();
 
-			if ( $course_id && PostTypes::COURSE === get_post_type( $course_id ) ) {
-				$ids[] = $course_id;
+			/**
+			 * Courses a WooCommerce product grants. By default the course linked to the product.
+			 *
+			 * @param int[]     $found      Course ids.
+			 * @param int       $product_id Product id.
+			 * @param \WC_Order $order      Order.
+			 */
+			$found = (array) apply_filters( 'shapelms_woo_product_course_ids', $found, $product_id, $order );
+
+			foreach ( $found as $found_id ) {
+				if ( PostTypes::COURSE === get_post_type( (int) $found_id ) ) {
+					$ids[] = (int) $found_id;
+				}
 			}
 		}
 

@@ -6,6 +6,7 @@ import { Button, SnackbarList } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 import { get, patch, errorMessage } from '../shared/api';
 import { Loading, ErrorNotice } from '../shared/components';
 import { success, error as notifyError } from '../admin/notices';
@@ -14,7 +15,7 @@ import CurriculumTab from './tabs/CurriculumTab';
 import SettingsTab from './tabs/SettingsTab';
 import PricingTab from './tabs/PricingTab';
 
-const tabs = [
+const coreTabs = [
 	{ id: 'basics', label: __( 'Basics', 'shapelms' ), Component: BasicsTab },
 	{ id: 'curriculum', label: __( 'Curriculum', 'shapelms' ), Component: CurriculumTab },
 	{ id: 'settings', label: __( 'Settings', 'shapelms' ), Component: SettingsTab },
@@ -94,11 +95,9 @@ export default function App( { courseId, config } ) {
 			...changes,
 			meta: { ...( pending.current.meta || {} ), ...( changes.meta || {} ) },
 		};
-		if ( ! changes.meta ) {
+		// Keep meta changes queued earlier; only drop the key when nothing is in it.
+		if ( ! Object.keys( pending.current.meta ).length ) {
 			delete pending.current.meta;
-			if ( Object.keys( pending.current ).some( ( k ) => k === 'meta' ) === false && pending.current.meta === undefined ) {
-				// nothing
-			}
 		}
 		setDirty( true );
 		clearTimeout( timer.current );
@@ -123,7 +122,9 @@ export default function App( { courseId, config } ) {
 		return <Loading />;
 	}
 
-	const Active = tabs.find( ( t ) => t.id === tab )?.Component || BasicsTab;
+	// Add-ons can add, remove or reorder sections: [ { id, label, Component } ].
+	const tabs = applyFilters( 'shapelms.builder.tabs', coreTabs, { course, config } );
+	const Active = tabs.find( ( t ) => t.id === tab )?.Component || tabs[ 0 ]?.Component || BasicsTab;
 	const isPublished = course.status === 'publish';
 
 	return (
@@ -135,7 +136,7 @@ export default function App( { courseId, config } ) {
 				</span>
 				<Button variant="tertiary" href={ course.preview_url || course.url } target="_blank">{ __( 'Preview', 'shapelms' ) }</Button>
 				<Button variant="secondary" onClick={ saveNow } isBusy={ saving } disabled={ ! dirty || saving }>{ __( 'Save', 'shapelms' ) }</Button>
-				{ isPublished ? (
+				{ course.can_change_status === false ? null : isPublished ? (
 					<Button variant="primary" onClick={ () => setStatus( 'draft' ) } disabled={ saving }>{ __( 'Unpublish', 'shapelms' ) }</Button>
 				) : course.can_publish ? (
 					<Button variant="primary" onClick={ () => setStatus( 'publish' ) } disabled={ saving }>{ __( 'Publish', 'shapelms' ) }</Button>
