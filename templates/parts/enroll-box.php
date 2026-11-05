@@ -24,11 +24,20 @@ $shapelms_missing = ( $shapelms_user_id && ! $shapelms_access ) ? $shapelms_enro
 
 /**
  * Filters the buy URL for a paid course (WooCommerce / checkout module fill this in).
+ * An empty URL means the course cannot be bought right now.
  *
  * @param string $url       Buy URL.
  * @param int    $course_id Course id.
  */
 $shapelms_buy_url = apply_filters( 'shapelms_course_buy_url', add_query_arg( 'course', $shapelms_id, \ShapeLMS\Core\Pages::get_url( 'checkout' ) ), $shapelms_id );
+
+/**
+ * Filters the label of the buy button.
+ *
+ * @param string $label     Label.
+ * @param int    $course_id Course id.
+ */
+$shapelms_buy_label = (string) apply_filters( 'shapelms_course_buy_label', __( 'Buy now', 'shapelms' ), $shapelms_id );
 ?>
 <div class="shapelms-enroll-box" id="shapelms-enroll" <?php echo \ShapeLMS\Frontend\Frontend::data_attributes( array( 'course-id' => (string) $shapelms_id ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in the method. ?>>
 	<?php
@@ -95,10 +104,12 @@ $shapelms_buy_url = apply_filters( 'shapelms_course_buy_url', add_query_arg( 'co
 						<?php esc_html_e( 'Log in to enroll', 'shapelms' ); ?>
 					</a>
 				<?php endif; ?>
-			<?php else : ?>
-				<a class="shapelms-btn shapelms-btn--primary shapelms-btn--block" href="<?php echo esc_url( $shapelms_buy_url ); ?>">
-					<?php esc_html_e( 'Buy now', 'shapelms' ); ?>
+			<?php elseif ( $shapelms_buy_url ) : ?>
+				<a class="shapelms-btn shapelms-btn--primary shapelms-btn--block" rel="nofollow" href="<?php echo esc_url( $shapelms_buy_url ); ?>"<?php echo \ShapeLMS\Modules\Checkout\Module::adds_to_cart( $shapelms_id ) ? ' data-shapelms-add-to-cart="' . esc_attr( (string) $shapelms_id ) . '"' : ''; ?>>
+					<?php echo esc_html( $shapelms_buy_label ); ?>
 				</a>
+			<?php else : ?>
+				<p class="shapelms-notice"><?php esc_html_e( 'This course cannot be bought right now.', 'shapelms' ); ?></p>
 			<?php endif; ?>
 			<p class="shapelms-enroll-box__message" aria-live="polite"></p>
 		<?php endif; ?>

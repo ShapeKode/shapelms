@@ -33,6 +33,7 @@ class Blocks {
 			'curriculum'              => array( __CLASS__, 'render_curriculum' ),
 			'dashboard'               => array( __CLASS__, 'render_dashboard' ),
 			'checkout'                => array( __CLASS__, 'render_checkout' ),
+			'cart'                    => array( __CLASS__, 'render_cart' ),
 			'instructor-registration' => array( __CLASS__, 'render_instructor_registration' ),
 			'login'                   => array( __CLASS__, 'render_login' ),
 			'register'                => array( __CLASS__, 'render_register' ),
@@ -59,6 +60,7 @@ class Blocks {
 		add_shortcode( 'shapelms_courses', array( __CLASS__, 'shortcode_courses' ) );
 		add_shortcode( 'shapelms_dashboard', array( __CLASS__, 'render_dashboard' ) );
 		add_shortcode( 'shapelms_checkout', array( __CLASS__, 'render_checkout' ) );
+		add_shortcode( 'shapelms_cart', array( __CLASS__, 'render_cart' ) );
 		add_shortcode( 'shapelms_instructor_registration', array( __CLASS__, 'render_instructor_registration' ) );
 		add_shortcode( 'shapelms_login', array( __CLASS__, 'render_login' ) );
 		add_shortcode( 'shapelms_register', array( __CLASS__, 'render_register' ) );
@@ -274,6 +276,15 @@ class Blocks {
 	 */
 	public static function render_checkout() {
 		return '<div class="shapelms shapelms-wrap">' . shapelms_get_template( 'checkout.php', array(), false ) . '</div>';
+	}
+
+	/**
+	 * Cart.
+	 *
+	 * @return string
+	 */
+	public static function render_cart() {
+		return '<div class="shapelms shapelms-wrap">' . shapelms_get_template( 'cart.php', array(), false ) . '</div>';
 	}
 
 	/**

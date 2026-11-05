@@ -8,7 +8,7 @@
 /**
  * Co-instructor list permissions on PUT /courses/{id}.
  */
-class CourseInstructorsTest extends ShapeLMS_TestCase {
+class ShapeLMS_CourseInstructorsTest extends ShapeLMS_TestCase {
 
 	/**
 	 * Sends a course update as a user.

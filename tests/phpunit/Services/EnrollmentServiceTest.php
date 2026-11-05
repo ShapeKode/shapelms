@@ -12,7 +12,7 @@ use ShapeLMS\Services\ProgressService;
 /**
  * Enroll, unenroll, caps and prerequisites.
  */
-class EnrollmentServiceTest extends ShapeLMS_TestCase {
+class ShapeLMS_EnrollmentServiceTest extends ShapeLMS_TestCase {
 
 	/**
 	 * Enrolling in a free course creates an active row and adds the student role.

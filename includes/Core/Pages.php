@@ -31,6 +31,10 @@ class Pages {
 				'title'   => __( 'Checkout', 'shapelms' ),
 				'content' => '<!-- wp:shapelms/checkout /-->',
 			),
+			'cart'                => array(
+				'title'   => __( 'Cart', 'shapelms' ),
+				'content' => '<!-- wp:shapelms/cart /-->',
+			),
 			'instructor_register' => array(
 				'title'   => __( 'Become an Instructor', 'shapelms' ),
 				'content' => '<!-- wp:shapelms/instructor-registration /-->',
@@ -66,6 +70,10 @@ class Pages {
 			if ( array_key_exists( $key, $pages ) && ! $recreate ) {
 				continue;
 			}
+			// The cart page is only needed once the "Buy Now" setting is off; turning it off creates the page.
+			if ( 'cart' === $key && Settings::get( 'commerce', 'buy_now', true ) ) {
+				continue;
+			}
 
 			$page_id = wp_insert_post(
 				array(
@@ -85,6 +93,50 @@ class Pages {
 
 		update_option( 'shapelms_pages', $pages );
 		Settings::flush();
+	}
+
+	/**
+	 * Brings back one page: out of the trash, or as a new page when it is gone.
+	 *
+	 * @param string $key Page key.
+	 * @return int Page id, 0 on failure.
+	 */
+	public static function restore( $key ) {
+		$definitions = self::definitions();
+
+		if ( ! isset( $definitions[ $key ] ) ) {
+			return 0;
+		}
+
+		$pages   = get_option( 'shapelms_pages', array() );
+		$pages   = is_array( $pages ) ? $pages : array();
+		$page_id = isset( $pages[ $key ] ) ? (int) $pages[ $key ] : 0;
+
+		if ( $page_id && get_post_status( $page_id ) ) {
+			$page_id = (int) wp_update_post(
+				array(
+					'ID'          => $page_id,
+					'post_status' => 'publish',
+				)
+			);
+		} else {
+			$page_id = (int) wp_insert_post(
+				array(
+					'post_title'     => $definitions[ $key ]['title'],
+					'post_content'   => $definitions[ $key ]['content'],
+					'post_status'    => 'publish',
+					'post_type'      => 'page',
+					'comment_status' => 'closed',
+				)
+			);
+		}
+
+		if ( $page_id ) {
+			$pages[ $key ] = $page_id;
+			update_option( 'shapelms_pages', $pages );
+		}
+
+		return $page_id;
 	}
 
 	/**

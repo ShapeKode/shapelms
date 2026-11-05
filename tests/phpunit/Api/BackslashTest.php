@@ -13,7 +13,7 @@ use ShapeLMS\Services\QuizService;
 /**
  * Import and REST saves keep backslashes.
  */
-class BackslashTest extends ShapeLMS_TestCase {
+class ShapeLMS_BackslashTest extends ShapeLMS_TestCase {
 
 	/**
 	 * Quiz id of a course made by make_course().

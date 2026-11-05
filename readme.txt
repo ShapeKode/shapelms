@@ -12,7 +12,7 @@ A fast, modern learning management system. Build courses with lessons and quizze
 
 == Description ==
 
-ShapeLMS turns your WordPress site into an online school. It is built on custom database tables so it stays fast with thousands of students, and every feature is available in the free plugin.
+ShapeLMS turns your WordPress site into an online school. It is built on custom database tables so it stays fast with thousands of students.
 
 **Course building**
 
@@ -44,7 +44,7 @@ ShapeLMS turns your WordPress site into an online school. It is built on custom 
 
 **Selling**
 
-* Free courses, or paid courses through the built-in checkout (Stripe and PayPal) or WooCommerce
+* Free courses, or paid courses through the built-in checkout (Stripe, PayPal, cash on delivery and bank transfer) or WooCommerce
 
 **Core**
 
@@ -67,10 +67,11 @@ ShapeLMS only connects to third-party services when you enable them or add their
 **Vimeo** (when an instructor adds a Vimeo lesson or intro video). The video is embedded from https://player.vimeo.com with "do not track" enabled; Vimeo receives the visitor's IP address and browser data. [Terms](https://vimeo.com/terms) · [Privacy](https://vimeo.com/privacy)
 
 **Other video providers.** If an instructor pastes a URL from another provider that WordPress supports for oEmbed, your server requests the embed code from that provider (cached for a day) and the visitor's browser loads the player from it. The provider receives your server's IP address and the video URL, and the visitor's IP address and browser data.
+**Embed code.** If an instructor pastes embed code from Wistia, Loom, Bunny Stream, Dailymotion or Vidyard into a lesson, the visitor's browser loads the player from that service, which receives the visitor's IP address and browser data. Wistia: [Terms](https://wistia.com/terms) · [Privacy](https://wistia.com/privacy). Loom (Atlassian): [Terms](https://www.atlassian.com/legal/atlassian-customer-agreement) · [Privacy](https://www.atlassian.com/legal/privacy-policy). Bunny Stream: [Terms](https://bunny.net/tos/) · [Privacy](https://bunny.net/privacy/). Dailymotion: [Terms](https://www.dailymotion.com/legal/terms) · [Privacy](https://legal.dailymotion.com/en/privacy-policy/). Vidyard: [Terms](https://www.vidyard.com/terms/) · [Privacy](https://www.vidyard.com/privacy/)
 
 **Course import.** Only when an administrator imports a course JSON file that references image URLs: your server downloads each image into the media library. The host of each image receives your server's IP address and your site URL (WordPress's standard HTTP user agent). No other data is sent.
 
-**Sample courses.** If you install the sample course pack (ShapeLMS → Tools → Import / Export), its lessons and intro videos are embedded from YouTube and Vimeo. Visitors who open them connect to those services as described above.
+**Demo and sample courses.** If you install the demo course from the setup wizard or the sample course pack (ShapeLMS → Tools → Import / Export), their lessons and intro videos are embedded from YouTube and Vimeo. Visitors who open them connect to those services as described above.
 
 == Source code ==
 
@@ -78,7 +79,7 @@ The JavaScript for the admin app, course builder and blocks is shipped unminifie
 
 == Credits ==
 
-The course builder uses [dnd kit](https://github.com/clauderic/dnd-kit) (MIT license) for drag and drop.
+The course builder uses [dnd kit](https://github.com/clauderic/dnd-kit) (MIT license, Copyright (c) 2021 Claudéric Demers) for drag and drop. The licence text is in `licenses/dnd-kit-LICENSE.txt`.
 
 == Installation ==
 
@@ -88,7 +89,7 @@ The course builder uses [dnd kit](https://github.com/clauderic/dnd-kit) (MIT lic
 
 == Frequently Asked Questions ==
 
-= Does the free version limit the number of courses or students? =
+= Is there a limit on courses or students? =
 
 No. There are no limits and no locked features.
 
@@ -102,7 +103,7 @@ Nothing is deleted unless ShapeLMS → Settings → General → "Delete all data
 
 = Does it work with WooCommerce? =
 
-Yes. Choose WooCommerce as the commerce engine in Settings → Selling and link each course to a product.
+Yes. Choose WooCommerce as the commerce engine in Settings → Selling. Each paid course gets a hidden product automatically and its price stays in sync. Buyers need an account, and they get access when the order is completed.
 
 == Screenshots ==
 

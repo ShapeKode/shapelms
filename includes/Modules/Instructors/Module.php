@@ -192,7 +192,7 @@ class Module extends AbstractModule {
 		}
 
 		if ( $errors->has_errors() ) {
-			set_transient( 'shapelms_reg_errors_' . ( $user_id ? $user_id : md5( (string) wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ) ), $errors->get_error_messages(), 60 ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			set_transient( 'shapelms_reg_errors_' . ( $user_id ? $user_id : md5( sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ) ) ), $errors->get_error_messages(), 60 );
 			wp_safe_redirect( add_query_arg( 'registered', 'error', wp_get_referer() ? wp_get_referer() : home_url( '/' ) ) );
 			exit;
 		}
@@ -207,7 +207,7 @@ class Module extends AbstractModule {
 	 * @return string[]
 	 */
 	public static function errors() {
-		$key    = get_current_user_id() ? get_current_user_id() : md5( (string) wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$key    = get_current_user_id() ? get_current_user_id() : md5( sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ) );
 		$errors = get_transient( 'shapelms_reg_errors_' . $key );
 		delete_transient( 'shapelms_reg_errors_' . $key );
 

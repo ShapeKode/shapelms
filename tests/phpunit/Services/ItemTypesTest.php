@@ -13,7 +13,7 @@ use ShapeLMS\Services\ProgressService;
  * An add-on item type appears in the curriculum, counts toward completion and can be completed
  * only through complete_item().
  */
-class ItemTypesTest extends ShapeLMS_TestCase {
+class ShapeLMS_ItemTypesTest extends ShapeLMS_TestCase {
 
 	/**
 	 * Registers a throwaway item type.

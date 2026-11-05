@@ -1,5 +1,5 @@
 /**
- * ShapeLMS checkout: Stripe Payment Element and PayPal buttons.
+ * ShapeLMS checkout: Stripe Payment Element, PayPal buttons and offline payments.
  *
  * @package ShapeLMS
  */
@@ -27,6 +27,7 @@
 		return;
 	}
 
+	var payLabel = payButton.textContent;
 	var state = { gateway: null, order: null, stripe: null, elements: null, paypalRendered: false };
 
 	function selected() {
@@ -34,18 +35,44 @@
 		return input ? input.value : gateways[ 0 ];
 	}
 
+	function isOffline( id ) {
+		return !! root.querySelector( '[data-gateway-panel="' + id + '"][data-gateway-offline]' );
+	}
+
 	function showPanel( id ) {
 		root.querySelectorAll( '[data-gateway-panel]' ).forEach( function ( panel ) {
 			panel.hidden = panel.getAttribute( 'data-gateway-panel' ) !== id;
 		} );
 		payButton.hidden = id === 'paypal';
+		payButton.textContent = isOffline( id ) ? payButton.getAttribute( 'data-offline-label' ) : payLabel;
 	}
 
-	function createOrder( gateway ) {
-		if ( state.order && state.order.gateway === gateway ) {
-			return Promise.resolve( state.order );
+	var billingForm = root.querySelector( '[data-shapelms-billing]' );
+
+	function billingValid() {
+		return ! billingForm || billingForm.reportValidity();
+	}
+
+	function billing() {
+		var values = {};
+		if ( billingForm ) {
+			billingForm.querySelectorAll( 'input[name]' ).forEach( function ( input ) {
+				if ( input.name !== 'terms' ) {
+					values[ input.name ] = input.value;
+				}
+			} );
 		}
-		return api( root, 'checkout/order', { method: 'POST', body: { course_ids: courseIds, gateway: gateway } } ).then( function ( order ) {
+		return values;
+	}
+
+	function termsAccepted() {
+		var box = billingForm ? billingForm.querySelector( 'input[name="terms"]' ) : null;
+		return !! box && box.checked;
+	}
+
+	// The order is only created when the buyer pays; the server reuses an unpaid one.
+	function createOrder( gateway ) {
+		return api( root, 'checkout/order', { method: 'POST', body: { course_ids: courseIds, gateway: gateway, billing: billing(), terms: termsAccepted() } } ).then( function ( order ) {
 			if ( order.completed && order.redirect ) {
 				window.location.href = order.redirect;
 				return order;
@@ -76,43 +103,48 @@
 			return;
 		}
 		payButton.disabled = true;
-		createOrder( 'stripe' ).then( function ( order ) {
-			if ( ! order.client_secret ) {
-				return;
-			}
-			state.stripe = state.stripe || window.Stripe( cfg.stripeKey );
-			state.elements = state.stripe.elements( { clientSecret: order.client_secret, appearance: { theme: 'stripe' } } );
-			var element = state.elements.create( 'payment' );
-			element.mount( '#shapelms-stripe-element' );
-			element.on( 'ready', function () {
-				payButton.disabled = false;
-			} );
-		} ).catch( function ( err ) {
-			message( msg, err.message, 'error' );
+		state.stripe = state.stripe || window.Stripe( cfg.stripeKey );
+		state.elements = state.stripe.elements( { mode: 'payment', amount: Number( cfg.amountMinor ), currency: ( cfg.currency || '' ).toLowerCase(), appearance: { theme: 'stripe' } } );
+		var element = state.elements.create( 'payment' );
+		element.mount( '#shapelms-stripe-element' );
+		element.on( 'ready', function () {
+			payButton.disabled = false;
 		} );
 	}
 
 	function payStripe() {
-		if ( ! state.stripe || ! state.elements || ! state.order ) {
+		if ( ! state.stripe || ! state.elements ) {
 			return;
 		}
+		var fail = function ( text ) {
+			payButton.disabled = false;
+			message( msg, text, 'error' );
+		};
 		payButton.disabled = true;
 		message( msg, '' );
-		state.stripe.confirmPayment( {
-			elements: state.elements,
-			confirmParams: { return_url: window.location.href },
-			redirect: 'if_required'
-		} ).then( function ( result ) {
-			if ( result.error ) {
-				payButton.disabled = false;
-				message( msg, result.error.message, 'error' );
-				return;
+		state.elements.submit().then( function ( submitted ) {
+			if ( submitted.error ) {
+				fail( submitted.error.message );
+				return null;
 			}
-			message( msg, __( 'Payment received. Finishing your order…', 'shapelms' ), 'success' );
-			confirm( state.order.order_key, { intent_id: result.paymentIntent.id } ).catch( function ( err ) {
-				payButton.disabled = false;
-				message( msg, err.message, 'error' );
+			return createOrder( 'stripe' ).then( function ( order ) {
+				state.order = order;
+				return state.stripe.confirmPayment( {
+					elements: state.elements,
+					clientSecret: order.client_secret,
+					confirmParams: { return_url: window.location.href },
+					redirect: 'if_required'
+				} );
+			} ).then( function ( result ) {
+				if ( result.error ) {
+					fail( result.error.message );
+					return null;
+				}
+				message( msg, __( 'Payment received. Finishing your order…', 'shapelms' ), 'success' );
+				return confirm( state.order.order_key, { intent_id: result.paymentIntent.id } );
 			} );
+		} ).catch( function ( err ) {
+			fail( err.message );
 		} );
 	}
 
@@ -128,6 +160,9 @@
 		state.paypalRendered = true;
 		window.paypal.Buttons( {
 			style: { layout: 'vertical', shape: 'rect' },
+			onClick: function ( data, actions ) {
+				return billingValid() ? actions.resolve() : actions.reject();
+			},
 			createOrder: function () {
 				message( msg, '' );
 				return createOrder( 'paypal' ).then( function ( order ) {
@@ -155,6 +190,8 @@
 		var id = selected();
 		state.gateway = id;
 		showPanel( id );
+		payButton.disabled = false;
+		message( msg, '' );
 		if ( id === 'stripe' ) {
 			setupStripe();
 		} else if ( id === 'paypal' ) {
@@ -167,8 +204,18 @@
 	} );
 
 	payButton.addEventListener( 'click', function () {
+		if ( ! billingValid() ) {
+			return;
+		}
 		if ( state.gateway === 'stripe' ) {
 			payStripe();
+		} else if ( isOffline( state.gateway ) ) {
+			payButton.disabled = true;
+			message( msg, '' );
+			createOrder( state.gateway ).catch( function ( err ) {
+				payButton.disabled = false;
+				message( msg, err.message, 'error' );
+			} );
 		}
 	} );
 

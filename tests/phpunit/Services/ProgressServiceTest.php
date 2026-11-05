@@ -12,7 +12,7 @@ use ShapeLMS\Services\ProgressService;
 /**
  * Completion, percentages, sequential locks and resume.
  */
-class ProgressServiceTest extends ShapeLMS_TestCase {
+class ShapeLMS_ProgressServiceTest extends ShapeLMS_TestCase {
 
 	/**
 	 * Course id.

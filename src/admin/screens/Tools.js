@@ -63,7 +63,7 @@ function Setup( { status, reload, config } ) {
 			title: __( 'Selling', 'shapelms' ),
 			body: (
 				<>
-					<SelectControl label={ __( 'How do you want to sell courses?', 'shapelms' ) } value={ engine } onChange={ setEngine } options={ [ { value: 'native', label: __( 'ShapeLMS checkout (Stripe, PayPal)', 'shapelms' ) }, { value: 'woocommerce', label: status.woocommerce ? __( 'WooCommerce', 'shapelms' ) : __( 'WooCommerce (not installed)', 'shapelms' ) } ] } __nextHasNoMarginBottom />
+					<SelectControl label={ __( 'How do you want to sell courses?', 'shapelms' ) } value={ engine } onChange={ setEngine } options={ [ { value: 'native', label: __( 'Native Checkout', 'shapelms' ) }, { value: 'woocommerce', label: status.woocommerce ? __( 'WooCommerce', 'shapelms' ) : __( 'WooCommerce (not installed)', 'shapelms' ) } ] } __nextHasNoMarginBottom />
 					<SelectControl label={ __( 'Currency', 'shapelms' ) } value={ currency } onChange={ setCurrency } options={ Object.entries( currencies ).map( ( [ k, l ] ) => ( { value: k, label: l } ) ) } __nextHasNoMarginBottom />
 					<p className="shapelms-muted">{ __( 'Add your Stripe or PayPal keys in Settings → Selling when you are ready to accept payments. Free courses work right away.', 'shapelms' ) }</p>
 				</>

@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Plugin constants.
  */
 define( 'SHAPELMS_VERSION', '1.0.0' );
-define( 'SHAPELMS_DB_VERSION', '1' );
+define( 'SHAPELMS_DB_VERSION', '2' );
 define( 'SHAPELMS_FILE', __FILE__ );
 define( 'SHAPELMS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'SHAPELMS_URL', plugin_dir_url( __FILE__ ) );

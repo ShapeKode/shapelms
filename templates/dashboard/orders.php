@@ -20,6 +20,7 @@ $shapelms_orders  = shapelms()->get( \ShapeLMS\Database\OrderRepository::class )
 );
 $shapelms_labels  = array(
 	'pending'   => __( 'Pending', 'shapelms' ),
+	'on-hold'   => __( 'Waiting for payment', 'shapelms' ),
 	'completed' => __( 'Paid', 'shapelms' ),
 	'refunded'  => __( 'Refunded', 'shapelms' ),
 	'cancelled' => __( 'Cancelled', 'shapelms' ),
@@ -37,6 +38,7 @@ $shapelms_labels  = array(
 				<th><?php esc_html_e( 'Total', 'shapelms' ); ?></th>
 				<th><?php esc_html_e( 'Status', 'shapelms' ); ?></th>
 				<th><?php esc_html_e( 'Date', 'shapelms' ); ?></th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -52,6 +54,13 @@ $shapelms_labels  = array(
 					<td><?php echo esc_html( $shapelms_order['total_html'] ); ?></td>
 					<td><span class="shapelms-tag"><?php echo esc_html( isset( $shapelms_labels[ $shapelms_order['status'] ] ) ? $shapelms_labels[ $shapelms_order['status'] ] : $shapelms_order['status'] ); ?></span></td>
 					<td><?php echo esc_html( wp_date( get_option( 'date_format' ), strtotime( $shapelms_order['created_at'] ) ) ); ?></td>
+					<td>
+						<?php if ( in_array( $shapelms_order['status'], array( 'pending', 'failed' ), true ) ) : ?>
+							<a href="<?php echo esc_url( add_query_arg( 'course', implode( ',', wp_list_pluck( $shapelms_order['items'], 'course_id' ) ), \ShapeLMS\Core\Pages::get_url( 'checkout' ) ) ); ?>"><?php esc_html_e( 'Pay', 'shapelms' ); ?></a>
+						<?php else : ?>
+							<a href="<?php echo esc_url( \ShapeLMS\Modules\Checkout\Module::order_url( $shapelms_row ) ); ?>"><?php esc_html_e( 'View', 'shapelms' ); ?></a>
+						<?php endif; ?>
+					</td>
 				</tr>
 			<?php endforeach; ?>
 		</tbody>

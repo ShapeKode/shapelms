@@ -45,14 +45,95 @@ class OrderService {
 	}
 
 	/**
+	 * Whether a user may buy a course right now. The checkout page and the order share this rule.
+	 *
+	 * @param int $user_id   User id.
+	 * @param int $course_id Course id.
+	 * @return true|\WP_Error
+	 */
+	public function can_purchase( $user_id, $course_id ) {
+		$can = true;
+
+		if ( ! CourseService::is_course( $course_id ) || 'publish' !== get_post_status( $course_id ) ) {
+			$can = new \WP_Error( 'shapelms_not_available', __( 'This course is not available.', 'shapelms' ) );
+		} elseif ( shapelms()->get( CourseService::class )->is_full( $course_id ) ) {
+			$can = new \WP_Error(
+				'shapelms_course_full',
+				/* translators: %s: course title */
+				sprintf( __( '%s is full.', 'shapelms' ), get_the_title( $course_id ) )
+			);
+		} elseif ( $user_id ) {
+			$missing = $this->enrollment->missing_prerequisites( $user_id, $course_id );
+			if ( $missing ) {
+				$can = new \WP_Error(
+					'shapelms_prerequisites',
+					sprintf(
+						/* translators: 1: course title, 2: list of course titles */
+						__( '%1$s requires you to complete these courses first: %2$s', 'shapelms' ),
+						get_the_title( $course_id ),
+						implode( ', ', array_map( 'get_the_title', $missing ) )
+					),
+					array( 'courses' => $missing )
+				);
+			}
+		}
+
+		/**
+		 * Filters whether a user may buy a course.
+		 *
+		 * @param true|\WP_Error $can       Decision.
+		 * @param int            $user_id   User id.
+		 * @param int            $course_id Course id.
+		 */
+		return apply_filters( 'shapelms_can_purchase_course', $can, (int) $user_id, (int) $course_id );
+	}
+
+	/**
+	 * The user's unpaid order with exactly these items, so trying again does not pile up orders.
+	 *
+	 * @param int               $user_id User id.
+	 * @param array<int, array> $items   Items.
+	 * @param float             $total   Order total.
+	 * @return object|null
+	 */
+	private function unpaid_order( $user_id, array $items, $total ) {
+		$wanted = array_map( 'intval', wp_list_pluck( $items, 'course_id' ) );
+		sort( $wanted );
+
+		$rows = $this->orders->where(
+			array(
+				'user_id' => (int) $user_id,
+				'status'  => array( 'pending', 'failed' ),
+			),
+			array(
+				'orderby' => 'id',
+				'order'   => 'DESC',
+				'limit'   => 20,
+			)
+		);
+
+		foreach ( $rows as $row ) {
+			$have = array_map( 'intval', wp_list_pluck( $this->orders->items( (int) $row->id ), 'course_id' ) );
+			sort( $have );
+
+			if ( $have === $wanted && abs( (float) $row->total - (float) $total ) < 0.001 ) {
+				return $row;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Creates a pending order for one or more courses.
 	 *
 	 * @param int    $user_id    Buyer.
 	 * @param int[]  $course_ids Courses.
 	 * @param string $gateway    Gateway id.
+	 * @param array  $billing    Billing details from checkout.
 	 * @return object|\WP_Error Order row.
 	 */
-	public function create( $user_id, array $course_ids, $gateway ) {
+	public function create( $user_id, array $course_ids, $gateway, array $billing = array() ) {
 		$user = get_userdata( $user_id );
 
 		if ( ! $user ) {
@@ -99,21 +180,21 @@ class OrderService {
 			if ( $this->enrollment->is_enrolled( $user_id, $course_id ) ) {
 				continue;
 			}
+			if ( $this->open_order( $user_id, $course_id ) ) {
+				return new \WP_Error(
+					'shapelms_order_on_hold',
+					/* translators: %s: course title */
+					sprintf( __( 'You already have an order for %s that is waiting for payment.', 'shapelms' ), get_the_title( $course_id ) )
+				);
+			}
+
 			$pricing = CourseService::pricing( $course_id );
 			if ( $pricing['is_free'] ) {
 				continue;
 			}
-			$missing = $this->enrollment->missing_prerequisites( $user_id, $course_id );
-			if ( $missing ) {
-				return new \WP_Error(
-					'shapelms_prerequisites',
-					sprintf(
-						/* translators: 1: course title, 2: prerequisite titles */
-						__( '%1$s requires you to complete these courses first: %2$s', 'shapelms' ),
-						get_the_title( $course_id ),
-						implode( ', ', array_map( 'get_the_title', $missing ) )
-					)
-				);
+			$can = $this->can_purchase( $user_id, $course_id );
+			if ( is_wp_error( $can ) ) {
+				return $can;
 			}
 			$items[]   = array(
 				'course_id' => $course_id,
@@ -145,20 +226,35 @@ class OrderService {
 			$user_id
 		);
 
+		$payer = array(
+			'gateway'       => sanitize_key( $gateway ),
+			'billing_email' => ! empty( $billing['email'] ) ? $billing['email'] : $user->user_email,
+			'billing_name'  => ! empty( $billing['first_name'] ) ? trim( $billing['first_name'] . ' ' . ( $billing['last_name'] ?? '' ) ) : $user->display_name,
+			'billing'       => $billing ? (string) wp_json_encode( $billing ) : null,
+		);
+
+		$unpaid = $this->unpaid_order( $user_id, $items, max( 0, (float) $totals['total'] ) );
+
+		if ( $unpaid ) {
+			$this->orders->update( (int) $unpaid->id, array_merge( $payer, array( 'status' => 'pending' ) ) );
+
+			return $this->orders->find( (int) $unpaid->id );
+		}
+
 		$order_id = $this->orders->insert(
-			array(
-				'order_key'     => 'slms_' . wp_generate_password( 24, false ),
-				'user_id'       => (int) $user_id,
-				'status'        => 'pending',
-				'currency'      => CurrencyService::code(),
-				'subtotal'      => (float) $totals['subtotal'],
-				'discount'      => (float) $totals['discount'],
-				'total'         => max( 0, (float) $totals['total'] ),
-				'gateway'       => sanitize_key( $gateway ),
-				'billing_email' => $user->user_email,
-				'billing_name'  => $user->display_name,
-				'ip_address'    => $this->client_ip(),
-				'created_at'    => shapelms_now(),
+			array_merge(
+				$payer,
+				array(
+					'order_key'  => 'slms_' . wp_generate_password( 24, false ),
+					'user_id'    => (int) $user_id,
+					'status'     => 'pending',
+					'currency'   => CurrencyService::code(),
+					'subtotal'   => (float) $totals['subtotal'],
+					'discount'   => (float) $totals['discount'],
+					'total'      => max( 0, (float) $totals['total'] ),
+					'ip_address' => $this->client_ip(),
+					'created_at' => shapelms_now(),
+				)
 			)
 		);
 
@@ -231,6 +327,34 @@ class OrderService {
 	}
 
 	/**
+	 * Marks an order as waiting for an offline payment.
+	 *
+	 * @param int $order_id Order id.
+	 * @return void
+	 */
+	public function hold( $order_id ) {
+		$this->orders->update( (int) $order_id, array( 'status' => 'on-hold' ) );
+
+		/**
+		 * Fires when an order starts waiting for an offline payment.
+		 *
+		 * @param object $order Order.
+		 */
+		do_action( 'shapelms_order_on_hold', $this->orders->find( (int) $order_id ) );
+	}
+
+	/**
+	 * The user's order for a course that is waiting for an offline payment.
+	 *
+	 * @param int $user_id   User id.
+	 * @param int $course_id Course id.
+	 * @return object|null
+	 */
+	public function open_order( $user_id, $course_id ) {
+		return $user_id ? $this->orders->find_on_hold( (int) $user_id, (int) $course_id ) : null;
+	}
+
+	/**
 	 * Refunds (or cancels) an order and revokes access.
 	 *
 	 * @param int    $order_id Order id.
@@ -289,7 +413,13 @@ class OrderService {
 			case 'failed':
 				$this->revoke( $order_id, $status );
 				return true;
+			case 'on-hold':
+				$this->enrollment->revoke_order( (int) $order_id );
+				$this->orders->update( $order_id, array( 'status' => 'on-hold' ) );
+				return true;
+
 			case 'pending':
+				$this->enrollment->revoke_order( (int) $order_id );
 				$this->orders->update( $order_id, array( 'status' => 'pending' ) );
 				return true;
 			default:
@@ -331,6 +461,7 @@ class OrderService {
 			'transaction_id' => $order->transaction_id,
 			'billing_email'  => $order->billing_email,
 			'billing_name'   => $order->billing_name,
+			'billing'        => ! empty( $order->billing ) ? (array) json_decode( (string) $order->billing, true ) : array(),
 			'created_at'     => $order->created_at,
 			'paid_at'        => $order->paid_at,
 			'refunded_at'    => $order->refunded_at,

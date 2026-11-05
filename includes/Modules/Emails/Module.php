@@ -85,6 +85,18 @@ class Module extends AbstractModule {
 				'subject' => __( 'New order #{order_id} ({order_total})', 'shapelms' ),
 				'body'    => __( "A new order was completed on {site_name}.\n\nOrder #{order_id}\nStudent: {student_name} ({student_email})\nTotal: {order_total}\n\n{order_items}", 'shapelms' ),
 			),
+			'student_order_hold'   => array(
+				'label'   => __( 'Student: order waiting for payment', 'shapelms' ),
+				'to'      => 'student',
+				'subject' => __( 'Your order #{order_id} on {site_name} is waiting for payment', 'shapelms' ),
+				'body'    => __( "Hi {student_name},\n\nWe received order #{order_id} for {order_total}. You get access as soon as we receive your payment.\n\n{order_items}\n\n{payment_instructions}", 'shapelms' ),
+			),
+			'admin_order_hold'     => array(
+				'label'   => __( 'Admin: order waiting for payment', 'shapelms' ),
+				'to'      => 'admin',
+				'subject' => __( 'Order #{order_id} is waiting for payment ({order_total})', 'shapelms' ),
+				'body'    => __( "Order #{order_id} on {site_name} is waiting for an offline payment.\n\nStudent: {student_name} ({student_email})\nTotal: {order_total}\n\n{order_items}\n\nMark it completed in ShapeLMS > Orders once the money arrives. The student gets access then.", 'shapelms' ),
+			),
 			'admin_instructor'     => array(
 				'label'   => __( 'Admin: new instructor application', 'shapelms' ),
 				'to'      => 'admin',
@@ -131,6 +143,7 @@ class Module extends AbstractModule {
 		add_action( Events::COURSE_COMPLETED, array( $this, 'on_completed' ), 10, 2 );
 		add_action( Events::QUIZ_FINISHED, array( $this, 'on_quiz' ), 10, 2 );
 		add_action( Events::ORDER_COMPLETED, array( $this, 'on_order' ), 10, 2 );
+		add_action( 'shapelms_order_on_hold', array( $this, 'on_order_hold' ) );
 		add_action( Events::INSTRUCTOR_APPLIED, array( $this, 'on_applied' ), 10, 2 );
 		add_action( Events::INSTRUCTOR_APPROVED, array( $this, 'on_approved' ), 10, 2 );
 		add_action( 'shapelms_announcement_published', array( $this, 'on_announcement' ), 10, 3 );
@@ -276,6 +289,32 @@ class Module extends AbstractModule {
 
 		Mailer::queue( 'student_order', $order->billing_email ? $order->billing_email : $tags['student_email'], $tags );
 		Mailer::queue( 'admin_order', get_option( 'admin_email' ), $tags );
+	}
+
+	/**
+	 * Order waiting for an offline payment.
+	 *
+	 * @param object $order Order.
+	 * @return void
+	 */
+	public function on_order_hold( $order ) {
+		$orders = shapelms()->get( \ShapeLMS\Database\OrderRepository::class );
+		$lines  = array();
+		foreach ( $orders->items( (int) $order->id ) as $item ) {
+			$lines[] = sprintf( '- %s: %s', $item->title, shapelms_format_price( (float) $item->price ) );
+		}
+
+		$checkout = shapelms()->get( \ShapeLMS\Core\Modules\ModuleRegistry::class )->get( 'checkout' );
+		$gateway  = $checkout ? $checkout->gateway( (string) $order->gateway ) : null;
+
+		$tags                         = $this->user_tags( (int) $order->user_id );
+		$tags['order_id']             = (string) $order->id;
+		$tags['order_total']          = shapelms_format_price( (float) $order->total );
+		$tags['order_items']          = implode( "\n", $lines );
+		$tags['payment_instructions'] = $gateway instanceof \ShapeLMS\Modules\Checkout\OfflineGateway ? $gateway->instructions() : '';
+
+		Mailer::queue( 'student_order_hold', $order->billing_email ? $order->billing_email : $tags['student_email'], $tags );
+		Mailer::queue( 'admin_order_hold', get_option( 'admin_email' ), $tags );
 	}
 
 	/**

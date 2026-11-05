@@ -12,7 +12,7 @@ use ShapeLMS\Frontend\Auth;
 /**
  * Sign-up validation, account creation and URL helpers.
  */
-class AuthTest extends ShapeLMS_TestCase {
+class ShapeLMS_AuthTest extends ShapeLMS_TestCase {
 
 	/**
 	 * A valid submission creates a subscriber with the student role.

@@ -116,7 +116,7 @@ class OrdersController extends RestController {
 					'status' => array(
 						'type'     => 'string',
 						'required' => true,
-						'enum'     => array( 'pending', 'completed', 'refunded', 'cancelled', 'failed' ),
+						'enum'     => array( 'pending', 'on-hold', 'completed', 'refunded', 'cancelled', 'failed' ),
 					),
 				),
 			)

@@ -5,6 +5,9 @@
  * @package ShapeLMS
  */
 
+// Command line only (PHPStan/PHPUnit run before WordPress defines ABSPATH); blocks direct web access.
+'cli' === PHP_SAPI || defined( 'ABSPATH' ) || exit;
+
 $shapelms_tests_dir = getenv( 'WP_TESTS_DIR' );
 
 if ( ! $shapelms_tests_dir ) {

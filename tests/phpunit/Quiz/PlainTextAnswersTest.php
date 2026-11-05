@@ -12,7 +12,7 @@ use ShapeLMS\Quiz\QuestionTypes;
 /**
  * Plain-text quiz content.
  */
-class PlainTextAnswersTest extends ShapeLMS_TestCase {
+class ShapeLMS_PlainTextAnswersTest extends ShapeLMS_TestCase {
 
 	/**
 	 * Literal tags in option text are kept; control characters are removed.

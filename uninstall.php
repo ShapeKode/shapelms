@@ -88,7 +88,7 @@ function shapelms_uninstall_site() {
 	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient\_shapelms\_%' OR option_name LIKE '\_transient\_timeout\_shapelms\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared -- literal pattern, no user input.
 
 	// User meta.
-	foreach ( array( 'shapelms_wishlist', 'shapelms_bio', 'shapelms_headline', 'shapelms_social', 'shapelms_instructor_status' ) as $meta_key ) {
+	foreach ( array( 'shapelms_wishlist', 'shapelms_cart', 'shapelms_billing', 'shapelms_bio', 'shapelms_headline', 'shapelms_social', 'shapelms_instructor_status' ) as $meta_key ) {
 		delete_metadata( 'user', 0, $meta_key, '', true );
 	}
 

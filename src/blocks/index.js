@@ -92,6 +92,7 @@ registerBlockType( 'shapelms/enroll-button', { edit: courseIdEdit( 'shapelms/enr
 registerBlockType( 'shapelms/curriculum', { edit: courseIdEdit( 'shapelms/curriculum', __( 'Course Curriculum', 'shapelms' ) ), save: () => null } );
 registerBlockType( 'shapelms/dashboard', { edit: placeholderEdit( __( 'LMS Dashboard', 'shapelms' ), __( 'The student and instructor dashboard renders here on the front end.', 'shapelms' ) ), save: () => null } );
 registerBlockType( 'shapelms/checkout', { edit: placeholderEdit( __( 'LMS Checkout', 'shapelms' ), __( 'The checkout renders here on the front end.', 'shapelms' ) ), save: () => null } );
+registerBlockType( 'shapelms/cart', { edit: placeholderEdit( __( 'LMS Cart', 'shapelms' ), __( 'The cart renders here on the front end.', 'shapelms' ) ), save: () => null } );
 registerBlockType( 'shapelms/instructor-registration', { edit: placeholderEdit( __( 'Instructor Registration', 'shapelms' ), __( 'The instructor application form renders here on the front end.', 'shapelms' ) ), save: () => null } );
 registerBlockType( 'shapelms/login', { edit: placeholderEdit( __( 'LMS Sign In', 'shapelms' ), __( 'The login, lost password and reset password forms render here on the front end.', 'shapelms' ) ), save: () => null } );
 registerBlockType( 'shapelms/register', { edit: placeholderEdit( __( 'LMS Sign Up', 'shapelms' ), __( 'The student registration form renders here on the front end.', 'shapelms' ) ), save: () => null } );

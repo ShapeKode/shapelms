@@ -2222,6 +2222,46 @@
 	font-weight: 700;
 }
 
+.shapelms-cart__item {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 16px 0;
+	border-bottom: 1px solid var(--shapelms-border);
+}
+
+.shapelms-cart__image {
+	flex: none;
+	width: 96px;
+	height: 64px;
+	border-radius: var(--shapelms-radius);
+	object-fit: cover;
+}
+
+.shapelms-cart__title {
+	flex: 1;
+	min-width: 0;
+	font-weight: 600;
+}
+
+.shapelms-cart__checkout {
+	margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+	.shapelms-cart__item {
+		flex-wrap: wrap;
+	}
+
+	.shapelms-cart__title {
+		flex-basis: calc(100% - 112px);
+	}
+
+	.shapelms-cart__item strong {
+		flex: 1;
+	}
+}
+
 .shapelms-gateways {
 	display: grid;
 	gap: 10px;
@@ -2244,6 +2284,64 @@
 
 .shapelms-gateway__panel {
 	margin: 12px 0 20px;
+}
+
+.shapelms-billing {
+	margin-bottom: 24px;
+}
+
+.shapelms-billing__fields {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0 16px;
+}
+
+.shapelms-billing__terms {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	margin-top: 8px;
+}
+
+.shapelms-receipt__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.shapelms-receipt {
+	max-width: 720px;
+	margin: 0 auto;
+}
+
+.shapelms-receipt__steps {
+	margin: 20px 0;
+	padding: 16px 20px;
+	border: 1px solid var(--shapelms-border);
+	border-radius: var(--shapelms-radius);
+	background: var(--shapelms-bg-soft);
+	font: inherit;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.shapelms-receipt__meta {
+	margin: 20px 0 24px;
+	padding: 0;
+	list-style: none;
+}
+
+.shapelms-receipt__meta li {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 10px 0;
+	border-bottom: 1px solid var(--shapelms-border);
+}
+
+.shapelms-receipt__total {
+	font-size: 18px;
+	font-weight: 700;
 }
 
 /* Responsive ------------------------------------------------------------ */

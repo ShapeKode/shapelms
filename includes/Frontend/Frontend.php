@@ -81,14 +81,14 @@ class Frontend {
 			return true;
 		}
 
-		foreach ( array( 'dashboard', 'checkout', 'instructor_register', 'login', 'register' ) as $key ) {
+		foreach ( array( 'dashboard', 'checkout', 'cart', 'instructor_register', 'login', 'register' ) as $key ) {
 			if ( Pages::is_page( $key ) ) {
 				return true;
 			}
 		}
 
 		if ( is_singular() ) {
-			foreach ( array( 'shapelms/course-grid', 'shapelms/dashboard', 'shapelms/checkout', 'shapelms/instructor-registration', 'shapelms/enroll-button', 'shapelms/login', 'shapelms/register' ) as $block ) {
+			foreach ( array( 'shapelms/course-grid', 'shapelms/dashboard', 'shapelms/checkout', 'shapelms/cart', 'shapelms/instructor-registration', 'shapelms/enroll-button', 'shapelms/login', 'shapelms/register' ) as $block ) {
 				if ( has_block( $block ) ) {
 					return true;
 				}

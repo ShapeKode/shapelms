@@ -166,7 +166,7 @@ class StripeGateway implements GatewayInterface {
 					'site'              => home_url(),
 				),
 			),
-			'shapelms_order_' . $order->id . '_' . md5( (string) $order->total )
+			'shapelms_order_' . $order->id . '_' . md5( $order->total . '|' . $order->billing_email )
 		);
 
 		if ( is_wp_error( $intent ) ) {

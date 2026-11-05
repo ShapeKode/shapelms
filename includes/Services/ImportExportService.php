@@ -304,6 +304,9 @@ class ImportExportService {
 
 		Curriculum::flush( (int) $id );
 
+		/** This action is documented in includes/Api/CoursesController.php */
+		do_action( 'shapelms_course_saved', (int) $id );
+
 		return (int) $id;
 	}
 

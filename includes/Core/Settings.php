@@ -83,6 +83,11 @@ class Settings {
 						'type'    => 'page',
 						'default' => 0,
 					),
+					'cart_page'                => array(
+						'label'   => __( 'Cart page', 'shapelms' ),
+						'type'    => 'page',
+						'default' => 0,
+					),
 					'instructor_register_page' => array(
 						'label'   => __( 'Instructor registration page', 'shapelms' ),
 						'type'    => 'page',
@@ -196,9 +201,27 @@ class Settings {
 						'type'    => 'select',
 						'default' => 'native',
 						'options' => array(
-							'native'      => __( 'ShapeLMS checkout (Stripe, PayPal)', 'shapelms' ),
+							'native'      => __( 'Native Checkout', 'shapelms' ),
 							'woocommerce' => __( 'WooCommerce', 'shapelms' ),
 						),
+					),
+					'buy_now'                => array(
+						'label'       => __( 'Enable "Buy Now" button', 'shapelms' ),
+						'type'        => 'checkbox',
+						'default'     => true,
+						'description' => __( 'Allow users to purchase courses directly without adding them to the cart. When off, the course page shows "Add to cart" instead.', 'shapelms' ),
+					),
+					'woo_auto_complete'      => array(
+						'label'       => __( 'Complete paid WooCommerce course orders automatically', 'shapelms' ),
+						'type'        => 'checkbox',
+						'default'     => true,
+						'description' => __( 'Students get access as soon as an online payment goes through. Cash on delivery, bank transfer and check orders still wait until you mark them completed.', 'shapelms' ),
+					),
+					'woo_redirect_courses'   => array(
+						'label'       => __( 'Redirect to courses after a completed WooCommerce order', 'shapelms' ),
+						'type'        => 'checkbox',
+						'default'     => false,
+						'description' => __( 'Students go from the order received page to their courses in the dashboard. Orders that are not completed yet stay on the order received page.', 'shapelms' ),
 					),
 					'currency'               => array(
 						'label'   => __( 'Currency', 'shapelms' ),
@@ -248,7 +271,7 @@ class Settings {
 						'label'       => __( 'Stripe webhook signing secret', 'shapelms' ),
 						'type'        => 'secret',
 						'default'     => '',
-						'description' => __( 'Webhook URL: /wp-json/shapelms/v1/webhooks/stripe', 'shapelms' ),
+						'description' => __( 'Paste the secret that starts with whsec_, not the URL. Add this webhook URL in Stripe: /wp-json/shapelms/v1/webhooks/stripe', 'shapelms' ),
 					),
 					'paypal_enabled'         => array(
 						'label'   => __( 'Enable PayPal', 'shapelms' ),
@@ -275,6 +298,56 @@ class Settings {
 						'type'        => 'text',
 						'default'     => '',
 						'description' => __( 'Webhook URL: /wp-json/shapelms/v1/webhooks/paypal. Add it in your PayPal app, then paste the webhook ID PayPal shows. Refunds are only processed when this is set.', 'shapelms' ),
+					),
+					'terms_page'             => array(
+						'label'       => __( 'Terms and conditions page', 'shapelms' ),
+						'type'        => 'page',
+						'default'     => 0,
+						'description' => __( 'When set, students must accept this page at checkout.', 'shapelms' ),
+					),
+					'cod_enabled'            => array(
+						'label'       => __( 'Enable cash on delivery', 'shapelms' ),
+						'type'        => 'checkbox',
+						'default'     => true,
+						'description' => __( 'Students get access when you mark the order completed in Orders.', 'shapelms' ),
+					),
+					'cod_title'              => array(
+						'label'   => __( 'Cash on delivery title', 'shapelms' ),
+						'type'    => 'text',
+						'default' => '',
+					),
+					'cod_description'        => array(
+						'label'   => __( 'Cash on delivery description', 'shapelms' ),
+						'type'    => 'textarea',
+						'default' => '',
+					),
+					'bacs_enabled'           => array(
+						'label'       => __( 'Enable direct bank transfer', 'shapelms' ),
+						'type'        => 'checkbox',
+						'default'     => false,
+						'description' => __( 'Students get access when you mark the order completed in Orders.', 'shapelms' ),
+					),
+					'bacs_title'             => array(
+						'label'   => __( 'Bank transfer title', 'shapelms' ),
+						'type'    => 'text',
+						'default' => '',
+					),
+					'bacs_description'       => array(
+						'label'   => __( 'Bank transfer description', 'shapelms' ),
+						'type'    => 'textarea',
+						'default' => '',
+					),
+					'bacs_instructions'      => array(
+						'label'       => __( 'Bank transfer instructions', 'shapelms' ),
+						'type'        => 'textarea',
+						'default'     => '',
+						'description' => __( 'Shown on the order page and in the email.', 'shapelms' ),
+					),
+					'bacs_account_details'   => array(
+						'label'       => __( 'Bank account details', 'shapelms' ),
+						'type'        => 'textarea',
+						'default'     => '',
+						'description' => __( 'Bank name, account name, account number and so on. Shown on the order page and in the email.', 'shapelms' ),
 					),
 				),
 			),

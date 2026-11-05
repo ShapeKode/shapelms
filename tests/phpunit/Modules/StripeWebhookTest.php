@@ -10,7 +10,7 @@ use ShapeLMS\Modules\Checkout\StripeGateway;
 /**
  * Only correctly signed events reach add-ons.
  */
-class StripeWebhookTest extends ShapeLMS_TestCase {
+class ShapeLMS_StripeWebhookTest extends ShapeLMS_TestCase {
 
 	/**
 	 * Builds a webhook request.

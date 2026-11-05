@@ -164,6 +164,54 @@
 	}
 
 	/* ------------------------------------------------------------------ */
+	/* Cart                                                                */
+	/* ------------------------------------------------------------------ */
+
+	function initCart() {
+		document.querySelectorAll( '[data-shapelms-add-to-cart]' ).forEach( function ( link ) {
+			link.addEventListener( 'click', function ( event ) {
+				// Added once: from then on the link simply opens the cart.
+				if ( ! link.hasAttribute( 'data-shapelms-add-to-cart' ) ) {
+					return;
+				}
+				event.preventDefault();
+
+				var box = link.closest( '.shapelms-enroll-box' ) || link.parentNode;
+				var msg = box.querySelector( '.shapelms-enroll-box__message' );
+
+				link.classList.add( 'is-loading' );
+				message( msg, '' );
+
+				api( link, 'cart', { method: 'POST', body: { course_id: parseInt( link.getAttribute( 'data-shapelms-add-to-cart' ), 10 ) } } )
+					.then( function ( res ) {
+						link.classList.remove( 'is-loading' );
+						link.removeAttribute( 'data-shapelms-add-to-cart' );
+						link.textContent = res.label;
+					} )
+					.catch( function ( err ) {
+						link.classList.remove( 'is-loading' );
+						message( msg, err.message, 'error' );
+					} );
+			} );
+		} );
+
+		document.querySelectorAll( '[data-shapelms-cart-remove]' ).forEach( function ( button ) {
+			button.addEventListener( 'click', function () {
+				button.disabled = true;
+
+				api( button, 'cart/' + parseInt( button.getAttribute( 'data-shapelms-cart-remove' ), 10 ), { method: 'DELETE' } )
+					.then( function () {
+						window.location.reload();
+					} )
+					.catch( function ( err ) {
+						button.disabled = false;
+						message( document.querySelector( '[data-shapelms-cart-message]' ), err.message, 'error' );
+					} );
+			} );
+		} );
+	}
+
+	/* ------------------------------------------------------------------ */
 	/* Learn page                                                          */
 	/* ------------------------------------------------------------------ */
 
@@ -992,6 +1040,7 @@
 	function boot() {
 		initProgress();
 		initEnroll();
+		initCart();
 		initLearn();
 		initQuiz();
 		initForms();

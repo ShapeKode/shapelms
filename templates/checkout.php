@@ -19,6 +19,26 @@ if ( ! $shapelms_registry->is_active( 'checkout' ) || ! Checkout::is_active_engi
 }
 
 $shapelms_checkout = $shapelms_registry->get( 'checkout' );
+
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only.
+if ( isset( $_GET['order'] ) ) {
+	$shapelms_viewed = Checkout::viewed_order();
+
+	if ( ! $shapelms_viewed ) {
+		echo '<p class="shapelms-notice">' . esc_html__( 'Order not found. Please log in with the account that placed it.', 'shapelms' ) . '</p>';
+		return;
+	}
+
+	shapelms_get_template(
+		'checkout-receipt.php',
+		array(
+			'order'   => $shapelms_viewed,
+			'gateway' => $shapelms_checkout->gateway( (string) $shapelms_viewed->gateway ),
+		)
+	);
+	return;
+}
+
 $shapelms_courses  = Checkout::requested_courses();
 $shapelms_gateways = $shapelms_checkout->enabled_gateways();
 $shapelms_total    = 0.0;
@@ -35,9 +55,10 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 	array_merge(
 		$shapelms_checkout->client_data(),
 		array(
-			'course-ids' => implode( ',', $shapelms_ids ),
-			'total'      => number_format( $shapelms_total, 2, '.', '' ),
-			'currency'   => \ShapeLMS\Services\CurrencyService::code(),
+			'course-ids'   => implode( ',', $shapelms_ids ),
+			'total'        => number_format( $shapelms_total, 2, '.', '' ),
+			'currency'     => \ShapeLMS\Services\CurrencyService::code(),
+			'amount-minor' => isset( $shapelms_gateways['stripe'] ) ? (string) $shapelms_gateways['stripe']->minor( $shapelms_total, \ShapeLMS\Services\CurrencyService::code() ) : '',
 		)
 	)
 );
@@ -62,6 +83,33 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 		<?php elseif ( ! $shapelms_gateways ) : ?>
 			<p class="shapelms-notice"><?php esc_html_e( 'No payment method is configured yet. Please contact the site owner.', 'shapelms' ); ?></p>
 		<?php else : ?>
+			<form class="shapelms-billing" data-shapelms-billing>
+				<h2><?php esc_html_e( 'Billing details', 'shapelms' ); ?></h2>
+				<div class="shapelms-billing__fields">
+					<?php $shapelms_saved = Checkout::billing_defaults( get_current_user_id() ); ?>
+					<?php foreach ( Checkout::billing_fields() as $shapelms_key => $shapelms_label ) : ?>
+						<div class="shapelms-field">
+							<label for="<?php echo esc_attr( 'shapelms-billing-' . $shapelms_key ); ?>"><?php echo esc_html( $shapelms_label ); ?></label>
+							<input class="shapelms-input" required id="<?php echo esc_attr( 'shapelms-billing-' . $shapelms_key ); ?>" name="<?php echo esc_attr( $shapelms_key ); ?>" type="<?php echo 'email' === $shapelms_key ? 'email' : 'text'; ?>" value="<?php echo esc_attr( (string) ( $shapelms_saved[ $shapelms_key ] ?? '' ) ); ?>">
+						</div>
+					<?php endforeach; ?>
+				</div>
+				<?php if ( Checkout::terms_page() ) : ?>
+					<label class="shapelms-billing__terms">
+						<input type="checkbox" name="terms" required>
+						<span>
+							<?php
+							printf(
+								/* translators: %s: link to the terms page */
+								esc_html__( 'I have read and accept the %s.', 'shapelms' ),
+								'<a href="' . esc_url( (string) get_permalink( Checkout::terms_page() ) ) . '" target="_blank" rel="noopener">' . esc_html( get_the_title( Checkout::terms_page() ) ) . '</a>'
+							);
+							?>
+						</span>
+					</label>
+				<?php endif; ?>
+			</form>
+
 			<h2><?php esc_html_e( 'Payment method', 'shapelms' ); ?></h2>
 			<div class="shapelms-gateways" role="radiogroup">
 				<?php $shapelms_first = true; ?>
@@ -74,6 +122,14 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 				<?php endforeach; ?>
 			</div>
 
+			<?php foreach ( $shapelms_gateways as $shapelms_gateway ) : ?>
+				<?php if ( $shapelms_gateway instanceof \ShapeLMS\Modules\Checkout\OfflineGateway ) : ?>
+					<div class="shapelms-gateway__panel" data-gateway-panel="<?php echo esc_attr( $shapelms_gateway->id() ); ?>" data-gateway-offline hidden>
+						<p class="shapelms-muted"><?php echo esc_html( $shapelms_gateway->description() ); ?></p>
+					</div>
+				<?php endif; ?>
+			<?php endforeach; ?>
+
 			<div class="shapelms-gateway__panel" data-gateway-panel="stripe" hidden>
 				<div id="shapelms-stripe-element"></div>
 			</div>
@@ -81,7 +137,7 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 				<div id="shapelms-paypal-buttons"></div>
 			</div>
 
-			<button type="button" class="shapelms-btn shapelms-btn--primary shapelms-btn--block" data-shapelms-pay>
+			<button type="button" class="shapelms-btn shapelms-btn--primary shapelms-btn--block" data-shapelms-pay data-offline-label="<?php esc_attr_e( 'Place order', 'shapelms' ); ?>">
 				<?php echo esc_html( sprintf( /* translators: %s: total */ __( 'Pay %s', 'shapelms' ), shapelms_format_price( $shapelms_total ) ) ); ?>
 			</button>
 			<p class="shapelms-checkout__message" data-shapelms-checkout-message aria-live="polite"></p>

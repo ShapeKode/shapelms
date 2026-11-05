@@ -408,6 +408,13 @@ class CoursesController extends RestController {
 		Curriculum::flush( $id );
 		clean_post_cache( $id );
 
+		/**
+		 * Fires after a course was saved with its meta and terms (the selling modules hook here).
+		 *
+		 * @param int $id Course id.
+		 */
+		do_action( 'shapelms_course_saved', $id );
+
 		return $this->builder_data( $request );
 	}
 

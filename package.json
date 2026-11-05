@@ -14,7 +14,8 @@
     "plugin-zip": "npm run build && npm run makepot && rm -rf dist && mkdir -p dist/shapelms && rsync -a --exclude-from=.distignore --exclude=dist ./ dist/shapelms/ && cd dist && zip -qr shapelms.zip shapelms && rm -rf shapelms && echo 'Built dist/shapelms.zip'"
   },
   "devDependencies": {
-    "@wordpress/scripts": "^30.0.0"
+    "@wordpress/scripts": "^30.0.0",
+    "rtlcss": "^4.3.0"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",

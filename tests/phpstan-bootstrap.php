@@ -5,6 +5,9 @@
  * @package ShapeLMS
  */
 
+// Command line only (PHPStan/PHPUnit run before WordPress defines ABSPATH); blocks direct web access.
+'cli' === PHP_SAPI || defined( 'ABSPATH' ) || exit;
+
 define( 'SHAPELMS_VERSION', '1.0.0' );
 define( 'SHAPELMS_DB_VERSION', '1' );
 define( 'SHAPELMS_FILE', __DIR__ . '/../shapelms.php' );

@@ -28,7 +28,7 @@ class OrderRepository extends Repository {
 	 *
 	 * @var string[]
 	 */
-	protected $columns = array( 'id', 'order_key', 'user_id', 'status', 'currency', 'subtotal', 'discount', 'total', 'gateway', 'transaction_id', 'billing_email', 'billing_name', 'ip_address', 'notes', 'created_at', 'paid_at', 'refunded_at' );
+	protected $columns = array( 'id', 'order_key', 'user_id', 'status', 'currency', 'subtotal', 'discount', 'total', 'gateway', 'transaction_id', 'billing_email', 'billing_name', 'billing', 'ip_address', 'notes', 'created_at', 'paid_at', 'refunded_at' );
 
 	/**
 	 * Formats.
@@ -48,12 +48,32 @@ class OrderRepository extends Repository {
 		'transaction_id' => '%s',
 		'billing_email'  => '%s',
 		'billing_name'   => '%s',
+		'billing'        => '%s',
 		'ip_address'     => '%s',
 		'notes'          => '%s',
 		'created_at'     => '%s',
 		'paid_at'        => '%s',
 		'refunded_at'    => '%s',
 	);
+
+	/**
+	 * The user's on-hold order that contains a course.
+	 *
+	 * @param int $user_id   User id.
+	 * @param int $course_id Course id.
+	 * @return object|null
+	 */
+	public function find_on_hold( $user_id, $course_id ) {
+		global $wpdb;
+
+		$table = esc_sql( $this->table() );
+		$items = esc_sql( shapelms_table( 'order_items' ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table names are internal and escaped.
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT o.* FROM {$table} o INNER JOIN {$items} i ON i.order_id = o.id WHERE o.user_id = %d AND o.status = 'on-hold' AND i.course_id = %d ORDER BY o.id DESC LIMIT 1", $user_id, $course_id ) );
+
+		return $row ? $row : null;
+	}
 
 	/**
 	 * Finds an order by its key.

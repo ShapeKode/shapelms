@@ -26,6 +26,7 @@ class Migrator {
 	public static function migrations() {
 		$migrations = array(
 			1 => Migrations\Migration_0001_Initial::class,
+			2 => Migrations\Migration_0002_Order_Billing::class,
 		);
 
 		/**

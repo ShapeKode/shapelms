@@ -12,7 +12,7 @@ use ShapeLMS\Services\ProgressService;
 /**
  * Order creation, completion, refunds and prerequisites.
  */
-class OrderServiceTest extends ShapeLMS_TestCase {
+class ShapeLMS_OrderServiceTest extends ShapeLMS_TestCase {
 
 	/**
 	 * Creates a paid course.

@@ -9,8 +9,8 @@ import { usePagedList, useDebounce } from '../../shared/hooks';
 import { PageHeader, Card, Toolbar, DataTable, Pagination, Badge, ErrorNotice, formatDate } from '../../shared/components';
 import { success, error as notifyError } from '../notices';
 
-const tone = { pending: 'warning', completed: 'success', refunded: 'neutral', cancelled: 'neutral', failed: 'danger' };
-const statuses = [ 'pending', 'completed', 'refunded', 'cancelled', 'failed' ];
+const tone = { pending: 'warning', 'on-hold': 'warning', completed: 'success', refunded: 'neutral', cancelled: 'neutral', failed: 'danger' };
+const statuses = [ 'pending', 'on-hold', 'completed', 'refunded', 'cancelled', 'failed' ];
 
 function OrderModal( { order, onClose, onChange } ) {
 	const [ status, setStatus ] = useState( order.status );
@@ -31,6 +31,9 @@ function OrderModal( { order, onClose, onChange } ) {
 	return (
 		<Modal title={ sprintf( /* translators: %d: order id */ __( 'Order #%d', 'shapelms' ), order.id ) } onRequestClose={ onClose } size="medium">
 			<p><strong>{ order.billing_name }</strong> · { order.billing_email }</p>
+			{ order.billing && order.billing.address && (
+				<p className="shapelms-muted">{ [ order.billing.phone, order.billing.address, order.billing.city, order.billing.state, order.billing.zip_code, order.billing.country ].filter( Boolean ).join( ', ' ) }</p>
+			) }
 			<p className="shapelms-muted">{ order.gateway } · { order.transaction_id || '—' } · { formatDate( order.created_at ) }</p>
 			<table className="shapelms-admin-table">
 				<tbody>

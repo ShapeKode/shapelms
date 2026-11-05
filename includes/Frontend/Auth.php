@@ -176,7 +176,7 @@ class Auth {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only; the reset key is verified with check_password_reset_key().
 		if ( isset( $_GET['redirect_to'] ) && ! is_user_logged_in() ) {
 			// Keep the destination even if the visitor switches to Sign up or comes back later.
-			self::remember_return( wp_unslash( $_GET['redirect_to'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- validated in remember_return().
+			self::remember_return( esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ) );
 		}
 
 		$step = isset( $_GET['step'] ) ? sanitize_key( wp_unslash( $_GET['step'] ) ) : '';

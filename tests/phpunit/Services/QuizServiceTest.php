@@ -12,7 +12,7 @@ use ShapeLMS\Services\QuizService;
 /**
  * Attempts, grading, attempt limits and locks.
  */
-class QuizServiceTest extends ShapeLMS_TestCase {
+class ShapeLMS_QuizServiceTest extends ShapeLMS_TestCase {
 
 	/**
 	 * Course id.
