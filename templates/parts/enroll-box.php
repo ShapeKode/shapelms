@@ -11,8 +11,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$shapelms_course  = isset( $args['course'] ) ? $args['course'] : array();
-$shapelms_id      = (int) $shapelms_course['id'];
+$shapelms_course = isset( $args['course'] ) ? $args['course'] : array();
+$shapelms_id     = (int) $shapelms_course['id'];
+
+if ( post_password_required( $shapelms_id ) ) {
+	return;
+}
+
 $shapelms_user_id = get_current_user_id();
 $shapelms_enroll  = shapelms()->get( \ShapeLMS\Services\EnrollmentService::class );
 $shapelms_access  = $shapelms_user_id && $shapelms_enroll->can_access( $shapelms_user_id, $shapelms_id );
@@ -21,6 +26,9 @@ $shapelms_pricing = $shapelms_course['pricing'];
 $shapelms_resume  = $shapelms_access ? shapelms()->get( \ShapeLMS\Services\ProgressService::class )->resume_item( $shapelms_user_id, $shapelms_id ) : 0;
 $shapelms_summary = $shapelms_access ? shapelms()->get( \ShapeLMS\Services\ProgressService::class )->summary( $shapelms_user_id, $shapelms_id ) : null;
 $shapelms_missing = ( $shapelms_user_id && ! $shapelms_access ) ? $shapelms_enroll->missing_prerequisites( $shapelms_user_id, $shapelms_id ) : array();
+$shapelms_read    = $shapelms_access ? 0 : \ShapeLMS\Services\CourseService::first_public_item( $shapelms_id );
+
+$shapelms_enroll_class = $shapelms_read ? 'shapelms-btn--secondary' : 'shapelms-btn--primary';
 
 /**
  * Filters the buy URL for a paid course (WooCommerce / checkout module fill this in).
@@ -83,6 +91,11 @@ $shapelms_buy_label = (string) apply_filters( 'shapelms_course_buy_label', __( '
 				<?php endif; ?>
 			</div>
 
+			<?php if ( $shapelms_read ) : ?>
+				<a class="shapelms-btn shapelms-btn--primary shapelms-btn--block" href="<?php echo esc_url( (string) get_permalink( $shapelms_read ) ); ?>"><?php esc_html_e( 'Start learning', 'shapelms' ); ?></a>
+				<p class="shapelms-muted"><?php esc_html_e( 'No enrollment needed to read. Enroll to save your progress and take quizzes.', 'shapelms' ); ?></p>
+			<?php endif; ?>
+
 			<?php if ( $shapelms_full ) : ?>
 				<p class="shapelms-notice"><?php esc_html_e( 'This course is full.', 'shapelms' ); ?></p>
 			<?php elseif ( $shapelms_missing ) : ?>
@@ -96,11 +109,11 @@ $shapelms_buy_label = (string) apply_filters( 'shapelms_course_buy_label', __( '
 				</div>
 			<?php elseif ( $shapelms_pricing['is_free'] ) : ?>
 				<?php if ( $shapelms_user_id ) : ?>
-					<button type="button" class="shapelms-btn shapelms-btn--primary shapelms-btn--block" data-shapelms-enroll="<?php echo esc_attr( (string) $shapelms_id ); ?>">
+					<button type="button" class="shapelms-btn <?php echo esc_attr( $shapelms_enroll_class ); ?> shapelms-btn--block" data-shapelms-enroll="<?php echo esc_attr( (string) $shapelms_id ); ?>">
 						<?php esc_html_e( 'Enroll for free', 'shapelms' ); ?>
 					</button>
 				<?php else : ?>
-					<a class="shapelms-btn shapelms-btn--primary shapelms-btn--block" href="<?php echo esc_url( shapelms_login_url( add_query_arg( 'shapelms_enroll', '1', (string) get_permalink( $shapelms_id ) ) ) ); ?>">
+					<a class="shapelms-btn <?php echo esc_attr( $shapelms_enroll_class ); ?> shapelms-btn--block" href="<?php echo esc_url( shapelms_login_url( add_query_arg( 'shapelms_enroll', $shapelms_id, (string) get_permalink( $shapelms_id ) ) ) ); ?>">
 						<?php esc_html_e( 'Log in to enroll', 'shapelms' ); ?>
 					</a>
 				<?php endif; ?>

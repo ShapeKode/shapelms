@@ -17,6 +17,7 @@ $shapelms_courses = shapelms()->get( \ShapeLMS\Services\CourseService::class );
 $shapelms_counts  = shapelms()->get( \ShapeLMS\Database\EnrollmentRepository::class )->counts_for_courses( $shapelms_ids );
 $shapelms_labels  = array(
 	'publish' => __( 'Published', 'shapelms' ),
+	'future'  => __( 'Scheduled', 'shapelms' ),
 	'draft'   => __( 'Draft', 'shapelms' ),
 	'pending' => __( 'Pending review', 'shapelms' ),
 	'private' => __( 'Private', 'shapelms' ),

@@ -3,10 +3,13 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 import { Button, Modal, ComboboxControl, SelectControl } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { get, post, del, errorMessage } from '../../shared/api';
-import { usePagedList, useDebounce } from '../../shared/hooks';
-import { PageHeader, Card, Toolbar, DataTable, Pagination, Badge, ErrorNotice, Avatar, Loading, formatDate } from '../../shared/components';
+import { usePagedList, useDebounce, takePreloadedData } from '../../shared/hooks';
+
+// Course filter list; must match the preload in Admin/Menu.php.
+const COURSE_QUERY = { status: 'any', per_page: 100 };
+import { PageHeader, Card, Toolbar, BulkActions, DataTable, Pagination, Badge, ErrorNotice, Avatar, Loading, formatDate } from '../../shared/components';
 import { success, error as notifyError } from '../notices';
 
 const tone = { active: 'info', completed: 'success', cancelled: 'neutral', expired: 'warning' };
@@ -160,17 +163,59 @@ function StudentModal( { id, onClose, onChange } ) {
 export default function Students() {
 	const [ search, setSearch ] = useState( '' );
 	const debounced = useDebounce( search );
-	const [ courses, setCourses ] = useState( [] );
+	// Course filter list, rendered into the page by the server (Menu::preload); fetched only when missing.
+	const [ courses, setCourses ] = useState( () => takePreloadedData( 'courses', COURSE_QUERY )?.items || [] );
 	const [ enrolling, setEnrolling ] = useState( false );
 	const [ viewing, setViewing ] = useState( null );
+	const [ selected, setSelected ] = useState( [] );
+	const [ bulkBusy, setBulkBusy ] = useState( false );
 	const listState = usePagedList( 'students', { search: debounced, course_id: 0, status: '' } );
+	// Only rows on the current page count, so paging or filtering drops stale picks.
+	const selectedIds = selected.filter( ( id ) => listState.items.some( ( row ) => row.id === id ) );
+
+	// Rows are enrollments: deleting one removes that student from that course only.
+	const applyBulk = ( action ) => {
+		const ids = selectedIds;
+		if ( action !== 'delete' || ! ids.length ) {
+			return;
+		}
+		if ( ! window.confirm( sprintf( /* translators: %d: number of enrollments */ _n(
+			'Delete %d enrollment permanently? The student loses access to the course and their lesson progress in it is deleted. Their user account, quiz attempts and orders are kept. This cannot be undone.',
+			'Delete %d enrollments permanently? The students lose access to these courses and their lesson progress in them is deleted. Their user accounts, quiz attempts and orders are kept. This cannot be undone.',
+			ids.length,
+			'shapelms'
+		), ids.length ) ) ) {
+			return;
+		}
+		setBulkBusy( true );
+		post( 'students/bulk', { action, ids } )
+			.then( ( res ) => {
+				if ( res.done ) {
+					/* translators: %d: number of enrollments */
+					success( sprintf( _n( '%d enrollment deleted.', '%d enrollments deleted.', res.done, 'shapelms' ), res.done ) );
+				}
+				if ( res.skipped ) {
+					/* translators: %d: number of enrollments */
+					notifyError( sprintf( _n( '%d enrollment was skipped: it no longer exists or you cannot edit its course.', '%d enrollments were skipped: they no longer exist or you cannot edit their courses.', res.skipped, 'shapelms' ), res.skipped ) );
+				}
+				setSelected( [] );
+				listState.reload();
+			} )
+			.catch( ( e ) => notifyError( errorMessage( e ) ) )
+			.finally( () => setBulkBusy( false ) );
+	};
 
 	if ( listState.query.search !== debounced ) {
 		listState.setQuery( { search: debounced } );
 	}
 
 	useEffect( () => {
-		get( 'courses', { status: 'any', per_page: 100 } ).then( ( res ) => setCourses( res.items || [] ) );
+		if ( courses.length ) {
+			return;
+		}
+		get( 'courses', COURSE_QUERY ).then( ( res ) => setCourses( res.items || [] ) );
+		// Only once, on mount.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	const columns = [
@@ -209,6 +254,7 @@ export default function Students() {
 			<ErrorNotice message={ listState.error } />
 			<Card padding={ false }>
 				<Toolbar
+					actions={ <BulkActions options={ [ { value: 'delete', label: __( 'Delete permanently', 'shapelms' ) } ] } onApply={ applyBulk } count={ selectedIds.length } busy={ bulkBusy } /> }
 					search={ search }
 					onSearch={ setSearch }
 					filters={ [
@@ -216,7 +262,7 @@ export default function Students() {
 						{ key: 'status', value: listState.query.status, onChange: ( status ) => listState.setQuery( { status } ), options: [ { value: '', label: __( 'All statuses', 'shapelms' ) }, { value: 'active', label: __( 'Active', 'shapelms' ) }, { value: 'completed', label: __( 'Completed', 'shapelms' ) }, { value: 'cancelled', label: __( 'Cancelled', 'shapelms' ) } ] },
 					] }
 				/>
-				<DataTable columns={ columns } rows={ listState.items } loading={ listState.loading } emptyText={ __( 'No enrollments yet.', 'shapelms' ) } />
+				<DataTable columns={ columns } rows={ listState.items } loading={ listState.loading } emptyText={ __( 'No enrollments yet.', 'shapelms' ) } selection={ { selected: selectedIds, onChange: setSelected } } />
 				<Pagination page={ listState.query.page } pages={ listState.pages } total={ listState.total } onChange={ listState.setPage } />
 			</Card>
 			{ enrolling && <EnrollModal onClose={ () => setEnrolling( false ) } onDone={ () => { setEnrolling( false ); listState.reload(); } } /> }

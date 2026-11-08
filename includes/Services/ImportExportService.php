@@ -34,7 +34,7 @@ class ImportExportService {
 			$ids = get_posts(
 				array(
 					'post_type'     => PostTypes::COURSE,
-					'post_status'   => array( 'publish', 'draft', 'pending', 'private' ),
+					'post_status'   => array( 'publish', 'future', 'draft', 'pending', 'private' ),
 					'numberposts'   => -1,
 					'fields'        => 'ids',
 					'no_found_rows' => true,
@@ -74,6 +74,7 @@ class ImportExportService {
 			'content'    => $post->post_content,
 			'excerpt'    => $post->post_excerpt,
 			'status'     => $post->post_status,
+			'password'   => $post->post_password,
 			'image'      => get_the_post_thumbnail_url( $post, 'full' ),
 			'meta'       => $this->export_meta( $post->ID, PostTypes::COURSE ),
 			'categories' => wp_get_object_terms( $post->ID, Taxonomies::CATEGORY, array( 'fields' => 'names' ) ),
@@ -198,13 +199,14 @@ class ImportExportService {
 		$id = wp_insert_post(
 			wp_slash(
 				array(
-					'post_type'    => PostTypes::COURSE,
-					'post_title'   => sanitize_text_field( (string) $course['title'] ),
-					'post_name'    => isset( $course['slug'] ) ? sanitize_title( (string) $course['slug'] ) : '',
-					'post_content' => wp_kses_post( (string) ( $course['content'] ?? '' ) ),
-					'post_excerpt' => sanitize_textarea_field( (string) ( $course['excerpt'] ?? '' ) ),
-					'post_status'  => $status,
-					'post_author'  => (int) $author,
+					'post_type'     => PostTypes::COURSE,
+					'post_title'    => sanitize_text_field( (string) $course['title'] ),
+					'post_name'     => isset( $course['slug'] ) ? sanitize_title( (string) $course['slug'] ) : '',
+					'post_content'  => wp_kses_post( (string) ( $course['content'] ?? '' ) ),
+					'post_excerpt'  => sanitize_textarea_field( (string) ( $course['excerpt'] ?? '' ) ),
+					'post_status'   => $status,
+					'post_password' => sanitize_text_field( (string) ( $course['password'] ?? '' ) ),
+					'post_author'   => (int) $author,
 				)
 			)
 		);

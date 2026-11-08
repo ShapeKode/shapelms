@@ -192,9 +192,67 @@ class AttemptRepository extends Repository {
 	}
 
 	/**
+	 * Result filter => SQL condition on the attempt (alias a). Pending = waiting for manual review.
+	 *
+	 * @var array<string, string>
+	 */
+	const RESULTS = array(
+		'pass'    => "(a.status != 'pending_review' AND a.passed = 1)",
+		'fail'    => "(a.status != 'pending_review' AND a.passed = 0)",
+		'pending' => "(a.status = 'pending_review')",
+	);
+
+	/**
+	 * WHERE clauses shared by the list and its counts (finished attempts only).
+	 *
+	 * @param array<string, mixed> $args { quiz_id, course_id, user_id }.
+	 * @return string[]
+	 */
+	private function filters( array $args ) {
+		global $wpdb;
+
+		$where = array( "a.status != 'in_progress'" );
+
+		foreach ( array( 'quiz_id', 'course_id', 'user_id' ) as $column ) {
+			if ( ! empty( $args[ $column ] ) ) {
+				$where[] = $wpdb->prepare( "a.{$column} = %d", (int) $args[ $column ] ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- column from a fixed whitelist.
+			}
+		}
+
+		return $where;
+	}
+
+	/**
+	 * Attempts per result for the result filter.
+	 *
+	 * @param array<string, mixed> $args { quiz_id, course_id, user_id }.
+	 * @return array{all: int, pass: int, fail: int, pending: int}
+	 */
+	public function counts( array $args = array() ) {
+		global $wpdb;
+
+		$table     = esc_sql( $this->table() );
+		$where_sql = implode( ' AND ', $this->filters( $args ) );
+		$parts     = array( 'COUNT(*) AS all_count' );
+
+		foreach ( self::RESULTS as $key => $condition ) {
+			$parts[] = "SUM(CASE WHEN {$condition} THEN 1 ELSE 0 END) AS {$key}";
+		}
+
+		$row = $wpdb->get_row( 'SELECT ' . implode( ', ', $parts ) . " FROM {$table} a WHERE {$where_sql}" ); // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are prepared or fixed.
+
+		return array(
+			'all'     => (int) ( $row->all_count ?? 0 ),
+			'pass'    => (int) ( $row->pass ?? 0 ),
+			'fail'    => (int) ( $row->fail ?? 0 ),
+			'pending' => (int) ( $row->pending ?? 0 ),
+		);
+	}
+
+	/**
 	 * Paginated attempts for admin/instructor screens.
 	 *
-	 * @param array<string, mixed> $args { quiz_id, course_id, user_id, page, per_page }.
+	 * @param array<string, mixed> $args { quiz_id, course_id, user_id, result, page, per_page }.
 	 * @return array{items: object[], total: int}
 	 */
 	public function paginate( array $args ) {
@@ -206,18 +264,17 @@ class AttemptRepository extends Repository {
 				'quiz_id'   => 0,
 				'course_id' => 0,
 				'user_id'   => 0,
+				'result'    => '',
 				'page'      => 1,
 				'per_page'  => 20,
 			)
 		);
 
 		$table = esc_sql( $this->table() );
-		$where = array( "a.status != 'in_progress'" );
+		$where = $this->filters( $args );
 
-		foreach ( array( 'quiz_id', 'course_id', 'user_id' ) as $column ) {
-			if ( ! empty( $args[ $column ] ) ) {
-				$where[] = $wpdb->prepare( "a.{$column} = %d", (int) $args[ $column ] ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- column from a fixed whitelist.
-			}
+		if ( isset( self::RESULTS[ $args['result'] ] ) ) {
+			$where[] = self::RESULTS[ $args['result'] ];
 		}
 
 		$where_sql = implode( ' AND ', $where );

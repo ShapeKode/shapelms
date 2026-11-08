@@ -1,15 +1,17 @@
 /**
  * Settings, rendered from the PHP schema.
  */
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { Button, TextControl, TextareaControl, ToggleControl, SelectControl, ColorPicker, TabPanel, Dropdown } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { get, post, errorMessage } from '../../shared/api';
 import { PageHeader, Card, Loading, ErrorNotice } from '../../shared/components';
+import { takePreloadedData } from '../../shared/hooks';
 import { success, error as notifyError } from '../notices';
+import PaymentMethods from '../components/PaymentMethods';
 
 function Field( { field, value, onChange, pages } ) {
-	const common = { label: field.label, help: field.description, __nextHasNoMarginBottom: true };
+	const common = { label: field.label, help: field.description, placeholder: field.placeholder, __nextHasNoMarginBottom: true };
 	switch ( field.type ) {
 		case 'checkbox':
 			return <ToggleControl { ...common } checked={ !! value } onChange={ onChange } />;
@@ -80,16 +82,28 @@ function EmailSection( { fields, values, onChange, pages } ) {
 	);
 }
 
-export default function Settings() {
-	const [ schema, setSchema ] = useState( null );
-	const [ values, setValues ] = useState( {} );
-	const [ pages, setPages ] = useState( [] );
+// Payment fields live in the "commerce" section but are shown on their own tab.
+const PAYMENTS_TAB = 'payments';
+
+export default function Settings( { config = {} } ) {
+	// Server-preloaded responses, taken once on first render.
+	const preloaded = useRef( null );
+	if ( ! preloaded.current ) {
+		preloaded.current = { s: takePreloadedData( 'settings' ), p: takePreloadedData( 'settings/pages' ) };
+	}
+	const [ schema, setSchema ] = useState( () => preloaded.current.s?.schema || null );
+	const [ values, setValues ] = useState( () => preloaded.current.s?.values || {} );
+	const [ pages, setPages ] = useState( () => preloaded.current.p || [] );
 	const [ error, setError ] = useState( '' );
 	const [ busy, setBusy ] = useState( false );
 	const [ dirty, setDirty ] = useState( false );
 
 	useEffect( () => {
-		Promise.all( [ get( 'settings' ), get( 'settings/pages' ) ] )
+		// Normally rendered into the page by the server; fetch only what is missing.
+		if ( preloaded.current.s && preloaded.current.p ) {
+			return;
+		}
+		Promise.all( [ preloaded.current.s || get( 'settings' ), preloaded.current.p || get( 'settings/pages' ) ] )
 			.then( ( [ s, p ] ) => {
 				setSchema( s.schema );
 				setValues( s.values );
@@ -122,29 +136,72 @@ export default function Settings() {
 		return <Loading />;
 	}
 
-	const tabs = Object.entries( schema ).map( ( [ id, section ] ) => ( { name: id, title: section.label } ) );
+	const tabs = [];
+	Object.entries( schema ).forEach( ( [ id, section ] ) => {
+		tabs.push( { name: id, title: section.label } );
+		if ( id === 'commerce' && section.gateways ) {
+			tabs.push( { name: PAYMENTS_TAB, title: __( 'Payments', 'shapelms' ) } );
+		}
+	} );
+	const urlTab = new URL( window.location.href ).searchParams.get( 'tab' );
+	const initialTab = tabs.some( ( t ) => t.name === urlTab ) ? urlTab : tabs[ 0 ]?.name;
+	const onTabSelect = ( name ) => {
+		const url = new URL( window.location.href );
+		if ( url.searchParams.get( 'tab' ) === name ) {
+			return;
+		}
+		url.searchParams.set( 'tab', name );
+		url.searchParams.delete( 'method' );
+		window.history.replaceState( null, '', url );
+	};
+	const renderSection = ( tabName ) => {
+		if ( tabName === PAYMENTS_TAB ) {
+			const commerce = values.commerce || {};
+			return (
+				<div className="shapelms-settings-section shapelms-settings-section--wide">
+					<p className="shapelms-muted">{ __( 'Choose how students pay for courses on Native Checkout. Select a method to add its API keys and options.', 'shapelms' ) }</p>
+					<PaymentMethods
+						section={ schema.commerce }
+						values={ commerce }
+						engine={ commerce.engine }
+						adminUrl={ config.adminUrl }
+						onChange={ ( key, v ) => change( 'commerce', key, v ) }
+						renderField={ ( key, field ) => (
+							<Field key={ key } field={ field } value={ commerce[ key ] } onChange={ ( v ) => change( 'commerce', key, v ) } pages={ pages } />
+						) }
+					/>
+				</div>
+			);
+		}
+		const section = schema[ tabName ];
+		const fields = Object.entries( section.fields ).filter( ( [ , field ] ) => field.tab !== PAYMENTS_TAB );
+		return (
+			<div className="shapelms-settings-section">
+				{ section.description && <p className="shapelms-muted">{ section.description }</p> }
+				{ tabName === 'emails' ? (
+					<EmailSection fields={ section.fields } values={ values[ tabName ] || {} } onChange={ ( key, v ) => change( tabName, key, v ) } pages={ pages } />
+				) : (
+					fields.map( ( [ key, field ] ) => (
+						<Field key={ key } field={ field } value={ values[ tabName ]?.[ key ] } onChange={ ( v ) => change( tabName, key, v ) } pages={ pages } />
+					) )
+				) }
+			</div>
+		);
+	};
+	const saveButton = <Button variant="primary" isBusy={ busy } disabled={ busy || ! dirty } onClick={ save }>{ __( 'Save changes', 'shapelms' ) }</Button>;
 
 	return (
 		<>
-			<PageHeader title={ __( 'Settings', 'shapelms' ) } actions={ <Button variant="primary" isBusy={ busy } disabled={ busy || ! dirty } onClick={ save }>{ __( 'Save changes', 'shapelms' ) }</Button> } />
+			<PageHeader title={ __( 'Settings', 'shapelms' ) } actions={ saveButton } />
 			<Card padding={ false }>
-				<TabPanel className="shapelms-settings-tabs" tabs={ tabs }>
-					{ ( tab ) => {
-						const section = schema[ tab.name ];
-						return (
-							<div className="shapelms-settings-section">
-								{ section.description && <p className="shapelms-muted">{ section.description }</p> }
-								{ tab.name === 'emails' ? (
-									<EmailSection fields={ section.fields } values={ values[ tab.name ] || {} } onChange={ ( key, v ) => change( tab.name, key, v ) } pages={ pages } />
-								) : (
-									Object.entries( section.fields ).map( ( [ key, field ] ) => (
-										<Field key={ key } field={ field } value={ values[ tab.name ]?.[ key ] } onChange={ ( v ) => change( tab.name, key, v ) } pages={ pages } />
-									) )
-								) }
-							</div>
-						);
-					} }
+				<TabPanel className="shapelms-settings-tabs" tabs={ tabs } initialTabName={ initialTab } onSelect={ onTabSelect }>
+					{ ( tab ) => renderSection( tab.name ) }
 				</TabPanel>
+				{ /* A second Save at the bottom, so long tabs don't need a scroll back up. */ }
+				<div className="shapelms-settings-footer">
+					{ saveButton }
+					{ dirty && ! busy && <span className="shapelms-muted">{ __( 'You have unsaved changes.', 'shapelms' ) }</span> }
+				</div>
 			</Card>
 		</>
 	);

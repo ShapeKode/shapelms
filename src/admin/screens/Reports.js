@@ -1,12 +1,16 @@
 /**
  * Reports.
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { Button, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { get, errorMessage } from '../../shared/api';
+import { takePreloadedData } from '../../shared/hooks';
 import { PageHeader, Card, StatCard, Loading, ErrorNotice, DataTable } from '../../shared/components';
 import LineChart from '../components/LineChart';
+
+// Course filter list; must match the preload in Admin/Menu.php.
+const COURSE_QUERY = { status: 'any', per_page: 100 };
 
 function daysAgo( n ) {
 	const d = new Date();
@@ -17,22 +21,57 @@ function daysAgo( n ) {
 export default function Reports( { config } ) {
 	const [ range, setRange ] = useState( '30' );
 	const [ courseId, setCourseId ] = useState( '0' );
-	const [ courses, setCourses ] = useState( [] );
-	const [ overview, setOverview ] = useState( null );
-	const [ rows, setRows ] = useState( null );
+	// First paint uses what the server rendered into the page (Menu::preload): the
+	// overview for the start range (last 30 days, all courses), the course table and
+	// the course filter. Each is fetched only when missing.
+	const [ courses, setCourses ] = useState( () => takePreloadedData( 'courses', COURSE_QUERY )?.items || null );
+	const [ rows, setRows ] = useState( () => takePreloadedData( 'reports/courses' ) );
+	// Overviews already loaded, by "range:course", so going back to one is instant.
+	const cache = useRef( null );
+	if ( ! cache.current ) {
+		const first = takePreloadedData( 'reports/overview', { course_id: 0 } );
+		cache.current = first ? { '30:0': first } : {};
+	}
+	const key = `${ range }:${ courseId }`;
+	const [ overview, setOverview ] = useState( () => cache.current[ key ] || null );
+	const [ loading, setLoading ] = useState( false );
 	const [ error, setError ] = useState( '' );
 
 	useEffect( () => {
-		get( 'courses', { status: 'any', per_page: 100 } ).then( ( res ) => setCourses( res.items || [] ) );
-		get( 'reports/courses' ).then( setRows ).catch( ( e ) => setError( errorMessage( e ) ) );
+		if ( ! courses ) {
+			get( 'courses', COURSE_QUERY ).then( ( res ) => setCourses( res.items || [] ) );
+		}
+		if ( ! rows ) {
+			get( 'reports/courses' ).then( setRows ).catch( ( e ) => setError( errorMessage( e ) ) );
+		}
+		// Only once, on mount.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	useEffect( () => {
-		setOverview( null );
+		if ( cache.current[ key ] ) {
+			setOverview( cache.current[ key ] );
+			setLoading( false );
+			return;
+		}
+		// The previous numbers stay on screen, dimmed, until the new ones arrive.
+		let live = true;
+		setLoading( true );
 		get( 'reports/overview', { from: daysAgo( parseInt( range, 10 ) - 1 ), to: daysAgo( 0 ), course_id: parseInt( courseId, 10 ) } )
-			.then( setOverview )
-			.catch( ( e ) => setError( errorMessage( e ) ) );
-	}, [ range, courseId ] );
+			.then( ( data ) => {
+				cache.current[ key ] = data;
+				if ( live ) {
+					setOverview( data );
+				}
+			} )
+			.catch( ( e ) => live && setError( errorMessage( e ) ) )
+			.finally( () => live && setLoading( false ) );
+		return () => {
+			live = false;
+		};
+		// range and courseId are both in key.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ key ] );
 
 	const exportCsv = () => {
 		if ( ! rows ) {
@@ -53,11 +92,12 @@ export default function Reports( { config } ) {
 			<ErrorNotice message={ error } />
 			<div className="shapelms-toolbar shapelms-toolbar--plain">
 				<SelectControl value={ range } onChange={ setRange } options={ [ { value: '7', label: __( 'Last 7 days', 'shapelms' ) }, { value: '30', label: __( 'Last 30 days', 'shapelms' ) }, { value: '90', label: __( 'Last 90 days', 'shapelms' ) }, { value: '365', label: __( 'Last year', 'shapelms' ) } ] } __nextHasNoMarginBottom />
-				<SelectControl value={ courseId } onChange={ setCourseId } options={ [ { value: '0', label: __( 'All courses', 'shapelms' ) }, ...courses.map( ( c ) => ( { value: String( c.id ), label: c.title } ) ) ] } __nextHasNoMarginBottom />
+				<SelectControl value={ courseId } onChange={ setCourseId } options={ [ { value: '0', label: __( 'All courses', 'shapelms' ) }, ...( courses || [] ).map( ( c ) => ( { value: String( c.id ), label: c.title } ) ) ] } __nextHasNoMarginBottom />
 			</div>
 			{ ! overview && <Loading /> }
 			{ overview && (
-				<>
+				<div className={ `shapelms-report-body${ loading ? ' is-refreshing' : '' }` }>
+					{ loading && <div className="shapelms-progress" /> }
 					<div className="shapelms-stats-grid">
 						<StatCard label={ __( 'Enrollments', 'shapelms' ) } value={ overview.period.enrollments } />
 						<StatCard label={ __( 'Completions', 'shapelms' ) } value={ overview.period.completions } />
@@ -67,7 +107,7 @@ export default function Reports( { config } ) {
 					<Card title={ __( 'Enrollments and completions', 'shapelms' ) }>
 						<LineChart series={ [ { label: __( 'Enrollments', 'shapelms' ), data: overview.series.enrollments }, { label: __( 'Completions', 'shapelms' ), data: overview.series.completions, color: '#15803d' } ] } />
 					</Card>
-				</>
+				</div>
 			) }
 			<Card title={ __( 'Courses', 'shapelms' ) } padding={ false }>
 				<DataTable

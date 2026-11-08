@@ -135,6 +135,68 @@ class CourseService {
 	}
 
 	/**
+	 * Who can see a course: public, private or password.
+	 *
+	 * @param int|\WP_Post $course Course.
+	 * @return string
+	 */
+	public static function visibility( $course ) {
+		$post = get_post( $course );
+
+		if ( ! $post ) {
+			return 'public';
+		}
+
+		if ( 'private' === $post->post_status ) {
+			return 'private';
+		}
+
+		return '' !== $post->post_password ? 'password' : 'public';
+	}
+
+	/**
+	 * Whether anyone can read the course without enrolling. Only a free course that is live for
+	 * everyone qualifies, so a paid, password protected or unpublished course never opens up.
+	 *
+	 * @param int $course_id Course id.
+	 * @return bool
+	 */
+	public static function is_public( $course_id ) {
+		return get_post_meta( $course_id, '_shapelms_public', true )
+			&& 'publish' === get_post_status( $course_id )
+			&& 'public' === self::visibility( $course_id )
+			&& self::pricing( $course_id )['is_free'];
+	}
+
+	/**
+	 * Whether an item type opens without enrolling in this course. Add-on types such as
+	 * assignments stay closed: they belong to enrolled students.
+	 *
+	 * @param int    $course_id Course id.
+	 * @param string $type      Item type.
+	 * @return bool
+	 */
+	public static function is_public_item( $course_id, $type ) {
+		return in_array( $type, array( 'lesson', 'quiz' ), true ) && self::is_public( $course_id );
+	}
+
+	/**
+	 * First item a visitor can open in a public course.
+	 *
+	 * @param int $course_id Course id.
+	 * @return int 0 when there is none.
+	 */
+	public static function first_public_item( $course_id ) {
+		foreach ( Curriculum::items( $course_id ) as $item ) {
+			if ( self::is_public_item( $course_id, $item['type'] ) ) {
+				return (int) $item['id'];
+			}
+		}
+
+		return 0;
+	}
+
+	/**
 	 * Full course data for templates and the public API.
 	 *
 	 * @param int  $course_id Course id.
@@ -156,6 +218,8 @@ class CourseService {
 			'title'          => $post->post_title,
 			'slug'           => $post->post_name,
 			'status'         => $post->post_status,
+			'visibility'     => self::visibility( $post ),
+			'is_public'      => self::is_public( $post->ID ),
 			'excerpt'        => $post->post_excerpt,
 			'content'        => $post->post_content,
 			'url'            => get_permalink( $post ),
@@ -174,6 +238,7 @@ class CourseService {
 			'lessons'        => $counts['lessons'],
 			'quizzes'        => $counts['quizzes'],
 			'topics'         => $counts['topics'],
+			'item_counts'    => self::item_counts( $counts['items'] ),
 			'students'       => $this->student_count( $post->ID ),
 			'rating'         => self::rating( $post->ID ),
 			'instructors'    => array_map( array( InstructorService::class, 'public_profile' ), self::instructor_ids( $post->ID ) ),
@@ -200,6 +265,19 @@ class CourseService {
 			$data['curriculum'] = Curriculum::tree( $post->ID );
 		}
 
+		// Locked by password: keep what a catalog card needs, drop everything behind the form.
+		if ( post_password_required( $post ) ) {
+			$data['excerpt']     = '';
+			$data['content']     = '';
+			$data['intro_video'] = '';
+			foreach ( array( 'requirements', 'outcomes', 'audience' ) as $key ) {
+				$data[ $key ] = array();
+			}
+			if ( $with_tree ) {
+				$data['curriculum'] = array();
+			}
+		}
+
 		/**
 		 * Filters the course array.
 		 *
@@ -207,6 +285,24 @@ class CourseService {
 		 * @param \WP_Post $post Course post.
 		 */
 		return apply_filters( 'shapelms_course_data', $data, $post );
+	}
+
+	/**
+	 * Curriculum item counts with their labels, in item-type order.
+	 *
+	 * @param array<string, int> $counts type => count.
+	 * @return array<int, array{type: string, label: string, count: int}>
+	 */
+	private static function item_counts( array $counts ) {
+		$out = array();
+		foreach ( Curriculum::item_types() as $type => $config ) {
+			$out[] = array(
+				'type'  => (string) $type,
+				'label' => (string) $config['label'],
+				'count' => isset( $counts[ $type ] ) ? (int) $counts[ $type ] : 0,
+			);
+		}
+		return $out;
 	}
 
 	/**
@@ -258,6 +354,8 @@ class CourseService {
 				'instructor' => 0,
 				'ids'        => array(),
 				'status'     => 'publish',
+				'date_from'  => '',
+				'date_to'    => '',
 			)
 		);
 
@@ -338,8 +436,20 @@ class CourseService {
 			$query_args['author'] = (int) $args['instructor'];
 		}
 		if ( ! empty( $args['ids'] ) ) {
+			// The ids only narrow the set; the requested sort still applies.
 			$query_args['post__in'] = array_map( 'intval', (array) $args['ids'] );
-			$query_args['orderby']  = 'post__in';
+		}
+
+		// Publish-date range, both ends inclusive (Y-m-d, site time).
+		$range = array( 'inclusive' => true );
+		if ( $args['date_from'] ) {
+			$range['after'] = $args['date_from'];
+		}
+		if ( $args['date_to'] ) {
+			$range['before'] = $args['date_to'] . ' 23:59:59';
+		}
+		if ( count( $range ) > 1 ) {
+			$query_args['date_query'] = array( $range );
 		}
 
 		$query = new \WP_Query( $query_args );

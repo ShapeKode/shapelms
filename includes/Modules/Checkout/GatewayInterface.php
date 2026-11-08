@@ -64,10 +64,11 @@ interface GatewayInterface {
 	public function confirm( $order, array $data );
 
 	/**
-	 * Handles a provider webhook. Returns the order id to complete, 0 to ignore, or WP_Error.
+	 * Handles a provider webhook. Returns the order id and what to do with it
+	 * (complete|hold|fail|refund|ignore; order id 0 = ignore), or WP_Error.
 	 *
 	 * @param WP_REST_Request $request Request.
-	 * @return array{order_id: int, transaction_id: string, action: string}|\WP_Error
+	 * @return array{order_id: int, transaction_id: string, action: string, amount?: float}|\WP_Error Optional amount: total refunded so far (refund action); missing means a full refund.
 	 */
 	public function webhook( WP_REST_Request $request );
 }

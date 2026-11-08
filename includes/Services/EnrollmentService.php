@@ -305,6 +305,10 @@ class EnrollmentService {
 			return new \WP_Error( 'shapelms_not_published', __( 'This course is not available yet.', 'shapelms' ) );
 		}
 
+		if ( post_password_required( $course_id ) ) {
+			return new \WP_Error( 'shapelms_password_required', __( 'Enter the password on the course page first.', 'shapelms' ) );
+		}
+
 		return $this->enroll( $user_id, $course_id, 'free' );
 	}
 
@@ -336,6 +340,41 @@ class EnrollmentService {
 		}
 
 		Events::fire( Events::COURSE_UNENROLLED, $user_id, array( 'course_id' => (int) $course_id ) );
+
+		return true;
+	}
+
+	/**
+	 * Deletes an enrollment for good: the row and the student's lesson progress in that course.
+	 * Quiz attempts and orders are kept as records.
+	 *
+	 * @param int $enrollment_id Enrollment id.
+	 * @return bool
+	 */
+	public function delete( $enrollment_id ) {
+		$row = $this->enrollments->find( (int) $enrollment_id );
+
+		if ( ! $row ) {
+			return false;
+		}
+
+		$this->progress->reset( (int) $row->user_id, (int) $row->course_id );
+
+		if ( ! $this->enrollments->delete( (int) $row->id ) ) {
+			return false;
+		}
+
+		// Add-ons that react to losing access still hear about it.
+		if ( in_array( $row->status, array( 'active', 'completed' ), true ) ) {
+			Events::fire( Events::COURSE_UNENROLLED, (int) $row->user_id, array( 'course_id' => (int) $row->course_id ) );
+		}
+
+		/**
+		 * Fires after an enrollment was deleted permanently.
+		 *
+		 * @param object $row Enrollment row as it was.
+		 */
+		do_action( 'shapelms_enrollment_deleted', $row );
 
 		return true;
 	}

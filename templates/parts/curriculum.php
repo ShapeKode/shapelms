@@ -14,6 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 $shapelms_course = isset( $args['course'] ) ? $args['course'] : array();
 $shapelms_tree   = isset( $shapelms_course['curriculum'] ) ? $shapelms_course['curriculum'] : array();
 
+if ( post_password_required( (int) $shapelms_course['id'] ) ) {
+	return;
+}
+
 if ( empty( $shapelms_tree ) ) {
 	echo '<p class="shapelms-muted">' . esc_html__( 'The curriculum will be published soon.', 'shapelms' ) . '</p>';
 	return;
@@ -25,6 +29,7 @@ $shapelms_summary    = $shapelms_can_access ? shapelms()->get( \ShapeLMS\Service
 $shapelms_statuses   = $shapelms_summary ? $shapelms_summary['statuses'] : array();
 $shapelms_locked     = $shapelms_summary ? $shapelms_summary['locked'] : array();
 $shapelms_lock_msgs  = $shapelms_summary ? $shapelms_summary['lock_messages'] : array();
+$shapelms_reader     = ! $shapelms_can_access && \ShapeLMS\Services\CourseService::is_public( (int) $shapelms_course['id'] );
 ?>
 <div class="shapelms-curriculum">
 	<?php foreach ( $shapelms_tree as $shapelms_index => $shapelms_topic ) : ?>
@@ -42,9 +47,9 @@ $shapelms_lock_msgs  = $shapelms_summary ? $shapelms_summary['lock_messages'] : 
 				<?php foreach ( $shapelms_topic['items'] as $shapelms_item ) : ?>
 					<?php
 					$shapelms_lock    = in_array( (int) $shapelms_item['id'], $shapelms_locked, true );
-					$shapelms_open    = ! $shapelms_lock && ( $shapelms_can_access || ! empty( $shapelms_item['preview'] ) );
+					$shapelms_open    = ! $shapelms_lock && ( $shapelms_can_access || ! empty( $shapelms_item['preview'] ) || ( $shapelms_reader && \ShapeLMS\Services\CourseService::is_public_item( (int) $shapelms_course['id'], $shapelms_item['type'] ) ) );
 					$shapelms_done    = isset( $shapelms_statuses[ $shapelms_item['id'] ] ) && 'completed' === $shapelms_statuses[ $shapelms_item['id'] ];
-					$shapelms_is_prev = ! $shapelms_can_access && ! empty( $shapelms_item['preview'] ) && 'lesson' === $shapelms_item['type'];
+					$shapelms_is_prev = ! $shapelms_can_access && ! $shapelms_reader && ! empty( $shapelms_item['preview'] ) && 'lesson' === $shapelms_item['type'];
 					$shapelms_modal   = $shapelms_is_prev && shapelms_lesson_has_video( (int) $shapelms_item['id'] ) ? shapelms_lesson_video_html( (int) $shapelms_item['id'], true ) : '';
 					?>
 					<li class="shapelms-curriculum__item shapelms-curriculum__item--<?php echo esc_attr( $shapelms_item['type'] ); ?><?php echo $shapelms_done ? ' is-done' : ''; ?><?php echo $shapelms_lock ? ' is-locked' : ''; ?>">
@@ -60,7 +65,7 @@ $shapelms_lock_msgs  = $shapelms_summary ? $shapelms_summary['lock_messages'] : 
 						<span class="shapelms-curriculum__right">
 							<?php if ( $shapelms_modal ) : ?>
 								<button type="button" class="shapelms-tag shapelms-tag--play" data-shapelms-video="shapelms-preview-<?php echo esc_attr( (string) $shapelms_item['id'] ); ?>" data-shapelms-video-title="<?php echo esc_attr( $shapelms_item['title'] ); ?>" data-shapelms-video-link="<?php echo esc_url( $shapelms_item['url'] ); ?>"><?php esc_html_e( 'Preview', 'shapelms' ); ?></button>
-							<?php elseif ( ! empty( $shapelms_item['preview'] ) && ! $shapelms_can_access ) : ?>
+							<?php elseif ( ! empty( $shapelms_item['preview'] ) && ! $shapelms_can_access && ! $shapelms_reader ) : ?>
 								<span class="shapelms-tag"><?php esc_html_e( 'Preview', 'shapelms' ); ?></span>
 							<?php endif; ?>
 							<?php if ( ! empty( $shapelms_item['duration'] ) ) : ?>

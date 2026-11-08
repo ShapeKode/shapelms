@@ -28,7 +28,40 @@ class OrderRepository extends Repository {
 	 *
 	 * @var string[]
 	 */
-	protected $columns = array( 'id', 'order_key', 'user_id', 'status', 'currency', 'subtotal', 'discount', 'total', 'gateway', 'transaction_id', 'billing_email', 'billing_name', 'billing', 'ip_address', 'notes', 'created_at', 'paid_at', 'refunded_at' );
+	protected $columns = array( 'id', 'order_key', 'user_id', 'status', 'currency', 'subtotal', 'discount', 'total', 'refunded_amount', 'gateway', 'transaction_id', 'billing_email', 'billing_name', 'billing', 'ip_address', 'notes', 'created_at', 'paid_at', 'refunded_at', 'trashed_at' );
+
+	/**
+	 * Admin list tabs => the order statuses they hold. Trash is separate (trashed_at).
+	 *
+	 * @var array<string, string[]>
+	 */
+	const VIEWS = array(
+		'incomplete' => array( 'pending', 'failed' ),
+		'pending'    => array( 'on-hold' ),
+		'completed'  => array( 'completed' ),
+		'cancelled'  => array( 'cancelled', 'refunded' ),
+	);
+
+	/**
+	 * Payment status => SQL condition on the order row (alias o). Mirrors OrderService::payment_status().
+	 *
+	 * @var array<string, string>
+	 */
+	const PAYMENT_SQL = array(
+		'paid'               => "((o.status = 'completed' AND o.refunded_amount <= 0) OR (o.status = 'cancelled' AND o.paid_at IS NOT NULL))",
+		'partially-refunded' => "(o.status = 'completed' AND o.refunded_amount > 0)",
+		'unpaid'             => "(o.status = 'pending' OR (o.status = 'cancelled' AND o.paid_at IS NULL))",
+		'pending'            => "(o.status = 'on-hold')",
+		'failed'             => "(o.status = 'failed')",
+		'refunded'           => "(o.status = 'refunded')",
+	);
+
+	/**
+	 * Sortable columns of the admin list.
+	 *
+	 * @var string[]
+	 */
+	const SORTABLE = array( 'id', 'created_at', 'total' );
 
 	/**
 	 * Formats.
@@ -44,6 +77,7 @@ class OrderRepository extends Repository {
 		'subtotal'       => '%f',
 		'discount'       => '%f',
 		'total'          => '%f',
+		'refunded_amount' => '%f',
 		'gateway'        => '%s',
 		'transaction_id' => '%s',
 		'billing_email'  => '%s',
@@ -54,6 +88,7 @@ class OrderRepository extends Repository {
 		'created_at'     => '%s',
 		'paid_at'        => '%s',
 		'refunded_at'    => '%s',
+		'trashed_at'     => '%s',
 	);
 
 	/**
@@ -70,7 +105,7 @@ class OrderRepository extends Repository {
 		$items = esc_sql( shapelms_table( 'order_items' ) );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table names are internal and escaped.
-		$row = $wpdb->get_row( $wpdb->prepare( "SELECT o.* FROM {$table} o INNER JOIN {$items} i ON i.order_id = o.id WHERE o.user_id = %d AND o.status = 'on-hold' AND i.course_id = %d ORDER BY o.id DESC LIMIT 1", $user_id, $course_id ) );
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT o.* FROM {$table} o INNER JOIN {$items} i ON i.order_id = o.id WHERE o.user_id = %d AND o.status = 'on-hold' AND o.trashed_at IS NULL AND i.course_id = %d ORDER BY o.id DESC LIMIT 1", $user_id, $course_id ) );
 
 		return $row ? $row : null;
 	}
@@ -152,7 +187,9 @@ class OrderRepository extends Repository {
 	/**
 	 * Paginated orders for the admin screen.
 	 *
-	 * @param array<string, mixed> $args { search, status, user_id, page, per_page }.
+	 * Trashed orders are left out unless the trash view is asked for.
+	 *
+	 * @param array<string, mixed> $args { search, view, status, payment, user_id, orderby, order, page, per_page }.
 	 * @return array{items: object[], total: int}
 	 */
 	public function paginate( array $args ) {
@@ -162,18 +199,28 @@ class OrderRepository extends Repository {
 			$args,
 			array(
 				'search'   => '',
+				'view'     => '',
 				'status'   => '',
+				'payment'  => '',
 				'user_id'  => 0,
+				'orderby'  => 'id',
+				'order'    => 'DESC',
 				'page'     => 1,
 				'per_page' => 20,
 			)
 		);
 
 		$table = esc_sql( $this->table() );
-		$where = array( '1=1' );
+		$where = array( 'trash' === $args['view'] ? 'o.trashed_at IS NOT NULL' : 'o.trashed_at IS NULL' );
 
+		if ( isset( self::VIEWS[ $args['view'] ] ) ) {
+			$where[] = "o.status IN ('" . implode( "','", array_map( 'esc_sql', self::VIEWS[ $args['view'] ] ) ) . "')";
+		}
 		if ( $args['status'] ) {
 			$where[] = $wpdb->prepare( 'o.status = %s', $args['status'] );
+		}
+		if ( isset( self::PAYMENT_SQL[ $args['payment'] ] ) ) {
+			$where[] = self::PAYMENT_SQL[ $args['payment'] ];
 		}
 		if ( $args['user_id'] ) {
 			$where[] = $wpdb->prepare( 'o.user_id = %d', (int) $args['user_id'] );
@@ -190,13 +237,92 @@ class OrderRepository extends Repository {
 		$per_page  = max( 1, min( 100, (int) $args['per_page'] ) );
 		$offset    = max( 0, ( (int) $args['page'] - 1 ) * $per_page );
 
-		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} o WHERE {$where_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- fragments are individually prepared; table and column names come from fixed whitelists.
-		$items = $wpdb->get_results( $wpdb->prepare( "SELECT o.* FROM {$table} o WHERE {$where_sql} ORDER BY o.id DESC LIMIT %d OFFSET %d", $per_page, $offset ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} o WHERE {$where_sql}" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- fragments are individually prepared; table and column names come from fixed whitelists.
+		// Whitelisted column and direction; id breaks ties so paging stays stable.
+		$orderby = in_array( $args['orderby'], self::SORTABLE, true ) ? $args['orderby'] : 'id';
+		$order   = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+		$sort    = 'id' === $orderby ? "o.id {$order}" : "o.{$orderby} {$order}, o.id {$order}";
+
+		$items = $wpdb->get_results( $wpdb->prepare( "SELECT o.* FROM {$table} o WHERE {$where_sql} ORDER BY {$sort} LIMIT %d OFFSET %d", $per_page, $offset ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- sort column and direction come from whitelists.
 
 		return array(
 			'items' => (array) $items,
 			'total' => $total,
 		);
+	}
+
+	/**
+	 * Number of orders in each admin tab.
+	 *
+	 * @return array<string, int> all, incomplete, pending, completed, cancelled, trash.
+	 */
+	public function counts() {
+		global $wpdb;
+
+		$table = esc_sql( $this->table() );
+		$rows  = $wpdb->get_results( "SELECT status, (trashed_at IS NOT NULL) AS trashed, COUNT(*) AS n FROM {$table} GROUP BY status, trashed" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- internal table, no input.
+
+		$counts = array_fill_keys( array_merge( array( 'all' ), array_keys( self::VIEWS ), array( 'trash' ) ), 0 );
+
+		foreach ( (array) $rows as $row ) {
+			if ( (int) $row->trashed ) {
+				$counts['trash'] += (int) $row->n;
+				continue;
+			}
+			$counts['all'] += (int) $row->n;
+			foreach ( self::VIEWS as $view => $statuses ) {
+				if ( in_array( $row->status, $statuses, true ) ) {
+					$counts[ $view ] += (int) $row->n;
+				}
+			}
+		}
+
+		return $counts;
+	}
+
+	/**
+	 * Moves orders to the trash. Their status, items and enrollments stay as they are.
+	 *
+	 * @param int[] $ids Order ids.
+	 * @return int Orders moved.
+	 */
+	public function trash( array $ids ) {
+		return $this->set_trashed( $ids, true );
+	}
+
+	/**
+	 * Takes orders out of the trash.
+	 *
+	 * @param int[] $ids Order ids.
+	 * @return int Orders restored.
+	 */
+	public function restore( array $ids ) {
+		return $this->set_trashed( $ids, false );
+	}
+
+	/**
+	 * Sets or clears trashed_at.
+	 *
+	 * @param int[] $ids     Order ids.
+	 * @param bool  $trashed Trash or restore.
+	 * @return int Rows changed.
+	 */
+	private function set_trashed( array $ids, $trashed ) {
+		global $wpdb;
+
+		$ids = array_values( array_filter( array_map( 'absint', $ids ) ) );
+
+		if ( ! $ids ) {
+			return 0;
+		}
+
+		$table        = esc_sql( $this->table() );
+		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
+		$set          = $trashed ? $wpdb->prepare( 'trashed_at = %s', shapelms_now() ) : 'trashed_at = NULL';
+		$only         = $trashed ? 'trashed_at IS NULL' : 'trashed_at IS NOT NULL';
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare -- fragments are prepared; table name is internal.
+		return (int) $wpdb->query( $wpdb->prepare( "UPDATE {$table} SET {$set} WHERE {$only} AND id IN ({$placeholders})", ...$ids ) );
 	}
 
 	/**
@@ -220,7 +346,7 @@ class OrderRepository extends Repository {
 
 		$rows = $wpdb->get_results( // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- fragments are individually prepared; table and column names come from fixed whitelists.
 			$wpdb->prepare(
-				"SELECT i.course_id, COALESCE(SUM(i.price),0) AS revenue, COUNT(*) AS sales FROM {$items} i INNER JOIN {$orders} o ON o.id = i.order_id WHERE o.status = 'completed' AND i.course_id IN ({$placeholders}) GROUP BY i.course_id", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+				"SELECT i.course_id, COALESCE(SUM(i.price),0) AS revenue, COUNT(*) AS sales FROM {$items} i INNER JOIN {$orders} o ON o.id = i.order_id WHERE o.status = 'completed' AND o.trashed_at IS NULL AND i.course_id IN ({$placeholders}) GROUP BY i.course_id", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 				...$course_ids
 			)
 		);
@@ -247,7 +373,8 @@ class OrderRepository extends Repository {
 		global $wpdb;
 
 		$table = esc_sql( $this->table() );
-		$sql   = "SELECT COALESCE(SUM(total),0) FROM {$table} WHERE status = 'completed'";
+		// Partial refunds are taken off; trashed orders are left out.
+		$sql = "SELECT COALESCE(SUM(total - refunded_amount),0) FROM {$table} WHERE status = 'completed' AND trashed_at IS NULL";
 
 		if ( $from ) {
 			$sql .= $wpdb->prepare( ' AND paid_at >= %s', $from );

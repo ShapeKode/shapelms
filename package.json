@@ -10,7 +10,7 @@
     "lint:js": "wp-scripts lint-js src",
     "lint:css": "wp-scripts lint-style src",
     "format": "wp-scripts format src",
-    "makepot": "wp i18n make-pot . languages/shapelms.pot --exclude=node_modules,vendor,tests,src,assets/build,dist",
+    "makepot": "wp i18n make-pot . languages/shapelms.pot --exclude=node_modules,vendor,tests,assets/build,dist",
     "plugin-zip": "npm run build && npm run makepot && rm -rf dist && mkdir -p dist/shapelms && rsync -a --exclude-from=.distignore --exclude=dist ./ dist/shapelms/ && cd dist && zip -qr shapelms.zip shapelms && rm -rf shapelms && echo 'Built dist/shapelms.zip'"
   },
   "devDependencies": {

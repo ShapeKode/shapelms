@@ -61,6 +61,7 @@ class Module extends AbstractModule {
 		add_action( 'rest_api_init', array( $this, 'routes' ) );
 		add_action( 'shapelms_single_course_after', array( $this, 'render' ), 10, 2 );
 		add_filter( 'shapelms_dashboard_tabs', array( $this, 'tab' ) );
+		( new Admin() )->register();
 	}
 
 	/**

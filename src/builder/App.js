@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { Button, SnackbarList } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
 import { get, patch, errorMessage } from '../shared/api';
 import { Loading, ErrorNotice } from '../shared/components';
@@ -14,6 +14,7 @@ import BasicsTab from './tabs/BasicsTab';
 import CurriculumTab from './tabs/CurriculumTab';
 import SettingsTab from './tabs/SettingsTab';
 import PricingTab from './tabs/PricingTab';
+import { formatSchedule } from './components/SchedulePanel';
 
 const coreTabs = [
 	{ id: 'basics', label: __( 'Basics', 'shapelms' ), Component: BasicsTab },
@@ -35,6 +36,8 @@ export default function App( { courseId, config } ) {
 	const [ dirty, setDirty ] = useState( false );
 	const [ saving, setSaving ] = useState( false );
 	const [ savedAt, setSavedAt ] = useState( null );
+	// A complete, future date the user picked but has not confirmed yet.
+	const [ scheduleDraft, setScheduleDraft ] = useState( '' );
 	const pending = useRef( {} );
 	const timer = useRef( null );
 
@@ -44,20 +47,20 @@ export default function App( { courseId, config } ) {
 
 	useEffect( () => {
 		const warn = ( e ) => {
-			if ( dirty ) {
+			if ( dirty || scheduleDraft ) {
 				e.preventDefault();
 				e.returnValue = '';
 			}
 		};
 		window.addEventListener( 'beforeunload', warn );
 		return () => window.removeEventListener( 'beforeunload', warn );
-	}, [ dirty ] );
+	}, [ dirty, scheduleDraft ] );
 
 	const flush = useCallback( () => {
 		const payload = pending.current;
 		pending.current = {};
 		if ( ! Object.keys( payload ).length ) {
-			return Promise.resolve();
+			return Promise.resolve( true );
 		}
 		setSaving( true );
 		return patch( `courses/${ courseId }`, payload )
@@ -83,8 +86,12 @@ export default function App( { courseId, config } ) {
 				if ( ! Object.keys( pending.current ).length ) {
 					setDirty( false );
 				}
+				return true;
 			} )
-			.catch( ( e ) => notifyError( errorMessage( e ) ) )
+			.catch( ( e ) => {
+				notifyError( errorMessage( e ) );
+				return false;
+			} )
 			.finally( () => setSaving( false ) );
 	}, [ courseId ] );
 
@@ -128,7 +135,39 @@ export default function App( { courseId, config } ) {
 	const setStatus = ( status ) => {
 		clearTimeout( timer.current );
 		pending.current = { ...pending.current, status };
-		flush().then( () => success( status === 'publish' ? __( 'Course published.', 'shapelms' ) : status === 'pending' ? __( 'Course submitted for review.', 'shapelms' ) : __( 'Course saved as draft.', 'shapelms' ) ) );
+		flush().then( ( ok ) => ok && success( status === 'publish' ? __( 'Course published.', 'shapelms' ) : status === 'pending' ? __( 'Course submitted for review.', 'shapelms' ) : __( 'Course saved as draft.', 'shapelms' ) ) );
+	};
+
+	const applySchedule = ( schedule ) => {
+		clearTimeout( timer.current );
+		pending.current = { ...pending.current, schedule };
+		flush().then( ( ok ) => {
+			if ( ! ok ) {
+				return;
+			}
+			setScheduleDraft( '' );
+			success( schedule ? sprintf( /* translators: %s: date and time */ __( 'Course scheduled for %s.', 'shapelms' ), formatSchedule( schedule, 'medium' ) ) : __( 'Schedule cancelled. The course is now a draft.', 'shapelms' ) );
+		} );
+	};
+
+	// The builder sits inside the classic editor's <form id="post">, whose hidden #title
+	// still holds the title from page load. Keep it in step so anything that submits that
+	// form (or WordPress autosave) sends the current title instead of reverting it.
+	const title = course?.title;
+	useEffect( () => {
+		const classic = document.getElementById( 'title' );
+		if ( classic && typeof title === 'string' && classic.value !== title ) {
+			classic.value = title;
+		}
+	}, [ title ] );
+
+	// Enter in a text field would submit that classic form and reload the page with the
+	// old title. Stop it for every field in the builder; fields that act on Enter (add a
+	// topic, add a lesson) still get their own key handler first.
+	const blockFormSubmit = ( e ) => {
+		if ( e.key === 'Enter' && e.target.tagName === 'INPUT' ) {
+			e.preventDefault();
+		}
 	};
 
 	if ( error ) {
@@ -141,21 +180,28 @@ export default function App( { courseId, config } ) {
 	// Add-ons can add, remove or reorder sections: [ { id, label, Component } ].
 	const tabs = applyFilters( 'shapelms.builder.tabs', coreTabs, { course, config } );
 	const Active = tabs.find( ( t ) => t.id === tab )?.Component || tabs[ 0 ]?.Component || BasicsTab;
-	const isPublished = course.status === 'publish';
+	// A private course is live too: its way back is Unpublish.
+	const isPublished = course.status === 'publish' || course.status === 'private';
 
 	return (
-		<div className="shapelms-builder">
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions -- only stops implicit form submission.
+		<div className="shapelms-builder" onKeyDown={ blockFormSubmit }>
 			<div className="shapelms-builder__bar">
-				<input className="shapelms-builder__title-input" value={ course.title } onChange={ ( e ) => update( { title: e.target.value } ) } placeholder={ __( 'Course title', 'shapelms' ) } aria-label={ __( 'Course title', 'shapelms' ) } />
+				<input className="shapelms-builder__title-input" value={ course.title } onChange={ ( e ) => update( { title: e.target.value } ) } onKeyDown={ ( e ) => e.key === 'Enter' && saveNow() } placeholder={ __( 'Course title', 'shapelms' ) } aria-label={ __( 'Course title', 'shapelms' ) } />
 				<span className="shapelms-builder__status">
 					{ saving ? __( 'Saving…', 'shapelms' ) : dirty ? __( 'Unsaved changes', 'shapelms' ) : savedAt ? __( 'Saved', 'shapelms' ) : '' }
 				</span>
+				{ course.status === 'future' && course.schedule && (
+					<span className="shapelms-badge is-info">{ sprintf( /* translators: %s: date and time */ __( 'Scheduled: %s', 'shapelms' ), formatSchedule( course.schedule, 'medium' ) ) }</span>
+				) }
 				<Button variant="tertiary" href={ course.preview_url || course.url } target="_blank">{ __( 'Preview', 'shapelms' ) }</Button>
 				<Button variant="secondary" onClick={ saveNow } isBusy={ saving } disabled={ ! dirty || saving }>{ __( 'Save', 'shapelms' ) }</Button>
-				{ course.can_change_status === false ? null : isPublished ? (
+				{ course.can_change_status === false ? null : scheduleDraft && course.status !== 'private' ? (
+					<Button variant="primary" onClick={ () => applySchedule( scheduleDraft ) } disabled={ saving }>{ course.status === 'future' ? __( 'Update schedule', 'shapelms' ) : __( 'Schedule course', 'shapelms' ) }</Button>
+				) : isPublished ? (
 					<Button variant="primary" onClick={ () => setStatus( 'draft' ) } disabled={ saving }>{ __( 'Unpublish', 'shapelms' ) }</Button>
 				) : course.can_publish ? (
-					<Button variant="primary" onClick={ () => setStatus( 'publish' ) } disabled={ saving }>{ __( 'Publish', 'shapelms' ) }</Button>
+					<Button variant="primary" onClick={ () => setStatus( 'publish' ) } disabled={ saving }>{ course.status === 'future' ? __( 'Publish now', 'shapelms' ) : __( 'Publish', 'shapelms' ) }</Button>
 				) : (
 					<Button variant="primary" onClick={ () => setStatus( 'pending' ) } disabled={ saving || course.status === 'pending' }>{ course.status === 'pending' ? __( 'Awaiting review', 'shapelms' ) : __( 'Submit for review', 'shapelms' ) }</Button>
 				) }
@@ -168,7 +214,7 @@ export default function App( { courseId, config } ) {
 					) ) }
 				</nav>
 				<div className="shapelms-builder__panel">
-					<Active course={ course } update={ update } setCourse={ setCourse } config={ config } />
+					<Active course={ course } update={ update } setCourse={ setCourse } config={ config } scheduleDraft={ scheduleDraft } setScheduleDraft={ setScheduleDraft } applySchedule={ applySchedule } />
 				</div>
 			</div>
 			<Snackbars />

@@ -59,11 +59,13 @@ class Frontend {
 		add_action( 'template_redirect', array( $this, 'guard_items' ) );
 		add_action( 'template_redirect', array( $this, 'record_item_start' ) );
 		add_action( 'template_redirect', array( $this, 'remember_checkout' ) );
-		add_action( 'template_redirect', array( $this, 'auto_enroll_after_login' ) );
+		add_action( 'template_redirect', array( $this, 'continue_after_login' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ) );
 		add_filter( 'body_class', array( $this, 'body_class' ) );
 		add_action( 'pre_get_posts', array( $this, 'archive_query' ) );
 		add_action( 'pre_get_posts', array( $this, 'block_item_listings' ) );
+		// Themes such as Astra reset posts_per_page on every archive here, after pre_get_posts.
+		add_action( 'parse_tax_query', array( $this, 'archive_per_page' ), PHP_INT_MAX );
 		add_filter( 'shapelms_save_settings', array( ThemeCss::class, 'regenerate' ), 20 );
 	}
 
@@ -113,7 +115,7 @@ class Frontend {
 		$file = '';
 
 		if ( is_singular( PostTypes::COURSE ) ) {
-			$file = 'single-course.php';
+			$file = post_password_required( get_queried_object_id() ) ? 'single-course-password.php' : 'single-course.php';
 		} elseif ( is_singular( Curriculum::item_post_types() ) ) {
 			$file = 'learn.php';
 		} elseif ( is_post_type_archive( PostTypes::COURSE ) || is_tax( array( Taxonomies::CATEGORY, Taxonomies::TAG ) ) ) {
@@ -193,7 +195,11 @@ class Frontend {
 
 		$is_preview = is_singular( PostTypes::LESSON ) && get_post_meta( $item_id, '_shapelms_preview', true );
 
-		if ( $is_preview && 'publish' === get_post_status( $course_id ) ) {
+		if ( $is_preview && 'publish' === get_post_status( $course_id ) && ! post_password_required( $course_id ) ) {
+			return;
+		}
+
+		if ( \ShapeLMS\Services\CourseService::is_public_item( $course_id, Curriculum::type_of( (string) get_post_type( $item_id ) ) ) ) {
 			return;
 		}
 
@@ -223,45 +229,32 @@ class Frontend {
 	}
 
 	/**
-	 * Finishes a free enrollment the visitor started before signing in ("Log in to enroll").
-	 *
-	 * The course page is opened with ?shapelms_enroll=1 after login. Free courses enroll
-	 * straight away and open the first lesson; paid courses go to checkout.
+	 * Tidies the course page opened after "Log in to enroll". The enrollment itself happened on the
+	 * sign in form (Auth::finish_enroll()); a link must not enroll anyone, so a visitor who was
+	 * already signed in gets the course page and its enroll button. Paid courses go to checkout.
 	 *
 	 * @return void
 	 */
-	public function auto_enroll_after_login() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- the visitor asked to enroll before logging in; only free, published courses are affected.
+	public function continue_after_login() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only: this only redirects.
 		if ( ! is_singular( PostTypes::COURSE ) || ! is_user_logged_in() || empty( $_GET['shapelms_enroll'] ) ) {
 			return;
 		}
 
 		$course_id = get_queried_object_id();
-		$user_id   = get_current_user_id();
-		$clean_url = (string) get_permalink( $course_id );
 
-		if ( $this->enrollment->can_access( $user_id, $course_id ) ) {
-			wp_safe_redirect( $clean_url );
-			exit;
+		if ( post_password_required( $course_id ) ) {
+			return;
 		}
 
-		if ( ! \ShapeLMS\Services\CourseService::pricing( $course_id )['is_free'] ) {
+		if ( ! $this->enrollment->can_access( get_current_user_id(), $course_id ) && ! \ShapeLMS\Services\CourseService::pricing( $course_id )['is_free'] ) {
 			wp_safe_redirect( add_query_arg( 'course', $course_id, Pages::get_url( 'checkout' ) ) );
 			exit;
 		}
 
-		$result = $this->enrollment->enroll_free( $user_id, $course_id );
-
-		if ( is_wp_error( $result ) ) {
-			wp_safe_redirect( $clean_url );
-			exit;
-		}
-
-		$next = $this->progress->resume_item( $user_id, $course_id );
-		wp_safe_redirect( $next ? (string) get_permalink( $next ) : $clean_url );
+		wp_safe_redirect( (string) get_permalink( $course_id ) );
 		exit;
 	}
-
 	/**
 	 * Records that the enrolled student opened the item.
 	 *
@@ -395,21 +388,48 @@ class Frontend {
 	}
 
 	/**
+	 * Whether a query is the front-end main query of the course archive or a course category/tag page.
+	 *
+	 * @param \WP_Query $query Query.
+	 * @return bool
+	 */
+	private function is_course_archive( $query ) {
+		if ( is_admin() || ! $query->is_main_query() ) {
+			return false;
+		}
+
+		return $query->is_post_type_archive( PostTypes::COURSE ) || $query->is_tax( array( Taxonomies::CATEGORY, Taxonomies::TAG ) );
+	}
+
+	/**
+	 * Applies Settings > General > Courses per page to the course archive.
+	 *
+	 * Runs on pre_get_posts and again last on parse_tax_query, because some themes
+	 * (Astra, for one) overwrite posts_per_page on all archives after pre_get_posts.
+	 *
+	 * @param \WP_Query $query Query.
+	 * @return void
+	 */
+	public function archive_per_page( $query ) {
+		if ( ! $this->is_course_archive( $query ) ) {
+			return;
+		}
+
+		$query->set( 'posts_per_page', max( 1, (int) shapelms_get_setting( 'general', 'courses_per_page', 12 ) ) );
+	}
+
+	/**
 	 * Filters and ordering on the course archive.
 	 *
 	 * @param \WP_Query $query Query.
 	 * @return void
 	 */
 	public function archive_query( $query ) {
-		if ( is_admin() || ! $query->is_main_query() ) {
+		if ( ! $this->is_course_archive( $query ) ) {
 			return;
 		}
 
-		if ( ! $query->is_post_type_archive( PostTypes::COURSE ) && ! $query->is_tax( array( Taxonomies::CATEGORY, Taxonomies::TAG ) ) ) {
-			return;
-		}
-
-		$query->set( 'posts_per_page', (int) shapelms_get_setting( 'general', 'courses_per_page', 12 ) );
+		$this->archive_per_page( $query );
 
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only filters.
 		$orderby = isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : '';

@@ -6,14 +6,19 @@ import { ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { get, post, errorMessage } from '../../shared/api';
 import { PageHeader, Loading, ErrorNotice, Badge } from '../../shared/components';
+import { takePreloadedData } from '../../shared/hooks';
 import { success, error as notifyError } from '../notices';
 
 export default function Modules() {
-	const [ modules, setModules ] = useState( null );
+	const [ modules, setModules ] = useState( () => takePreloadedData( 'modules' ) );
 	const [ error, setError ] = useState( '' );
 
 	useEffect( () => {
+		if ( modules ) {
+			return; // Preloaded with the page.
+		}
 		get( 'modules' ).then( setModules ).catch( ( e ) => setError( errorMessage( e ) ) );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	const toggle = ( module, enabled ) => {

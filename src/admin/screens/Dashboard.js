@@ -6,6 +6,7 @@ import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { get, errorMessage } from '../../shared/api';
 import { PageHeader, Card, StatCard, Loading, ErrorNotice, Empty, formatDate } from '../../shared/components';
+import { takePreloadedData } from '../../shared/hooks';
 import LineChart from '../components/LineChart';
 
 const eventLabels = {
@@ -18,11 +19,17 @@ const eventLabels = {
 };
 
 export default function Dashboard( { config } ) {
-	const [ data, setData ] = useState( null );
+	// The server renders the overview into the page, so it shows on first paint.
+	const [ data, setData ] = useState( () => takePreloadedData( 'reports/overview' ) );
 	const [ error, setError ] = useState( '' );
 
 	useEffect( () => {
+		if ( data ) {
+			return;
+		}
 		get( 'reports/overview' ).then( setData ).catch( ( e ) => setError( errorMessage( e ) ) );
+		// Only on mount; a preloaded overview needs no request.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	return (

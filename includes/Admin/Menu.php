@@ -98,7 +98,7 @@ class Menu {
 			'shapelms_admin_menu_groups',
 			array(
 				array( '', 'courses', 'tax:category', 'tax:tag' ),
-				array( 'orders', 'students', 'instructors', 'quizzes', 'reports' ),
+				array( 'orders', 'students', 'instructors', 'quizzes', 'qa', 'announcements', 'reports' ),
 				array( 'modules', 'tools', 'settings' ),
 			)
 		);
@@ -165,11 +165,161 @@ class Menu {
 		$screen = str_replace( self::SLUG . '-', '', $screen );
 		$screen = self::SLUG === $screen ? 'dashboard' : $screen;
 
+		$preload = self::preload( $screen );
+
 		printf(
-			'<div id="shapelms-admin" class="shapelms-admin-root" data-screen="%s" %s></div>',
+			'<div id="shapelms-admin" class="shapelms-admin-root" data-screen="%s"%s %s></div>',
 			esc_attr( $screen ),
+			$preload ? ' data-preload="' . esc_attr( (string) wp_json_encode( $preload ) ) . '"' : '', // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inline.
 			Assets::data_attributes() // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in the method.
 		);
+	}
+
+	/**
+	 * Runs the screen's first requests on the server, so the React screen renders
+	 * with data on first paint instead of showing a spinner while it fetches.
+	 *
+	 * The query must match the one the screen starts with; if it does not, the JS
+	 * ignores that preload and fetches as usual.
+	 *
+	 * @param string $screen Screen key.
+	 * @return array<int, array{path: string, query: array, data: mixed}>|null
+	 */
+	private static function preload( $screen ) {
+		$lists = array(
+			// Third item false: a plain request, no page/per_page added.
+			'dashboard'   => array( 'reports/overview', array(), false ),
+			// A screen can preload several requests: a list of entries.
+			'courses'     => array(
+				array(
+					'courses',
+					array(
+						'status' => 'any',
+						'search' => '',
+						'mine'   => ! current_user_can( Capabilities::MANAGE ),
+					),
+				),
+				array( 'courses/filters', array(), false ),
+			),
+			'settings'    => array(
+				array( 'settings', array(), false ),
+				array( 'settings/pages', array(), false ),
+			),
+			'modules'     => array( 'modules', array(), false ),
+			'tools'       => array( 'tools/status', array(), false ),
+			// The course list fills the course filter (same query as COURSE_QUERY in the screens).
+			'students'    => array(
+				array(
+					'students',
+					array(
+						'search'    => '',
+						'course_id' => 0,
+						'status'    => '',
+					),
+				),
+				array(
+					'courses',
+					array(
+						'status'   => 'any',
+						'per_page' => 100,
+					),
+					false,
+				),
+			),
+			'quizzes'     => array(
+				array(
+					'quizzes/attempts',
+					array(
+						'course_id' => 0,
+						'result'    => '',
+					),
+				),
+				array(
+					'courses',
+					array(
+						'status'   => 'any',
+						'per_page' => 100,
+					),
+					false,
+				),
+			),
+			// Overview without dates: the route defaults to the last 30 days, the screen's start range.
+			'reports'     => array(
+				array( 'reports/overview', array( 'course_id' => 0 ), false ),
+				array( 'reports/courses', array(), false ),
+				array(
+					'courses',
+					array(
+						'status'   => 'any',
+						'per_page' => 100,
+					),
+					false,
+				),
+			),
+			'instructors' => array(
+				'instructors',
+				array(
+					'status' => 'all',
+					'search' => '',
+				),
+			),
+			'orders'      => array(
+				'orders',
+				array(
+					'view'    => '',
+					'payment' => '',
+					'search'  => '',
+				),
+			),
+		);
+
+		/**
+		 * Filters the list requests preloaded into admin screens.
+		 *
+		 * @param array<string, array> $lists Screen key => [ REST path under shapelms/v1, initial query, paged (default true) ], or a list of those.
+		 */
+		$lists = apply_filters( 'shapelms_admin_preload', $lists );
+
+		if ( empty( $lists[ $screen ] ) || ! is_array( $lists[ $screen ] ) ) {
+			return null;
+		}
+
+		$entries = is_string( $lists[ $screen ][0] ?? null ) ? array( $lists[ $screen ] ) : $lists[ $screen ];
+		$out     = array();
+
+		foreach ( $entries as $entry ) {
+			if ( ! is_array( $entry ) || ! is_string( $entry[0] ?? null ) ) {
+				continue;
+			}
+			$path  = $entry[0];
+			$query = isset( $entry[1] ) ? (array) $entry[1] : array();
+			if ( ! isset( $entry[2] ) || false !== $entry[2] ) {
+				$query = array_merge(
+					array(
+						'page'     => 1,
+						'per_page' => \ShapeLMS\Core\Settings::admin_per_page(),
+					),
+					$query
+				);
+			}
+
+			$request = new \WP_REST_Request( 'GET', '/shapelms/v1/' . ltrim( $path, '/' ) );
+			$request->set_query_params( $query );
+			$response = rest_do_request( $request );
+
+			if ( $response->is_error() ) {
+				continue;
+			}
+
+			$out[] = array(
+				'path'  => $path,
+				// An object in JSON even when empty, so the JS compares it as a query.
+				'query' => (object) $query,
+				'data'  => rest_get_server()->response_to_data( $response, false ),
+			);
+		}
+
+		return $out ? $out : null;
 	}
 
 	/**

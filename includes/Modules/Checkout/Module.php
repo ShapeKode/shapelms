@@ -768,6 +768,16 @@ class Module extends AbstractModule {
 		$data   = $request->get_param( 'data' );
 		$result = $gateways[ $order->gateway ]->confirm( $order, is_array( $data ) ? $data : array() );
 
+		// The buyer has paid and PayPal is still processing it: the order waits, and is not paid twice.
+		if ( is_wp_error( $result ) && 'shapelms_paypal_pending' === $result->get_error_code() ) {
+			shapelms()->get( OrderService::class )->hold( (int) $order->id );
+
+			return array(
+				'completed' => false,
+				'redirect'  => self::order_url( $order ),
+			);
+		}
+
 		if ( is_wp_error( $result ) ) {
 			$result->add_data( array( 'status' => 402 ) );
 			return $result;
@@ -806,16 +816,24 @@ class Module extends AbstractModule {
 			switch ( $result['action'] ) {
 				case 'complete':
 					$order = shapelms()->get( OrderRepository::class )->find( $result['order_id'] );
-					if ( $order && in_array( $order->status, array( 'pending', 'failed' ), true ) ) {
+					if ( $order && in_array( $order->status, array( 'pending', 'failed', 'on-hold' ), true ) ) {
 						$service->complete( $result['order_id'], $result['transaction_id'] );
 					}
 					break;
+				case 'hold':
+					$order = shapelms()->get( OrderRepository::class )->find( $result['order_id'] );
+					if ( $order && in_array( $order->status, array( 'pending', 'failed' ), true ) ) {
+						$service->hold( $result['order_id'] );
+					}
+					break;
 				case 'refund':
-					$service->revoke( $result['order_id'], 'refunded' );
+					// No amount = refunded in full.
+					$service->refund( $result['order_id'], isset( $result['amount'] ) ? (float) $result['amount'] : null );
 					break;
 				case 'fail':
 					$order = shapelms()->get( OrderRepository::class )->find( $result['order_id'] );
-					if ( $order && 'pending' === $order->status ) {
+					// A late failure from an old payment session must not undo a paid order.
+					if ( $order && in_array( $order->status, array( 'pending', 'on-hold' ), true ) ) {
 						$service->revoke( $result['order_id'], 'failed' );
 					}
 					break;

@@ -66,6 +66,8 @@ class Module extends AbstractModule {
 		add_action( 'shapelms_learn_after', array( $this, 'render' ), 10, 2 );
 		add_filter( 'comments_clauses', array( $this, 'hide_from_comment_queries' ), 10, 2 );
 		add_filter( 'shapelms_dashboard_tabs', array( $this, 'tab' ) );
+
+		( new Admin() )->register();
 	}
 
 	/**
@@ -309,7 +311,38 @@ class Module extends AbstractModule {
 			return new \WP_Error( 'shapelms_forbidden', __( 'You are not allowed to do that.', 'shapelms' ), array( 'status' => 403 ) );
 		}
 
-		return array( 'deleted' => (bool) wp_delete_comment( (int) $comment->comment_ID, true ) );
+		return array( 'deleted' => self::delete_message( (int) $comment->comment_ID ) );
+	}
+
+	/**
+	 * Deletes a Q&A message for good. A question takes its replies with it; otherwise
+	 * WordPress would move them up and they would show as new questions.
+	 *
+	 * @param int $comment_id Comment id.
+	 * @return bool
+	 */
+	public static function delete_message( $comment_id ) {
+		$comment = get_comment( (int) $comment_id );
+
+		if ( ! $comment || self::TYPE !== $comment->comment_type ) {
+			return false;
+		}
+
+		if ( ! (int) $comment->comment_parent ) {
+			$replies = get_comments(
+				array(
+					'parent' => (int) $comment->comment_ID,
+					'type'   => self::TYPE,
+					'status' => 'all',
+					'fields' => 'ids',
+				)
+			);
+			foreach ( (array) $replies as $reply_id ) {
+				wp_delete_comment( (int) $reply_id, true );
+			}
+		}
+
+		return (bool) wp_delete_comment( (int) $comment->comment_ID, true );
 	}
 
 	/**

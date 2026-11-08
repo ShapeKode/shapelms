@@ -31,6 +31,13 @@ class Module extends AbstractModule {
 	const BACKFILLED   = 'shapelms_woo_products_backfilled';
 
 	/**
+	 * Orders found by waiting_order() in this request.
+	 *
+	 * @var array<string, \WC_Order|null>
+	 */
+	private $waiting = array();
+
+	/**
 	 * True while this module saves a product, so the save is not read back into the course.
 	 *
 	 * @var bool
@@ -288,6 +295,12 @@ class Module extends AbstractModule {
 	 * @return string
 	 */
 	public function buy_url( $url, $course_id ) {
+		$waiting = $this->waiting_order( get_current_user_id(), (int) $course_id );
+
+		if ( $waiting ) {
+			return $waiting->get_view_order_url();
+		}
+
 		$product = wc_get_product( (int) get_post_meta( $course_id, self::COURSE_META, true ) );
 
 		if ( ! $product || ! $product->is_purchasable() ) {
@@ -311,6 +324,10 @@ class Module extends AbstractModule {
 	 * @return string
 	 */
 	public function buy_label( $label, $course_id ) {
+		if ( $this->waiting_order( get_current_user_id(), (int) $course_id ) ) {
+			return __( 'View order', 'shapelms' );
+		}
+
 		if ( ! CartService::enabled() ) {
 			return $label;
 		}
@@ -318,6 +335,43 @@ class Module extends AbstractModule {
 		$product = wc_get_product( (int) get_post_meta( $course_id, self::COURSE_META, true ) );
 
 		return $product && $this->in_cart( $product ) ? __( 'View cart', 'shapelms' ) : __( 'Add to cart', 'shapelms' );
+	}
+
+	/**
+	 * The buyer's order for this course that is waiting for its payment to be confirmed (a bank
+	 * transfer, cash on delivery, a delayed PayPal payment), so the course is not paid for twice.
+	 *
+	 * @param int $user_id   User id.
+	 * @param int $course_id Course id.
+	 * @return \WC_Order|null
+	 */
+	private function waiting_order( $user_id, $course_id ) {
+		if ( ! $user_id ) {
+			return null;
+		}
+
+		$key = $user_id . ':' . $course_id;
+
+		if ( ! array_key_exists( $key, $this->waiting ) ) {
+			$this->waiting[ $key ] = null;
+
+			$orders = wc_get_orders(
+				array(
+					'customer_id' => $user_id,
+					'status'      => array( 'wc-on-hold', 'wc-processing' ),
+					'limit'       => -1,
+				)
+			);
+
+			foreach ( $orders as $order ) {
+				if ( in_array( $course_id, $this->course_ids( $order ), true ) ) {
+					$this->waiting[ $key ] = $order;
+					break;
+				}
+			}
+		}
+
+		return $this->waiting[ $key ];
 	}
 
 	/**
@@ -371,7 +425,11 @@ class Module extends AbstractModule {
 			return $purchasable;
 		}
 
-		if ( 'publish' !== get_post_status( $course_id ) || CourseService::pricing( $course_id )['is_free'] ) {
+		if ( $this->waiting_order( get_current_user_id(), $course_id ) ) {
+			return false;
+		}
+
+		if ( 'publish' !== get_post_status( $course_id ) || CourseService::pricing( $course_id )['is_free'] || post_password_required( $course_id ) ) {
 			return false;
 		}
 
@@ -550,7 +608,8 @@ class Module extends AbstractModule {
 	private function linked_product_id( $course_id ) {
 		$product_id = (int) get_post_meta( $course_id, self::COURSE_META, true );
 
-		if ( $product_id && 'product' === get_post_type( $product_id ) ) {
+		// A product that sells another course is never taken over, however the link got here.
+		if ( $product_id && 'product' === get_post_type( $product_id ) && in_array( (int) get_post_meta( $product_id, self::PRODUCT_META, true ), array( 0, (int) $course_id ), true ) ) {
 			return $product_id;
 		}
 

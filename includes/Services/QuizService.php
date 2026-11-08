@@ -291,18 +291,138 @@ class QuizService {
 			return $attempt;
 		}
 
+		$question = $this->attempt_question( $attempt, (int) $question_id );
+
+		if ( is_wp_error( $question ) ) {
+			return $question;
+		}
+
+		$checkable = self::is_checkable( $question, (int) $attempt->quiz_id );
+
+		if ( ! $checkable && ! self::saves_now( $question, $attempt ) ) {
+			return new \WP_Error( 'shapelms_answer_on_submit', __( 'Answers are sent when the quiz is submitted.', 'shapelms' ), array( 'status' => 403 ) );
+		}
+
+		if ( $checkable ) {
+			if ( empty( $raw_answer ) ) {
+				return new \WP_Error( 'shapelms_answer_required', __( 'Choose an answer first.', 'shapelms' ), array( 'status' => 400 ) );
+			}
+
+			$saved = $this->attempts->answers( (int) $attempt->id );
+
+			if ( isset( $saved[ $question->id() ] ) ) {
+				return new \WP_Error( 'shapelms_answer_committed', __( 'This question has already been answered.', 'shapelms' ), array( 'status' => 409 ) );
+			}
+		}
+
+		$grade = $this->store_answer( $attempt, $question, $raw_answer, (int) $user_id );
+
+		if ( is_wp_error( $grade ) ) {
+			return $grade;
+		}
+
+		$response = array( 'saved' => true );
+
+		return $checkable ? array_merge( $response, self::instant_feedback( $question, (int) $attempt->quiz_id, $grade['is_correct'], $grade['points'] ) ) : $response;
+	}
+
+	/**
+	 * Question types a student can check one at a time in instant feedback mode. The rest are
+	 * graded when the quiz is submitted.
+	 *
+	 * @return string[]
+	 */
+	public static function checkable_types() {
+		/**
+		 * Filters the question types that can be checked during an attempt.
+		 *
+		 * @param string[] $types Question types.
+		 */
+		return (array) apply_filters( 'shapelms_quiz_checkable_types', array( 'single_choice', 'multiple_choice', 'true_false' ) );
+	}
+
+	/**
+	 * Whether a student may check this question during the attempt.
+	 *
+	 * @param Question $question Question.
+	 * @param int      $quiz_id  Quiz id.
+	 * @return bool
+	 */
+	private static function is_checkable( Question $question, $quiz_id ) {
+		return 'instant' === self::settings( $quiz_id )['feedback_mode'] && in_array( $question->type, self::checkable_types(), true );
+	}
+
+	/**
+	 * Whether this question's answer goes to the server as soon as it changes, instead of on submit.
+	 *
+	 * @param Question $question Question.
+	 * @param object   $attempt  Attempt row.
+	 * @return bool
+	 */
+	private static function saves_now( Question $question, $attempt ) {
+		/**
+		 * Filters whether an answer is saved as soon as it changes. For add-ons whose rules depend on
+		 * when the answer arrives, such as per-question time limits.
+		 *
+		 * @param bool     $now      Save now.
+		 * @param Question $question Question.
+		 * @param object   $attempt  Attempt row.
+		 */
+		return (bool) apply_filters( 'shapelms_quiz_save_answer_now', false, $question, $attempt );
+	}
+
+	/**
+	 * What a student sees after checking a question.
+	 *
+	 * @param Question  $question   Question.
+	 * @param int       $quiz_id    Quiz id.
+	 * @param bool|null $is_correct Whether the answer is right.
+	 * @param float     $points     Points earned.
+	 * @return array<string, mixed>
+	 */
+	private static function instant_feedback( Question $question, $quiz_id, $is_correct, $points ) {
+		$feedback = array(
+			'is_correct'  => $is_correct,
+			'points'      => $points,
+			'explanation' => wp_kses_post( $question->explanation ),
+		);
+
+		if ( self::settings( $quiz_id )['show_answers'] ) {
+			$feedback['correct'] = QuestionTypes::get( $question->type )->correct_answer( $question );
+		}
+
+		return $feedback;
+	}
+
+	/**
+	 * A question that belongs to the attempt.
+	 *
+	 * @param object $attempt     Attempt row.
+	 * @param int    $question_id Question id.
+	 * @return Question|\WP_Error
+	 */
+	private function attempt_question( $attempt, $question_id ) {
 		$order = (array) json_decode( (string) $attempt->question_order, true );
 
-		if ( ! in_array( (int) $question_id, array_map( 'intval', $order ), true ) ) {
+		if ( ! in_array( $question_id, array_map( 'intval', $order ), true ) ) {
 			return new \WP_Error( 'shapelms_invalid_question', __( 'Question is not part of this attempt.', 'shapelms' ) );
 		}
 
 		$question = Question::load( $question_id );
 
-		if ( ! $question ) {
-			return new \WP_Error( 'shapelms_invalid_question', __( 'Question not found.', 'shapelms' ) );
-		}
+		return $question ? $question : new \WP_Error( 'shapelms_invalid_question', __( 'Question not found.', 'shapelms' ) );
+	}
 
+	/**
+	 * Grades and stores one answer.
+	 *
+	 * @param object   $attempt    Attempt row.
+	 * @param Question $question   Question.
+	 * @param mixed    $raw_answer Raw answer.
+	 * @param int      $user_id    User id.
+	 * @return array<string, mixed>|\WP_Error Grade.
+	 */
+	private function store_answer( $attempt, Question $question, $raw_answer, $user_id ) {
 		/**
 		 * Filters whether an answer may be saved now (add-ons use it for per-question time limits).
 		 * Return a WP_Error to refuse it.
@@ -312,7 +432,7 @@ class QuizService {
 		 * @param Question       $question Question.
 		 * @param int            $user_id  User id.
 		 */
-		$allowed = apply_filters( 'shapelms_quiz_can_answer', true, $attempt, $question, (int) $user_id );
+		$allowed = apply_filters( 'shapelms_quiz_can_answer', true, $attempt, $question, $user_id );
 
 		if ( is_wp_error( $allowed ) ) {
 			return $allowed;
@@ -324,19 +444,30 @@ class QuizService {
 
 		$this->attempts->save_answer( (int) $attempt->id, $question->id(), $answer, $grade );
 
-		$settings = self::settings( (int) $attempt->quiz_id );
-		$response = array( 'saved' => true );
+		return $grade;
+	}
 
-		if ( 'instant' === $settings['feedback_mode'] ) {
-			$response['is_correct']  = $grade['is_correct'];
-			$response['points']      = $grade['points'];
-			$response['explanation'] = wp_kses_post( $question->explanation );
-			if ( $settings['show_answers'] ) {
-				$response['correct'] = $type->correct_answer( $question );
-			}
+	/**
+	 * Whether the student has an attempt still running on this quiz. One whose time ran out is
+	 * closed here, so the quiz page never reopens it.
+	 *
+	 * @param int $user_id User id.
+	 * @param int $quiz_id Quiz id.
+	 * @return bool
+	 */
+	public function has_running_attempt( $user_id, $quiz_id ) {
+		$open = $this->attempts->open_attempt( $user_id, $quiz_id );
+
+		if ( ! $open ) {
+			return false;
 		}
 
-		return $response;
+		if ( $open->expires_at && strtotime( $open->expires_at ) < time() ) {
+			$this->finish( (int) $open->id, true );
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -354,8 +485,21 @@ class QuizService {
 			return $attempt;
 		}
 
+		$saved = $this->attempts->answers( (int) $attempt->id );
+
 		foreach ( $answers as $question_id => $raw ) {
-			$this->answer( $user_id, $attempt_id, (int) $question_id, $raw );
+			$question = $this->attempt_question( $attempt, (int) $question_id );
+
+			if ( is_wp_error( $question ) ) {
+				continue;
+			}
+
+			// An answer checked during the attempt is final.
+			if ( isset( $saved[ $question->id() ] ) && self::is_checkable( $question, (int) $attempt->quiz_id ) ) {
+				continue;
+			}
+
+			$this->store_answer( $attempt, $question, $raw, (int) $user_id );
 		}
 
 		$expired = $attempt->expires_at && strtotime( $attempt->expires_at ) < ( time() - 30 );
@@ -605,6 +749,15 @@ class QuizService {
 			return new \WP_Error( 'shapelms_not_found', __( 'Attempt not found.', 'shapelms' ), array( 'status' => 404 ) );
 		}
 
+		// The result holds the correct answers, so its owner only gets it once the attempt is closed.
+		if ( 'in_progress' === $attempt->status && (int) $attempt->user_id === (int) $user_id ) {
+			if ( $attempt->expires_at && strtotime( $attempt->expires_at ) < ( time() - 30 ) ) {
+				return $this->finish( (int) $attempt->id, true );
+			}
+
+			return new \WP_Error( 'shapelms_attempt_open', __( 'Submit the quiz to see the result.', 'shapelms' ), array( 'status' => 409 ) );
+		}
+
 		$settings = self::settings( (int) $attempt->quiz_id );
 		$data     = $this->attempt_to_array( $attempt );
 		$review   = 'none' !== $settings['feedback_mode'] || (int) $attempt->user_id !== (int) $user_id;
@@ -621,7 +774,10 @@ class QuizService {
 				}
 				$type   = QuestionTypes::get( $question->type );
 				$answer = isset( $answers[ $question->id() ] ) ? $answers[ $question->id() ] : null;
-				$item   = array(
+				if ( ! $answer && 'in_progress' === $attempt->status ) {
+					continue;
+				}
+				$item = array(
 					'id'          => $question->id(),
 					'type'        => $question->type,
 					'title'       => $question->text(),
@@ -669,7 +825,12 @@ class QuizService {
 			if ( ! $question ) {
 				continue;
 			}
-			$questions[] = self::question_payload( $question, $attempt, isset( $answers[ $question->id() ] ) ? json_decode( (string) $answers[ $question->id() ]->answer, true ) : null );
+			$row  = isset( $answers[ $question->id() ] ) ? $answers[ $question->id() ] : null;
+			$item = self::question_payload( $question, $attempt, $row ? json_decode( (string) $row->answer, true ) : null );
+			if ( $row && $item['checkable'] ) {
+				$item['checked'] = self::instant_feedback( $question, (int) $attempt->quiz_id, null === $row->is_correct ? null : (bool) $row->is_correct, (float) $row->points );
+			}
+			$questions[] = $item;
 		}
 
 		return array(
@@ -698,6 +859,8 @@ class QuizService {
 			'points'      => $question->points,
 			'data'        => $type->public_data( $question ),
 			'answer'      => $answer,
+			'checkable'   => self::is_checkable( $question, (int) $attempt->quiz_id ),
+			'save_now'    => self::saves_now( $question, $attempt ),
 		);
 
 		/**

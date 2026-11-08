@@ -135,6 +135,57 @@ class StudentsController extends RestController {
 				),
 			)
 		);
+
+		$this->route(
+			'/bulk',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'bulk' ),
+				'permission_callback' => array( $this, 'allow_instructor' ),
+				'args'                => array(
+					'action' => array(
+						'type'     => 'string',
+						'required' => true,
+						'enum'     => array( 'delete' ),
+					),
+					// Enrollment ids (one row of the Students table each).
+					'ids'    => array(
+						'type'     => 'array',
+						'required' => true,
+						'items'    => array( 'type' => 'integer' ),
+						'minItems' => 1,
+						'maxItems' => 100,
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Bulk delete of enrollments. Instructors may only touch courses they can edit.
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return array{done: int, skipped: int}
+	 */
+	public function bulk( WP_REST_Request $request ) {
+		$ids  = array_values( array_unique( array_filter( array_map( 'absint', (array) $request->get_param( 'ids' ) ) ) ) );
+		$done = 0;
+
+		foreach ( $ids as $id ) {
+			$row = $this->enrollments->find( $id );
+
+			if ( ! $row || ! current_user_can( 'shapelms_edit_course', (int) $row->course_id ) ) {
+				continue;
+			}
+			if ( $this->enrollment->delete( $id ) ) {
+				++$done;
+			}
+		}
+
+		return array(
+			'done'    => $done,
+			'skipped' => count( $ids ) - $done,
+		);
 	}
 
 	/**

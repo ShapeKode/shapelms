@@ -70,7 +70,8 @@ class ReportService {
 		$is_manager = user_can( $user_id, Capabilities::MANAGE );
 		$course_ids = $is_manager ? array() : InstructorService::course_ids( $user_id, array( 'publish' ) );
 
-		if ( ! $is_manager && $course_id && ! in_array( $course_id, $course_ids, true ) ) {
+		// No courses means no data: an empty list would otherwise read as every course.
+		if ( ! $is_manager && ( ! $course_ids || ( $course_id && ! in_array( $course_id, $course_ids, true ) ) ) ) {
 			$course_id = -1;
 		}
 
@@ -128,7 +129,15 @@ class ReportService {
 			$data['period_revenue']      = $this->orders->revenue( $from . ' 00:00:00', $to . ' 23:59:59' );
 			$data['revenue_html']        = shapelms_format_price( $data['revenue'] );
 			$data['period_revenue_html'] = shapelms_format_price( $data['period_revenue'] );
-			$data['orders']              = $this->orders->count( array( 'status' => 'completed' ) );
+			$data['orders']              = $this->orders->count(
+				array(
+					'status'     => 'completed',
+					'trashed_at' => array(
+						'op'    => '=',
+						'value' => null,
+					),
+				)
+			);
 			$data['recent']              = array_map( array( $this, 'format_activity' ), $this->activity->recent( 15, array( Events::COURSE_ENROLLED, Events::COURSE_COMPLETED, Events::QUIZ_FINISHED, Events::ORDER_COMPLETED, Events::REVIEW_SUBMITTED, Events::INSTRUCTOR_APPLIED ) ) );
 		}
 

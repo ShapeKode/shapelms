@@ -42,6 +42,8 @@ export function list( path, query = {} ) {
 			items: json.items || [],
 			total: parseInt( response.headers.get( 'X-WP-Total' ) || json.total || 0, 10 ),
 			pages: parseInt( response.headers.get( 'X-WP-TotalPages' ) || json.pages || 1, 10 ),
+			// Optional per-tab totals some lists send along.
+			...( json.counts ? { counts: json.counts } : {} ),
 		};
 	} );
 }

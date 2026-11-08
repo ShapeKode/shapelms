@@ -153,6 +153,41 @@ class InstructorService {
 	}
 
 	/**
+	 * Removes someone as an instructor for good: the instructor role, status and profile.
+	 * The user account and the courses they wrote stay. Site managers are never removed.
+	 *
+	 * @param int $user_id User id.
+	 * @return bool False for unknown users and managers.
+	 */
+	public static function remove( $user_id ) {
+		$user = get_userdata( (int) $user_id );
+
+		if ( ! $user || user_can( $user, Capabilities::MANAGE ) ) {
+			return false;
+		}
+
+		$user->remove_role( Capabilities::INSTRUCTOR );
+
+		// Nobody is left without a role.
+		if ( empty( $user->roles ) ) {
+			$user->set_role( (string) get_option( 'default_role', 'subscriber' ) );
+		}
+
+		foreach ( array( self::META_STATUS, self::META_HEADLINE, self::META_BIO, self::META_SOCIAL ) as $key ) {
+			delete_user_meta( $user->ID, $key );
+		}
+
+		/**
+		 * Fires after a user was removed as an instructor.
+		 *
+		 * @param int $user_id User id.
+		 */
+		do_action( 'shapelms_instructor_removed', (int) $user->ID );
+
+		return true;
+	}
+
+	/**
 	 * Saves profile fields.
 	 *
 	 * @param int                  $user_id User id.
@@ -184,7 +219,7 @@ class InstructorService {
 	 * @param string[] $status  Statuses.
 	 * @return int[]
 	 */
-	public static function course_ids( $user_id, array $status = array( 'publish', 'draft', 'pending', 'private' ) ) {
+	public static function course_ids( $user_id, array $status = array( 'publish', 'future', 'draft', 'pending', 'private' ) ) {
 		$own = get_posts(
 			array(
 				'post_type'     => PostTypes::COURSE,
@@ -213,7 +248,15 @@ class InstructorService {
 			)
 		);
 
-		return array_values( array_unique( array_map( 'intval', array_merge( $own, $co ) ) ) );
+		// The LIKE also matches the array keys of the stored list, so confirm each match.
+		$co = array_filter(
+			array_map( 'intval', $co ),
+			static function ( $course_id ) use ( $user_id ) {
+				return in_array( (int) $user_id, CourseService::instructor_ids( $course_id ), true );
+			}
+		);
+
+		return array_values( array_unique( array_merge( array_map( 'intval', $own ), $co ) ) );
 	}
 
 	/**
@@ -244,14 +287,22 @@ class InstructorService {
 			$args['meta_key']   = self::META_STATUS; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			$args['meta_value'] = sanitize_key( $status ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 		} else {
-			$args['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-				'relation' => 'OR',
+			// Anyone with an instructor status (pending, rejected, blocked lose or never had the role)
+			// or the role itself. WP_User_Query ANDs role and meta, so the union is built by id.
+			$with_role   = get_users(
 				array(
-					'key'     => self::META_STATUS,
-					'compare' => 'EXISTS',
-				),
+					'role__in' => array( Capabilities::INSTRUCTOR, 'administrator' ),
+					'fields'   => 'ID',
+				)
 			);
-			$args['role__in']   = array( Capabilities::INSTRUCTOR );
+			$with_status = get_users(
+				array(
+					'meta_key' => self::META_STATUS, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+					'fields'   => 'ID',
+				)
+			);
+			$ids             = array_values( array_unique( array_map( 'intval', array_merge( $with_role, $with_status ) ) ) );
+			$args['include'] = $ids ? $ids : array( 0 );
 		}
 
 		$query = new \WP_User_Query( $args );

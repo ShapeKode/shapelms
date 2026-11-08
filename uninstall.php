@@ -44,7 +44,8 @@ function shapelms_uninstall_site() {
 	$post_ids = get_posts(
 		array(
 			'post_type'     => array( 'shapelms_course', 'shapelms_topic', 'shapelms_lesson', 'shapelms_quiz', 'shapelms_question', 'shapelms_announce' ),
-			'post_status'   => 'any',
+			// 'any' would skip trashed posts and auto-drafts.
+			'post_status'   => array_keys( get_post_stati() ),
 			'numberposts'   => -1,
 			'fields'        => 'ids',
 			'no_found_rows' => true,
@@ -80,7 +81,7 @@ function shapelms_uninstall_site() {
 	delete_post_meta_by_key( '_shapelms_course_id' );
 
 	// Options.
-	foreach ( array( 'shapelms_settings', 'shapelms_modules', 'shapelms_db_version', 'shapelms_version', 'shapelms_pages', 'shapelms_setup_complete', 'shapelms_theme_css_version', 'shapelms_paypal_webhook_id', 'shapelms_caps_version' ) as $option ) {
+	foreach ( array( 'shapelms_settings', 'shapelms_modules', 'shapelms_db_version', 'shapelms_version', 'shapelms_pages', 'shapelms_setup_complete', 'shapelms_theme_css_version', 'shapelms_paypal_webhook_id', 'shapelms_caps_version', 'shapelms_woo_products_backfilled' ) as $option ) {
 		delete_option( $option );
 	}
 
@@ -132,7 +133,7 @@ function shapelms_uninstall_site() {
 	}
 
 	// Scheduled events (WP-Cron and Action Scheduler).
-	wp_clear_scheduled_hook( 'shapelms_send_queued_email' );
+	wp_unschedule_hook( 'shapelms_send_queued_email' );
 	if ( function_exists( 'as_unschedule_all_actions' ) ) {
 		as_unschedule_all_actions( '', array(), 'shapelms' );
 	}

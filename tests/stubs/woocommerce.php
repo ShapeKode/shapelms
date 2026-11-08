@@ -67,6 +67,8 @@ class WC_Order {
 	/** @return int */
 	public function get_user_id() {}
 	/** @return string */
+	public function get_view_order_url() {}
+	/** @return string */
 	public function get_payment_method() {}
 	/** @param string $key @return bool */
 	public function key_is_valid( $key ) {}
@@ -93,6 +95,12 @@ class WC_Product_Simple extends WC_Product {}
  * @return WC_Order|false
  */
 function wc_get_order( $order_id ) {}
+
+/**
+ * @param array<string, mixed> $args
+ * @return WC_Order[]
+ */
+function wc_get_orders( $args ) {}
 
 /** @return string */
 function wc_get_checkout_url() {}

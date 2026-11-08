@@ -28,6 +28,22 @@ class Capabilities {
 	 */
 	public function register() {
 		add_filter( 'map_meta_cap', array( $this, 'map_meta_cap' ), 10, 4 );
+		add_filter( 'post_password_required', array( $this, 'skip_password_with_access' ), 10, 2 );
+	}
+
+	/**
+	 * Students, instructors and managers of a password-protected course never see the form.
+	 *
+	 * @param bool     $required Whether the password is required.
+	 * @param \WP_Post $post     Post.
+	 * @return bool
+	 */
+	public function skip_password_with_access( $required, $post ) {
+		if ( ! $required || 'shapelms_course' !== $post->post_type ) {
+			return $required;
+		}
+
+		return ! shapelms()->get( \ShapeLMS\Services\EnrollmentService::class )->can_access( get_current_user_id(), (int) $post->ID );
 	}
 
 	/**
@@ -119,6 +135,12 @@ class Capabilities {
 			}
 
 			if ( 'read_post' === $cap && 'publish' === $post->post_status ) {
+				return array( 'read' );
+			}
+
+			// A private course stays open to the students already in it.
+			if ( 'read_post' === $cap && 'private' === $post->post_status && 'shapelms_course' === $post->post_type
+				&& shapelms()->get( \ShapeLMS\Services\EnrollmentService::class )->can_access( (int) $user_id, (int) $post->ID ) ) {
 				return array( 'read' );
 			}
 

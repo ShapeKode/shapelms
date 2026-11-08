@@ -363,7 +363,7 @@
 		var startBtn = quiz.querySelector( '[data-shapelms-quiz-start]' );
 		var history = quiz.querySelector( '[data-shapelms-quiz-history]' );
 
-		var state = { attempt: null, questions: [], settings: {}, page: 0, perPage: 1, answers: {}, timerId: null };
+		var state = { attempt: null, questions: [], settings: {}, page: 0, perPage: 1, answers: {}, checked: {}, timerId: null };
 
 		function loadOverview() {
 			api( learn, 'quizzes/' + quizId ).then( function ( data ) {
@@ -374,9 +374,6 @@
 				if ( startBtn && data.attempts_left === 0 ) {
 					startBtn.disabled = true;
 					startBtn.textContent = __( 'No attempts left', 'shapelms' );
-				}
-				if ( startBtn && data.open_attempt_id ) {
-					startBtn.textContent = __( 'Resume quiz', 'shapelms' );
 				}
 				renderHistory( data.history || [] );
 			} ).catch( function () {
@@ -405,8 +402,39 @@
 			history.hidden = false;
 		}
 
+		// Answers stay in this browser until the quiz is submitted; the draft survives a page reload.
+		function draftKey() {
+			return 'shapelms-quiz-' + state.attempt.id;
+		}
+
+		function saveDraft() {
+			try {
+				window.localStorage.setItem( draftKey(), JSON.stringify( state.answers ) );
+			} catch ( e ) {
+				// Storage is off: the answers are still sent on submit.
+			}
+		}
+
+		function readDraft() {
+			try {
+				return JSON.parse( window.localStorage.getItem( draftKey() ) ) || {};
+			} catch ( e ) {
+				return {};
+			}
+		}
+
+		function clearDraft() {
+			try {
+				window.localStorage.removeItem( draftKey() );
+			} catch ( e ) {
+				// Nothing to clear.
+			}
+		}
+
 		function start() {
-			startBtn.disabled = true;
+			if ( startBtn ) {
+				startBtn.disabled = true;
+			}
 			message( msg, '' );
 			api( learn, 'quizzes/' + quizId + '/start', { method: 'POST' } ).then( function ( data ) {
 				state.attempt = data.attempt;
@@ -415,10 +443,15 @@
 				// 0 means "all questions on one page" (as the quiz settings say).
 				state.perPage = data.settings.questions_per_page > 0 ? data.settings.questions_per_page : Math.max( 1, data.questions.length );
 				state.page = 0;
-				state.answers = {};
+				state.answers = readDraft();
+				state.checked = {};
+				// What the server holds wins over the draft.
 				data.questions.forEach( function ( q ) {
 					if ( q.answer !== null && q.answer !== undefined ) {
 						state.answers[ q.id ] = q.answer;
+					}
+					if ( q.checked ) {
+						state.checked[ q.id ] = q.checked;
 					}
 				} );
 				intro.hidden = true;
@@ -428,7 +461,10 @@
 				renderPage();
 				player.scrollIntoView( { behavior: 'smooth', block: 'start' } );
 			} ).catch( function ( err ) {
-				startBtn.disabled = false;
+				if ( startBtn ) {
+					startBtn.disabled = false;
+				}
+				intro.hidden = false;
 				message( msg, err.message, 'error' );
 			} );
 		}
@@ -527,7 +563,7 @@
 					__: __,
 					setAnswer: function ( value ) {
 						state.answers[ q.id ] = value;
-						saveAnswer( q, fieldset );
+						saveAnswer( q );
 					},
 				} ) );
 			} else if ( q.type === 'single_choice' || q.type === 'true_false' || q.type === 'multiple_choice' ) {
@@ -544,7 +580,7 @@
 						} else {
 							state.answers[ q.id ] = opt.id;
 						}
-						saveAnswer( q, fieldset );
+						saveAnswer( q );
 					} );
 					var label = el( 'label', { class: 'shapelms-option' }, [ input, el( 'span', { class: 'shapelms-option__text', text: opt.text } ) ] );
 					if ( opt.image ) {
@@ -556,7 +592,7 @@
 				var input = el( 'input', { type: 'text', class: 'shapelms-input', name: name, maxlength: q.data.max_length || 200, value: answer || '' } );
 				input.addEventListener( 'change', function () {
 					state.answers[ q.id ] = input.value;
-					saveAnswer( q, fieldset );
+					saveAnswer( q );
 				} );
 				fieldset.appendChild( input );
 			} else if ( q.type === 'fill_blank' ) {
@@ -571,7 +607,7 @@
 								return b.value;
 							} );
 							state.answers[ q.id ] = list;
-							saveAnswer( q, fieldset );
+							saveAnswer( q );
 						} );
 						wrap.appendChild( blank );
 					}
@@ -579,29 +615,62 @@
 				fieldset.appendChild( wrap );
 			}
 
-			fieldset.appendChild( el( 'div', { class: 'shapelms-question__feedback', 'aria-live': 'polite' } ) );
+			fieldset.appendChild( renderFeedback( q, fieldset ) );
+			if ( q.checkable && ! state.checked[ q.id ] ) {
+				fieldset.appendChild( el( 'button', { type: 'button', class: 'shapelms-btn shapelms-btn--secondary shapelms-question__check', text: __( 'Check answer', 'shapelms' ), onclick: function () {
+					checkAnswer( q );
+				} } ) );
+			}
 			return fieldset;
 		}
 
-		function saveAnswer( q, fieldset ) {
-			api( learn, 'quizzes/attempts/' + state.attempt.id + '/answer', { method: 'POST', body: { question_id: q.id, answer: state.answers[ q.id ] } } )
-				.then( function ( res ) {
-					if ( state.settings.feedback_mode === 'instant' && typeof res.is_correct !== 'undefined' && res.is_correct !== null ) {
-						var box = fieldset.querySelector( '.shapelms-question__feedback' );
-						box.className = 'shapelms-question__feedback is-' + ( res.is_correct ? 'correct' : 'incorrect' );
-						box.innerHTML = '';
-						box.appendChild( el( 'strong', { text: res.is_correct ? __( 'Correct!', 'shapelms' ) : __( 'Not quite.', 'shapelms' ) } ) );
-						if ( res.explanation ) {
-							box.appendChild( el( 'div', { html: res.explanation } ) );
-						}
-					}
-				} )
-				.catch( function ( err ) {
-					message( msg, err.message, 'error' );
-					if ( err.code === 'shapelms_attempt_expired' || err.code === 'shapelms_attempt_closed' ) {
-						showResult( state.attempt.id );
-					}
-				} );
+		function renderFeedback( q, fieldset ) {
+			var box = el( 'div', { class: 'shapelms-question__feedback', 'aria-live': 'polite' } );
+			var checked = state.checked[ q.id ];
+			if ( checked ) {
+				// A checked answer is final.
+				fieldset.disabled = true;
+				if ( checked.is_correct !== null ) {
+					box.classList.add( checked.is_correct ? 'is-correct' : 'is-incorrect' );
+					box.appendChild( el( 'strong', { text: checked.is_correct ? __( 'Correct!', 'shapelms' ) : __( 'Not quite.', 'shapelms' ) } ) );
+				}
+				if ( checked.explanation ) {
+					box.appendChild( el( 'div', { html: checked.explanation } ) );
+				}
+			}
+			return box;
+		}
+
+		function sendAnswer( q ) {
+			return api( learn, 'quizzes/attempts/' + state.attempt.id + '/answer', { method: 'POST', body: { question_id: q.id, answer: state.answers[ q.id ] } } );
+		}
+
+		function answerFailed( err ) {
+			message( msg, err.message, 'error' );
+			if ( err.code === 'shapelms_attempt_expired' || err.code === 'shapelms_attempt_closed' ) {
+				showResult( state.attempt.id );
+			}
+		}
+
+		function saveAnswer( q ) {
+			saveDraft();
+			// Only questions whose rules depend on when the answer arrives go to the server now.
+			if ( q.save_now ) {
+				sendAnswer( q ).catch( answerFailed );
+			}
+		}
+
+		function checkAnswer( q ) {
+			var answer = state.answers[ q.id ];
+			if ( answer === undefined || answer === null || answer === '' || ( Array.isArray( answer ) && ! answer.length ) ) {
+				message( msg, __( 'Choose an answer first.', 'shapelms' ), 'error' );
+				return;
+			}
+			message( msg, '' );
+			sendAnswer( q ).then( function ( res ) {
+				state.checked[ q.id ] = res;
+				rerender( q );
+			} ).catch( answerFailed );
 		}
 
 		function submit( auto ) {
@@ -634,6 +703,9 @@
 		}
 
 		function renderResult( data ) {
+			if ( state.attempt ) {
+				clearDraft();
+			}
 			player.hidden = true;
 			intro.hidden = true;
 			result.hidden = false;
@@ -679,6 +751,9 @@
 			actions.appendChild( el( 'button', { type: 'button', class: 'shapelms-btn shapelms-btn--secondary', text: __( 'Back to quiz', 'shapelms' ), onclick: function () {
 				result.hidden = true;
 				intro.hidden = false;
+				if ( startBtn ) {
+					startBtn.disabled = false;
+				}
 				loadOverview();
 			} } ) );
 			var nextUrl = learn.getAttribute( 'data-next-url' );
@@ -736,7 +811,10 @@
 			e.preventDefault();
 		} );
 
-		if ( config( learn ).loggedIn === '1' ) {
+		// A quiz in progress reopens by itself; the intro and history wait until it is submitted.
+		if ( quiz.getAttribute( 'data-running' ) === '1' ) {
+			start();
+		} else if ( config( learn ).loggedIn === '1' ) {
 			loadOverview();
 		}
 	}
@@ -902,7 +980,7 @@
 				'<div class="shapelms-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="shapelms-modal-title">' +
 					'<div class="shapelms-modal__header">' +
 						'<h2 class="shapelms-modal__title" id="shapelms-modal-title"></h2>' +
-						'<button type="button" class="shapelms-modal__close" data-shapelms-modal-close><span class="screen-reader-text"></span><span aria-hidden="true">&times;</span></button>' +
+						'<button type="button" class="shapelms-modal__close" data-shapelms-modal-close><span class="screen-reader-text"></span><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1.5 1.5l11 11m0-11l-11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>' +
 					'</div>' +
 					'<div class="shapelms-modal__body shapelms-video"></div>' +
 					'<div class="shapelms-modal__footer" hidden><a class="shapelms-btn shapelms-btn--secondary" href="#"></a></div>' +

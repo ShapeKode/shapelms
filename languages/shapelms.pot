@@ -9,16 +9,16 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-26T03:07:15+00:00\n"
+"POT-Creation-Date: 2026-11-05T10:12:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: shapelms\n"
 
 #. Plugin Name of the plugin
 #: shapelms.php
-#: includes/Admin/Menu.php:73
-#: includes/Admin/Menu.php:74
-#: includes/Blocks/Blocks.php:78
+#: includes/Admin/Menu.php:79
+#: includes/Admin/Menu.php:80
+#: includes/Blocks/Blocks.php:80
 #: includes/Modules/Elementor/Module.php:73
 msgid "ShapeLMS"
 msgstr ""
@@ -43,77 +43,98 @@ msgstr ""
 msgid "https://profiles.wordpress.org/shapekode22/"
 msgstr ""
 
-#: includes/Admin/Menu.php:32
+#: includes/Admin/Menu.php:38
 #: includes/Core/Pages.php:27
+#: src/admin/screens/Dashboard.js:31
 #: templates/dashboard.php:28
-#: templates/learn.php:71
+#: templates/learn.php:76
 msgid "Dashboard"
 msgstr ""
 
-#: includes/Admin/Menu.php:33
+#: includes/Admin/Menu.php:39
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:64
+#: src/admin/screens/Courses.js:144
+#: src/admin/screens/Instructors.js:36
+#: src/admin/screens/Orders.js:78
+#: src/admin/screens/Reports.js:72
+#: src/blocks/index.js:16
 #: templates/archive-course.php:35
-#: templates/dashboard/orders.php:36
+#: templates/dashboard/orders.php:37
 msgid "Courses"
 msgstr ""
 
-#: includes/Admin/Menu.php:34
+#: includes/Admin/Menu.php:40
 #: includes/Modules/Instructors/Module.php:74
-#: templates/dashboard/instructor-courses.php:36
+#: src/admin/screens/Courses.js:125
+#: src/admin/screens/Dashboard.js:53
+#: src/admin/screens/Reports.js:78
+#: src/admin/screens/Students.js:208
+#: templates/dashboard/instructor-courses.php:37
 #: templates/dashboard/instructor-students.php:38
-#: templates/parts/enroll-box.php:123
+#: templates/parts/enroll-box.php:147
 msgid "Students"
 msgstr ""
 
-#: includes/Admin/Menu.php:35
+#: includes/Admin/Menu.php:41
 msgid "Quiz Attempts"
 msgstr ""
 
-#: includes/Admin/Menu.php:36
-#: includes/Core/Settings.php:169
+#: includes/Admin/Menu.php:42
+#: includes/Core/Settings.php:174
+#: src/admin/screens/Instructors.js:54
 msgid "Instructors"
 msgstr ""
 
-#: includes/Admin/Menu.php:37
+#: includes/Admin/Menu.php:43
+#: src/admin/screens/Orders.js:88
 #: templates/dashboard/instructor-earnings.php:44
 msgid "Orders"
 msgstr ""
 
-#: includes/Admin/Menu.php:38
+#: includes/Admin/Menu.php:44
+#: src/admin/screens/Dashboard.js:35
+#: src/admin/screens/Reports.js:52
 msgid "Reports"
 msgstr ""
 
-#: includes/Admin/Menu.php:39
+#: includes/Admin/Menu.php:45
+#: src/admin/screens/Modules.js:31
 msgid "Modules"
 msgstr ""
 
-#: includes/Admin/Menu.php:40
+#: includes/Admin/Menu.php:46
 #: includes/Frontend/Dashboard.php:54
+#: src/admin/screens/Settings.js:129
+#: src/builder/App.js:22
+#: src/builder/tabs/SettingsTab.js:94
 #: templates/dashboard/settings.php:16
 msgid "Settings"
 msgstr ""
 
-#: includes/Admin/Menu.php:41
+#: includes/Admin/Menu.php:47
+#: src/admin/screens/Tools.js:219
 msgid "Tools"
 msgstr ""
 
-#: includes/Admin/Menu.php:120
+#: includes/Admin/Menu.php:126
 #: includes/Content/Taxonomies.php:48
+#: src/builder/tabs/BasicsTab.js:37
 msgid "Categories"
 msgstr ""
 
-#: includes/Admin/Menu.php:123
+#: includes/Admin/Menu.php:129
 #: includes/Content/Taxonomies.php:76
+#: src/builder/tabs/BasicsTab.js:52
 msgid "Tags"
 msgstr ""
 
 #: includes/Api/CurriculumController.php:151
 #: includes/Modules/Announcements/Module.php:255
-#: includes/Services/EnrollmentService.php:136
+#: includes/Services/EnrollmentService.php:145
 msgid "Course not found."
 msgstr ""
 
-#: includes/Api/CurriculumController.php:227
+#: includes/Api/CurriculumController.php:229
 msgid "Topic not found."
 msgstr ""
 
@@ -122,7 +143,7 @@ msgid "Module not found."
 msgstr ""
 
 #: includes/Api/QuestionsController.php:116
-#: includes/Services/QuizService.php:170
+#: includes/Services/QuizService.php:201
 msgid "Quiz not found."
 msgstr ""
 
@@ -140,95 +161,102 @@ msgstr ""
 msgid "Not found."
 msgstr ""
 
-#: includes/Blocks/Blocks.php:176
+#: includes/Blocks/Blocks.php:178
 msgid "No courses found."
 msgstr ""
 
-#: includes/Content/PostTypes.php:54
+#: includes/Content/PostTypes.php:66
 msgctxt "post type general name"
 msgid "Courses"
 msgstr ""
 
-#: includes/Content/PostTypes.php:55
+#: includes/Content/PostTypes.php:67
 msgctxt "post type singular name"
 msgid "Course"
 msgstr ""
 
-#: includes/Content/PostTypes.php:56
+#: includes/Content/PostTypes.php:68
 msgid "Add New"
 msgstr ""
 
-#: includes/Content/PostTypes.php:57
+#: includes/Content/PostTypes.php:69
 msgid "Add New Course"
 msgstr ""
 
-#: includes/Content/PostTypes.php:58
+#: includes/Content/PostTypes.php:70
 msgid "Edit Course"
 msgstr ""
 
-#: includes/Content/PostTypes.php:59
+#: includes/Content/PostTypes.php:71
 msgid "New Course"
 msgstr ""
 
-#: includes/Content/PostTypes.php:60
+#: includes/Content/PostTypes.php:72
 msgid "View Course"
 msgstr ""
 
-#: includes/Content/PostTypes.php:61
+#: includes/Content/PostTypes.php:73
 msgid "Search Courses"
 msgstr ""
 
-#: includes/Content/PostTypes.php:62
+#: includes/Content/PostTypes.php:74
 #: templates/archive-course.php:114
 msgid "No courses found"
 msgstr ""
 
-#: includes/Content/PostTypes.php:63
+#: includes/Content/PostTypes.php:75
 msgid "No courses found in Trash"
 msgstr ""
 
-#: includes/Content/PostTypes.php:64
+#: includes/Content/PostTypes.php:76
 msgid "All Courses"
 msgstr ""
 
-#: includes/Content/PostTypes.php:65
+#: includes/Content/PostTypes.php:77
 msgid "Course Archives"
 msgstr ""
 
-#: includes/Content/PostTypes.php:105
+#: includes/Content/PostTypes.php:117
 msgid "Topics"
 msgstr ""
 
-#: includes/Content/PostTypes.php:106
+#: includes/Content/PostTypes.php:118
 msgid "Topic"
 msgstr ""
 
-#: includes/Content/PostTypes.php:119
-#: templates/parts/enroll-box.php:118
+#: includes/Content/PostTypes.php:131
+#: src/admin/screens/Courses.js:124
+#: templates/parts/enroll-box.php:142
 msgid "Lessons"
 msgstr ""
 
-#: includes/Content/PostTypes.php:120
+#: includes/Content/Curriculum.php:47
+#: includes/Content/PostTypes.php:132
+#: src/builder/itemTypes.js:8
 msgid "Lesson"
 msgstr ""
 
-#: includes/Content/PostTypes.php:137
-#: templates/parts/enroll-box.php:119
+#: includes/Content/PostTypes.php:149
+#: templates/parts/enroll-box.php:143
 msgid "Quizzes"
 msgstr ""
 
-#: includes/Content/PostTypes.php:138
+#: includes/Content/Curriculum.php:54
+#: includes/Content/PostTypes.php:150
 #: includes/Modules/Privacy/Module.php:148
+#: src/admin/screens/Quizzes.js:60
+#: src/builder/itemTypes.js:9
 #: templates/dashboard/quizzes.php:32
 msgid "Quiz"
 msgstr ""
 
-#: includes/Content/PostTypes.php:155
-#: templates/parts/quiz-player.php:26
+#: includes/Content/PostTypes.php:167
+#: templates/parts/quiz-player.php:27
 msgid "Questions"
 msgstr ""
 
-#: includes/Content/PostTypes.php:156
+#: includes/Content/PostTypes.php:168
+#: src/builder/components/QuestionsEditor.js:58
 msgid "Question"
 msgstr ""
 
@@ -280,7 +308,8 @@ msgstr ""
 msgid "Add New Tag"
 msgstr ""
 
-#: includes/Core/Capabilities.php:88
+#: includes/Core/Capabilities.php:104
+#: src/admin/screens/Instructors.js:33
 #: templates/parts/qa.php:41
 #: templates/parts/qa.php:58
 #: templates/single-course.php:161
@@ -289,27 +318,30 @@ msgid_plural "Instructors"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Core/Capabilities.php:89
+#: includes/Core/Capabilities.php:105
+#: src/admin/screens/Quizzes.js:59
+#: src/admin/screens/Students.js:103
+#: src/admin/screens/Students.js:179
 #: templates/dashboard/instructor-students.php:45
 msgid "Student"
 msgstr ""
 
 #: includes/Core/Pages.php:31
-#: templates/checkout.php:47
+#: templates/checkout.php:68
 msgid "Checkout"
 msgstr ""
 
-#: includes/Core/Pages.php:35
+#: includes/Core/Pages.php:39
 msgid "Become an Instructor"
 msgstr ""
 
-#: includes/Core/Pages.php:39
+#: includes/Core/Pages.php:43
 #: templates/auth/login.php:58
 #: templates/auth/register.php:68
 msgid "Sign in"
 msgstr ""
 
-#: includes/Core/Pages.php:43
+#: includes/Core/Pages.php:47
 #: templates/auth/login.php:65
 #: templates/auth/register.php:19
 msgid "Sign up"
@@ -379,305 +411,302 @@ msgstr ""
 msgid "Checkout page"
 msgstr ""
 
-#: includes/Core/Settings.php:87
+#: includes/Core/Settings.php:92
 msgid "Instructor registration page"
 msgstr ""
 
-#: includes/Core/Settings.php:92
+#: includes/Core/Settings.php:97
 msgid "Sign in page"
 msgstr ""
 
-#: includes/Core/Settings.php:97
+#: includes/Core/Settings.php:102
 msgid "Sign up page"
 msgstr ""
 
-#: includes/Core/Settings.php:102
+#: includes/Core/Settings.php:107
 msgid "Allow student registration"
 msgstr ""
 
-#: includes/Core/Settings.php:105
+#: includes/Core/Settings.php:110
 msgid "Lets visitors create a student account on the Sign up page. WordPress's own \"Anyone can register\" option (Settings → General) must also be on."
 msgstr ""
 
-#: includes/Core/Settings.php:108
+#: includes/Core/Settings.php:113
 msgid "Sign in / Sign up page layout"
 msgstr ""
 
-#: includes/Core/Settings.php:112
+#: includes/Core/Settings.php:117
 msgid "Standalone (site logo, form, no theme header)"
 msgstr ""
 
-#: includes/Core/Settings.php:113
+#: includes/Core/Settings.php:118
 msgid "Inside the theme layout"
 msgstr ""
 
-#: includes/Core/Settings.php:115
+#: includes/Core/Settings.php:120
 msgid "Standalone gives a clean, focused page on any theme. Choose the theme layout to keep your header and footer."
 msgstr ""
 
-#: includes/Core/Settings.php:118
+#: includes/Core/Settings.php:123
 msgid "Use the Sign in page for all login links"
 msgstr ""
 
-#: includes/Core/Settings.php:121
+#: includes/Core/Settings.php:126
 msgid "Theme and WordPress login, registration and lost-password links point to the ShapeLMS pages instead of wp-login.php. Administrators can still open wp-login.php directly."
 msgstr ""
 
-#: includes/Core/Settings.php:124
+#: includes/Core/Settings.php:129
 msgid "Delete all data on uninstall"
 msgstr ""
 
-#: includes/Core/Settings.php:127
+#: includes/Core/Settings.php:132
 msgid "Removes courses, enrollments, progress and orders when the plugin is deleted."
 msgstr ""
 
-#: includes/Core/Settings.php:132
+#: includes/Core/Settings.php:137
 msgid "Courses & learning"
 msgstr ""
 
-#: includes/Core/Settings.php:133
+#: includes/Core/Settings.php:138
 msgid "How students learn and complete courses."
 msgstr ""
 
-#: includes/Core/Settings.php:136
+#: includes/Core/Settings.php:141
 msgid "Enable course reviews"
 msgstr ""
 
-#: includes/Core/Settings.php:141
+#: includes/Core/Settings.php:146
 msgid "Enable course Q&A"
 msgstr ""
 
-#: includes/Core/Settings.php:146
+#: includes/Core/Settings.php:151
 msgid "Enable wishlist"
 msgstr ""
 
-#: includes/Core/Settings.php:151
+#: includes/Core/Settings.php:156
 msgid "Go to the next lesson after completing one"
 msgstr ""
 
-#: includes/Core/Settings.php:156
+#: includes/Core/Settings.php:161
 msgid "Require passing all quizzes to complete a course"
 msgstr ""
 
-#: includes/Core/Settings.php:161
+#: includes/Core/Settings.php:166
 msgid "Sequential learning"
 msgstr ""
 
-#: includes/Core/Settings.php:164
+#: includes/Core/Settings.php:169
 msgid "Lock each lesson and quiz until the previous one is completed. Each course can override this in its builder settings."
 msgstr ""
 
-#: includes/Core/Settings.php:170
+#: includes/Core/Settings.php:175
 msgid "Instructor registration and permissions."
 msgstr ""
 
-#: includes/Core/Settings.php:173
+#: includes/Core/Settings.php:178
 msgid "Allow instructor registration"
 msgstr ""
 
-#: includes/Core/Settings.php:178
+#: includes/Core/Settings.php:183
 msgid "Require admin approval for new instructors"
 msgstr ""
 
-#: includes/Core/Settings.php:183
+#: includes/Core/Settings.php:188
 msgid "Instructors can publish courses without review"
 msgstr ""
 
-#: includes/Core/Settings.php:186
+#: includes/Core/Settings.php:191
 msgid "When off, instructor courses are submitted as pending for an admin to publish."
 msgstr ""
 
-#: includes/Core/Settings.php:191
+#: includes/Core/Settings.php:196
+#: src/admin/screens/Tools.js:63
 msgid "Selling"
 msgstr ""
 
-#: includes/Core/Settings.php:192
+#: includes/Core/Settings.php:197
 msgid "Choose how paid courses are sold."
 msgstr ""
 
-#: includes/Core/Settings.php:195
+#: includes/Core/Settings.php:200
 msgid "Commerce engine"
 msgstr ""
 
-#: includes/Core/Settings.php:199
-msgid "ShapeLMS checkout (Stripe, PayPal)"
-msgstr ""
-
-#: includes/Core/Settings.php:200
-#: includes/Modules/WooCommerce/Module.php:40
+#: includes/Core/Settings.php:205
+#: includes/Modules/WooCommerce/Module.php:62
+#: src/admin/screens/Tools.js:66
+#: src/admin/screens/Tools.js:188
+#: src/builder/tabs/PricingTab.js:47
 msgid "WooCommerce"
 msgstr ""
 
-#: includes/Core/Settings.php:204
+#: includes/Core/Settings.php:227
+#: src/admin/screens/Tools.js:67
 msgid "Currency"
 msgstr ""
 
-#: includes/Core/Settings.php:210
+#: includes/Core/Settings.php:233
 msgid "Currency symbol position"
 msgstr ""
 
-#: includes/Core/Settings.php:214
+#: includes/Core/Settings.php:237
 msgid "Left ($99)"
 msgstr ""
 
-#: includes/Core/Settings.php:215
+#: includes/Core/Settings.php:238
 msgid "Right (99$)"
 msgstr ""
 
-#: includes/Core/Settings.php:216
+#: includes/Core/Settings.php:239
 msgid "Left with space ($ 99)"
 msgstr ""
 
-#: includes/Core/Settings.php:217
+#: includes/Core/Settings.php:240
 msgid "Right with space (99 $)"
 msgstr ""
 
-#: includes/Core/Settings.php:221
+#: includes/Core/Settings.php:244
 msgid "Decimals"
 msgstr ""
 
-#: includes/Core/Settings.php:228
+#: includes/Core/Settings.php:251
 msgid "Enable Stripe"
 msgstr ""
 
-#: includes/Core/Settings.php:233
+#: includes/Core/Settings.php:256
 msgid "Stripe test mode"
 msgstr ""
 
-#: includes/Core/Settings.php:238
+#: includes/Core/Settings.php:261
 msgid "Stripe publishable key"
 msgstr ""
 
-#: includes/Core/Settings.php:243
+#: includes/Core/Settings.php:266
 msgid "Stripe secret key"
 msgstr ""
 
-#: includes/Core/Settings.php:248
+#: includes/Core/Settings.php:271
 msgid "Stripe webhook signing secret"
 msgstr ""
 
-#: includes/Core/Settings.php:251
-msgid "Webhook URL: /wp-json/shapelms/v1/webhooks/stripe"
-msgstr ""
-
-#: includes/Core/Settings.php:254
+#: includes/Core/Settings.php:277
 msgid "Enable PayPal"
 msgstr ""
 
-#: includes/Core/Settings.php:259
+#: includes/Core/Settings.php:282
 msgid "PayPal sandbox mode"
 msgstr ""
 
-#: includes/Core/Settings.php:264
+#: includes/Core/Settings.php:287
 msgid "PayPal client ID"
 msgstr ""
 
-#: includes/Core/Settings.php:269
+#: includes/Core/Settings.php:292
 msgid "PayPal secret"
 msgstr ""
 
-#: includes/Core/Settings.php:276
+#: includes/Core/Settings.php:355
 msgid "Emails"
 msgstr ""
 
-#: includes/Core/Settings.php:277
+#: includes/Core/Settings.php:356
 msgid "Sender details and which notifications are sent."
 msgstr ""
 
-#: includes/Core/Settings.php:280
+#: includes/Core/Settings.php:359
 msgid "From name"
 msgstr ""
 
-#: includes/Core/Settings.php:285
+#: includes/Core/Settings.php:364
 msgid "From email"
 msgstr ""
 
-#: includes/Core/Settings.php:290
+#: includes/Core/Settings.php:369
 msgid "Footer text"
 msgstr ""
 
-#: includes/Core/Settings.php:297
+#: includes/Core/Settings.php:376
 msgid "Design"
 msgstr ""
 
-#: includes/Core/Settings.php:298
+#: includes/Core/Settings.php:377
 msgid "Colors used by the course pages, player and dashboard."
 msgstr ""
 
-#: includes/Core/Settings.php:301
+#: includes/Core/Settings.php:380
 msgid "Primary color"
 msgstr ""
 
-#: includes/Core/Settings.php:306
+#: includes/Core/Settings.php:385
 msgid "Corner radius (px)"
 msgstr ""
 
-#: includes/Frontend/Auth.php:346
+#: includes/Frontend/Auth.php:378
 msgid "Too many failed attempts. Please wait 15 minutes and try again."
 msgstr ""
 
-#: includes/Frontend/Auth.php:367
+#: includes/Frontend/Auth.php:399
 msgid "The username, email or password is incorrect."
 msgstr ""
 
-#: includes/Frontend/Auth.php:396
+#: includes/Frontend/Auth.php:428
 #: includes/Modules/Instructors/Module.php:123
 msgid "Registration is closed."
 msgstr ""
 
-#: includes/Frontend/Auth.php:408
+#: includes/Frontend/Auth.php:440
 msgid "Too many sign-up attempts. Please try again later."
 msgstr ""
 
-#: includes/Frontend/Auth.php:451
+#: includes/Frontend/Auth.php:483
 msgid "Please enter your username or email address."
 msgstr ""
 
-#: includes/Frontend/Auth.php:459
+#: includes/Frontend/Auth.php:491
 msgid "Too many requests. Please try again in a few minutes."
 msgstr ""
 
-#: includes/Frontend/Auth.php:489
+#: includes/Frontend/Auth.php:521
 msgid "The reset email could not be sent. Please try again later."
 msgstr ""
 
-#: includes/Frontend/Auth.php:516
+#: includes/Frontend/Auth.php:548
 msgid "This reset link is invalid or has expired. Please request a new one."
 msgstr ""
 
-#: includes/Frontend/Auth.php:522
-#: includes/Frontend/Auth.php:570
+#: includes/Frontend/Auth.php:554
+#: includes/Frontend/Auth.php:602
 #: includes/Modules/Instructors/Module.php:137
 msgid "Password must be at least 8 characters."
 msgstr ""
 
-#: includes/Frontend/Auth.php:524
-#: includes/Frontend/Auth.php:572
+#: includes/Frontend/Auth.php:556
+#: includes/Frontend/Auth.php:604
 msgid "The passwords do not match."
 msgstr ""
 
-#: includes/Frontend/Auth.php:558
+#: includes/Frontend/Auth.php:590
 msgid "Please choose a username (letters and numbers only)."
 msgstr ""
 
-#: includes/Frontend/Auth.php:560
+#: includes/Frontend/Auth.php:592
 msgid "That username is already taken."
 msgstr ""
 
-#: includes/Frontend/Auth.php:562
+#: includes/Frontend/Auth.php:594
 msgid "That username is not allowed."
 msgstr ""
 
-#: includes/Frontend/Auth.php:565
+#: includes/Frontend/Auth.php:597
 #: includes/Modules/Instructors/Module.php:132
 msgid "Please enter a valid email address."
 msgstr ""
 
-#: includes/Frontend/Auth.php:567
+#: includes/Frontend/Auth.php:599
 msgid "An account with this email already exists. Please sign in instead."
 msgstr ""
 
-#: includes/Frontend/Auth.php:688
+#: includes/Frontend/Auth.php:720
 #: includes/Modules/Instructors/Module.php:100
 msgid "Security check failed. Please try again."
 msgstr ""
@@ -693,6 +722,7 @@ msgstr ""
 
 #: includes/Frontend/Dashboard.php:42
 #: includes/Modules/Privacy/Module.php:144
+#: src/admin/screens/Quizzes.js:70
 #: templates/dashboard/overview.php:44
 #: templates/dashboard/quizzes.php:26
 msgid "Quiz attempts"
@@ -717,6 +747,7 @@ msgid "Account"
 msgstr ""
 
 #: includes/Frontend/VideoEmbed.php:82
+#: src/builder/components/ItemEditor.js:62
 msgid "Video"
 msgstr ""
 
@@ -734,7 +765,7 @@ msgstr ""
 
 #: includes/Modules/Announcements/Module.php:42
 #: includes/Modules/Announcements/Module.php:76
-#: includes/Modules/Announcements/Module.php:325
+#: includes/Modules/Announcements/Module.php:327
 #: templates/dashboard/announcements.php:24
 #: templates/parts/announcements.php:21
 msgid "Announcements"
@@ -748,38 +779,34 @@ msgstr ""
 msgid "Announcement"
 msgstr ""
 
-#: includes/Modules/Checkout/Module.php:51
+#: includes/Modules/Checkout/Module.php:59
 msgid "ShapeLMS checkout"
 msgstr ""
 
-#: includes/Modules/Checkout/Module.php:60
-msgid "Built-in checkout for one-time course payments with Stripe and PayPal."
-msgstr ""
-
-#: includes/Modules/Checkout/Module.php:218
+#: includes/Modules/Checkout/Module.php:673
 #: templates/checkout.php:17
 msgid "Checkout is not available."
 msgstr ""
 
-#: includes/Modules/Checkout/Module.php:225
-#: includes/Modules/Checkout/Module.php:290
+#: includes/Modules/Checkout/Module.php:680
+#: includes/Modules/Checkout/Module.php:765
 msgid "Payment method not available."
 msgstr ""
 
-#: includes/Modules/Checkout/Module.php:274
+#: includes/Modules/Checkout/Module.php:749
 msgid "Order not found."
 msgstr ""
 
-#: includes/Modules/Checkout/Module.php:285
+#: includes/Modules/Checkout/Module.php:760
 msgid "This order can no longer be paid."
 msgstr ""
 
-#: includes/Modules/Checkout/Module.php:319
+#: includes/Modules/Checkout/Module.php:804
 msgid "Unknown gateway."
 msgstr ""
 
-#: includes/Modules/Checkout/Module.php:410
-#: templates/dashboard/orders.php:29
+#: includes/Modules/Checkout/Module.php:907
+#: templates/dashboard/orders.php:30
 msgid "Purchases"
 msgstr ""
 
@@ -791,37 +818,39 @@ msgstr ""
 msgid "Could not authenticate with PayPal. Check your credentials."
 msgstr ""
 
-#: includes/Modules/Checkout/PayPalGateway.php:163
+#: includes/Modules/Checkout/PayPalGateway.php:166
 msgid "PayPal error."
 msgstr ""
 
 #. translators: 1: order id, 2: site name
-#: includes/Modules/Checkout/PayPalGateway.php:186
+#: includes/Modules/Checkout/PayPalGateway.php:211
 #: includes/Modules/Checkout/StripeGateway.php:162
 #, php-format
 msgid "Order #%1$d on %2$s"
 msgstr ""
 
-#: includes/Modules/Checkout/PayPalGateway.php:221
+#: includes/Modules/Checkout/PayPalGateway.php:246
 #: includes/Modules/Checkout/StripeGateway.php:205
 msgid "Payment does not belong to this order."
 msgstr ""
 
-#: includes/Modules/Checkout/PayPalGateway.php:236
+#: includes/Modules/Checkout/PayPalGateway.php:261
+#: includes/Modules/Checkout/PayPalGateway.php:275
+#: includes/Modules/Checkout/PayPalGateway.php:280
 #: includes/Modules/Checkout/StripeGateway.php:209
 msgid "Payment has not completed yet."
 msgstr ""
 
-#: includes/Modules/Checkout/PayPalGateway.php:243
+#: includes/Modules/Checkout/PayPalGateway.php:288
 msgid "Payment amount does not match the order."
 msgstr ""
 
-#: includes/Modules/Checkout/PayPalGateway.php:260
+#: includes/Modules/Checkout/PayPalGateway.php:306
 #: includes/Modules/Checkout/StripeGateway.php:286
 msgid "Invalid payload."
 msgstr ""
 
-#: includes/Modules/Checkout/PayPalGateway.php:279
+#: includes/Modules/Checkout/PayPalGateway.php:325
 #: includes/Modules/Checkout/StripeGateway.php:281
 msgid "Invalid signature."
 msgstr ""
@@ -871,14 +900,17 @@ msgid "Course Grid"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:69
+#: src/blocks/index.js:17
 msgid "Number of courses"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:79
+#: src/blocks/index.js:18
 msgid "Columns"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:92
+#: src/blocks/index.js:19
 msgid "Category slug"
 msgstr ""
 
@@ -887,26 +919,34 @@ msgid "Leave empty for all categories."
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:101
+#: src/blocks/index.js:22
 msgid "Order by"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:105
+#: src/blocks/index.js:25
 #: templates/parts/filters.php:52
 msgid "Newest"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:106
+#: src/blocks/index.js:26
+#: src/builder/components/ItemEditor.js:57
 #: templates/dashboard/announcements.php:38
 msgid "Title"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:107
+#: src/admin/screens/Courses.js:123
+#: src/blocks/index.js:27
+#: src/blocks/index.js:44
 #: templates/parts/filters.php:137
 #: templates/parts/filters.php:183
 msgid "Price"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/CourseGrid.php:108
+#: src/blocks/index.js:28
 msgid "Popular"
 msgstr ""
 
@@ -915,14 +955,21 @@ msgid "Featured only"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/Curriculum.php:37
+#: src/blocks/index.js:92
 msgid "Course Curriculum"
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/Curriculum.php:64
 #: includes/Modules/Elementor/Widgets/EnrollButton.php:64
 #: includes/Modules/Privacy/Module.php:117
+#: src/admin/screens/Courses.js:96
+#: src/admin/screens/Reports.js:77
+#: src/admin/screens/Students.js:57
+#: src/admin/screens/Students.js:119
+#: src/admin/screens/Students.js:190
+#: src/blocks/index.js:66
 #: templates/dashboard/announcements.php:30
-#: templates/dashboard/instructor-courses.php:34
+#: templates/dashboard/instructor-courses.php:35
 #: templates/dashboard/instructor-earnings.php:51
 #: templates/dashboard/instructor-students.php:46
 #: templates/dashboard/quizzes.php:33
@@ -940,6 +987,7 @@ msgid "Leave 0 to use the current course."
 msgstr ""
 
 #: includes/Modules/Elementor/Widgets/EnrollButton.php:37
+#: src/blocks/index.js:91
 msgid "Course Enroll Box"
 msgstr ""
 
@@ -959,31 +1007,12 @@ msgstr ""
 msgid "You are enrolled in {course_title}"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:62
-msgid ""
-"Hi {student_name},\n"
-"\n"
-"You are now enrolled in {course_title}. Start learning here:\n"
-"{course_url}\n"
-"\n"
-"Happy learning!"
-msgstr ""
-
 #: includes/Modules/Emails/Module.php:65
 msgid "Student: completed a course"
 msgstr ""
 
 #: includes/Modules/Emails/Module.php:67
 msgid "Congratulations! You completed {course_title}"
-msgstr ""
-
-#: includes/Modules/Emails/Module.php:68
-msgid ""
-"Hi {student_name},\n"
-"\n"
-"You have completed {course_title}. Well done!\n"
-"\n"
-"See your dashboard: {dashboard_url}"
 msgstr ""
 
 #: includes/Modules/Emails/Module.php:71
@@ -994,32 +1023,12 @@ msgstr ""
 msgid "Your result for {quiz_title}: {quiz_score}%"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:74
-msgid ""
-"Hi {student_name},\n"
-"\n"
-"You scored {quiz_score}% on {quiz_title} in {course_title}. Result: {quiz_result}.\n"
-"\n"
-"{course_url}"
-msgstr ""
-
 #: includes/Modules/Emails/Module.php:77
 msgid "Student: order receipt"
 msgstr ""
 
 #: includes/Modules/Emails/Module.php:79
 msgid "Your order #{order_id} on {site_name}"
-msgstr ""
-
-#: includes/Modules/Emails/Module.php:80
-msgid ""
-"Hi {student_name},\n"
-"\n"
-"Thanks for your purchase. Order #{order_id} for {order_total} is complete.\n"
-"\n"
-"{order_items}\n"
-"\n"
-"Go to your dashboard: {dashboard_url}"
 msgstr ""
 
 #: includes/Modules/Emails/Module.php:83
@@ -1030,107 +1039,65 @@ msgstr ""
 msgid "New order #{order_id} ({order_total})"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:86
-msgid ""
-"A new order was completed on {site_name}.\n"
-"\n"
-"Order #{order_id}\n"
-"Student: {student_name} ({student_email})\n"
-"Total: {order_total}\n"
-"\n"
-"{order_items}"
-msgstr ""
-
-#: includes/Modules/Emails/Module.php:89
+#: includes/Modules/Emails/Module.php:101
 msgid "Admin: new instructor application"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:91
+#: includes/Modules/Emails/Module.php:103
 msgid "New instructor application from {student_name}"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:92
-msgid ""
-"{student_name} ({student_email}) applied to become an instructor on {site_name}.\n"
-"\n"
-"Review applications: {admin_instructors_url}"
-msgstr ""
-
-#: includes/Modules/Emails/Module.php:95
+#: includes/Modules/Emails/Module.php:107
 msgid "Instructor: application approved"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:97
+#: includes/Modules/Emails/Module.php:109
 msgid "You are now an instructor on {site_name}"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:98
-msgid ""
-"Hi {student_name},\n"
-"\n"
-"Your instructor application was approved. You can create your first course here:\n"
-"{dashboard_url}"
-msgstr ""
-
-#: includes/Modules/Emails/Module.php:101
+#: includes/Modules/Emails/Module.php:113
 msgid "Instructor: new student enrolled"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:103
+#: includes/Modules/Emails/Module.php:115
 msgid "New student in {course_title}"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:104
-msgid ""
-"{student_name} enrolled in {course_title}.\n"
-"\n"
-"{course_url}"
-msgstr ""
-
-#: includes/Modules/Emails/Module.php:107
+#: includes/Modules/Emails/Module.php:119
 msgid "Student: course announcement"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:109
+#: includes/Modules/Emails/Module.php:121
 msgid "{course_title}: {announcement_title}"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:110
-msgid ""
-"Hi {student_name},\n"
-"\n"
-"A new announcement was posted in {course_title}:\n"
-"\n"
-"{announcement_title}\n"
-"\n"
-"{announcement_content}\n"
-"\n"
-"{course_url}"
-msgstr ""
-
-#: includes/Modules/Emails/Module.php:155
+#: includes/Modules/Emails/Module.php:168
 msgid "Subject"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:161
+#: includes/Modules/Emails/Module.php:174
 msgid "Body"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:165
+#: includes/Modules/Emails/Module.php:178
 msgid "Tags: {student_name} {student_email} {course_title} {course_url} {quiz_title} {quiz_score} {quiz_result} {order_id} {order_total} {order_items} {dashboard_url} {site_name}"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:248
+#: assets/js/frontend.js:397
+#: includes/Modules/Emails/Module.php:261
 #: includes/Modules/Privacy/Module.php:156
-#: templates/dashboard/quizzes.php:45
-#: assets/js/frontend.js:342
+#: src/admin/screens/Quizzes.js:24
+#: src/admin/screens/Quizzes.js:63
+#: templates/dashboard/quizzes.php:49
 msgid "Passed"
 msgstr ""
 
-#: includes/Modules/Emails/Module.php:248
-#: templates/dashboard/orders.php:26
-#: templates/dashboard/quizzes.php:45
-#: assets/js/frontend.js:342
+#: assets/js/frontend.js:397
+#: includes/Modules/Emails/Module.php:261
+#: src/admin/screens/Quizzes.js:24
+#: src/admin/screens/Quizzes.js:63
+#: templates/dashboard/orders.php:27
+#: templates/dashboard/quizzes.php:49
 msgid "Failed"
 msgstr ""
 
@@ -1143,7 +1110,7 @@ msgid "Front-end instructor registration with admin approval, plus instructor da
 msgstr ""
 
 #: includes/Modules/Instructors/Module.php:68
-#: templates/dashboard/instructor-courses.php:26
+#: templates/dashboard/instructor-courses.php:27
 #: templates/instructor-register.php:32
 msgid "My courses"
 msgstr ""
@@ -1189,12 +1156,22 @@ msgstr ""
 
 #: includes/Modules/Privacy/Module.php:121
 #: includes/Modules/Privacy/Module.php:183
-#: templates/dashboard/instructor-courses.php:35
-#: templates/dashboard/orders.php:38
+#: src/admin/screens/Courses.js:107
+#: src/admin/screens/Instructors.js:35
+#: src/admin/screens/Orders.js:46
+#: src/admin/screens/Orders.js:81
+#: src/admin/screens/Students.js:120
+#: src/admin/screens/Students.js:191
+#: src/admin/screens/Tools.js:223
+#: src/builder/components/ItemEditor.js:136
+#: templates/dashboard/instructor-courses.php:36
+#: templates/dashboard/orders.php:39
 msgid "Status"
 msgstr ""
 
 #: includes/Modules/Privacy/Module.php:125
+#: src/admin/screens/Students.js:121
+#: src/admin/screens/Students.js:194
 #: templates/dashboard/instructor-students.php:47
 msgid "Progress"
 msgstr ""
@@ -1203,19 +1180,22 @@ msgstr ""
 msgid "Started"
 msgstr ""
 
+#: assets/js/frontend.js:262
 #: includes/Modules/Privacy/Module.php:133
+#: src/admin/screens/Reports.js:79
+#: src/admin/screens/Students.js:216
 #: templates/dashboard/courses.php:36
 #: templates/dashboard/instructor-students.php:66
 #: templates/dashboard/overview.php:43
 #: templates/dashboard/parts/enrolled-card.php:38
-#: templates/learn.php:153
-#: assets/js/frontend.js:204
+#: templates/learn.php:184
 msgid "Completed"
 msgstr ""
 
 #: includes/Modules/Privacy/Module.php:152
+#: src/admin/screens/Quizzes.js:62
 #: templates/dashboard/quizzes.php:34
-#: templates/parts/quiz-player.php:46
+#: templates/parts/quiz-player.php:47
 msgid "Score"
 msgstr ""
 
@@ -1229,9 +1209,12 @@ msgstr ""
 
 #: includes/Modules/Privacy/Module.php:160
 #: includes/Modules/Privacy/Module.php:195
-#: templates/dashboard/orders.php:39
+#: src/admin/screens/Orders.js:82
+#: src/admin/screens/Quizzes.js:64
+#: src/builder/components/SchedulePanel.js:77
+#: templates/dashboard/orders.php:40
 #: templates/dashboard/quizzes.php:36
-#: templates/parts/quiz-player.php:48
+#: templates/parts/quiz-player.php:49
 msgid "Date"
 msgstr ""
 
@@ -1240,13 +1223,18 @@ msgid "Course orders"
 msgstr ""
 
 #: includes/Modules/Privacy/Module.php:175
-#: templates/dashboard/orders.php:35
+#: src/admin/screens/Orders.js:76
+#: templates/dashboard/orders.php:36
 msgid "Order"
 msgstr ""
 
 #: includes/Modules/Privacy/Module.php:179
-#: templates/checkout.php:108
-#: templates/dashboard/orders.php:37
+#: src/admin/screens/Orders.js:43
+#: src/admin/screens/Orders.js:79
+#: templates/cart.php:56
+#: templates/checkout-receipt.php:46
+#: templates/checkout.php:164
+#: templates/dashboard/orders.php:38
 msgid "Total"
 msgstr ""
 
@@ -1277,12 +1265,14 @@ msgstr ""
 #: includes/Modules/QA/Module.php:156
 #: includes/Modules/QA/Module.php:244
 #: includes/Services/ProgressService.php:107
-#: includes/Services/QuizService.php:174
+#: includes/Services/ProgressService.php:181
+#: includes/Services/QuizService.php:205
 msgid "You are not enrolled in this course."
 msgstr ""
 
 #: includes/Modules/QA/Module.php:254
-#: includes/Services/QuizService.php:272
+#: includes/Services/QuizService.php:413
+#: includes/Services/QuizService.php:655
 msgid "Question not found."
 msgstr ""
 
@@ -1334,19 +1324,19 @@ msgstr ""
 msgid "Add to wishlist"
 msgstr ""
 
-#: includes/Modules/WooCommerce/Module.php:49
+#: includes/Modules/WooCommerce/Module.php:71
 msgid "Sell courses through WooCommerce products and checkout."
 msgstr ""
 
-#: includes/Modules/WooCommerce/Module.php:252
+#: includes/Modules/WooCommerce/Module.php:770
 msgid "— None —"
 msgstr ""
 
-#: includes/Modules/WooCommerce/Module.php:260
+#: includes/Modules/WooCommerce/Module.php:778
 msgid "ShapeLMS course"
 msgstr ""
 
-#: includes/Modules/WooCommerce/Module.php:264
+#: includes/Modules/WooCommerce/Module.php:782
 msgid "Buyers are enrolled in this course when the order is paid."
 msgstr ""
 
@@ -1371,14 +1361,17 @@ msgid "True / False"
 msgstr ""
 
 #: includes/Quiz/Types/TrueFalse.php:51
+#: src/builder/components/QuestionsEditor.js:78
 msgid "True"
 msgstr ""
 
 #: includes/Quiz/Types/TrueFalse.php:55
+#: src/builder/components/QuestionsEditor.js:78
 msgid "False"
 msgstr ""
 
-#: includes/Services/CourseService.php:173
+#: includes/Services/CourseService.php:237
+#: src/blocks/index.js:48
 #: templates/parts/filters.php:48
 msgid "Free"
 msgstr ""
@@ -1503,43 +1496,43 @@ msgstr ""
 msgid "New Zealand Dollar"
 msgstr ""
 
-#: includes/Services/EnrollmentService.php:132
-#: includes/Services/OrderService.php:59
+#: includes/Services/EnrollmentService.php:141
+#: includes/Services/OrderService.php:142
 msgid "User not found."
 msgstr ""
 
-#: includes/Services/EnrollmentService.php:150
-#: templates/parts/enroll-box.php:78
+#: includes/Services/EnrollmentService.php:184
+#: templates/parts/enroll-box.php:100
 msgid "This course is full."
 msgstr ""
 
 #. translators: %s: course titles
-#: includes/Services/EnrollmentService.php:160
+#: includes/Services/EnrollmentService.php:194
 #, php-format
 msgid "Complete these courses first: %s"
 msgstr ""
 
-#: includes/Services/EnrollmentService.php:189
+#: includes/Services/EnrollmentService.php:223
 msgid "Could not enroll the user."
 msgstr ""
 
-#: includes/Services/EnrollmentService.php:267
+#: includes/Services/EnrollmentService.php:301
 msgid "This course must be purchased."
 msgstr ""
 
-#: includes/Services/EnrollmentService.php:271
+#: includes/Services/EnrollmentService.php:305
 msgid "This course is not available yet."
 msgstr ""
 
-#: includes/Services/ImportExportService.php:158
+#: includes/Services/ImportExportService.php:159
 msgid "No courses found in the file."
 msgstr ""
 
-#: includes/Services/ImportExportService.php:371
+#: includes/Services/ImportExportService.php:385
 msgid "Demo file not found."
 msgstr ""
 
-#: includes/Services/ImportExportService.php:382
+#: includes/Services/ImportExportService.php:396
 msgid "Could not import the demo course."
 msgstr ""
 
@@ -1548,20 +1541,20 @@ msgid "You have already applied or are already an instructor."
 msgstr ""
 
 #. translators: 1: course title, 2: prerequisite titles
-#: includes/Services/OrderService.php:82
+#: includes/Services/OrderService.php:74
 #, php-format
 msgid "%1$s requires you to complete these courses first: %2$s"
 msgstr ""
 
-#: includes/Services/OrderService.php:97
+#: includes/Services/OrderService.php:210
 msgid "There is nothing to purchase."
 msgstr ""
 
-#: includes/Services/OrderService.php:136
+#: includes/Services/OrderService.php:264
 msgid "Could not create the order."
 msgstr ""
 
-#: includes/Services/OrderService.php:244
+#: includes/Services/OrderService.php:428
 msgid "Invalid status."
 msgstr ""
 
@@ -1573,37 +1566,37 @@ msgstr ""
 msgid "Complete the previous lessons first."
 msgstr ""
 
-#: includes/Services/QuizService.php:178
+#: includes/Services/QuizService.php:209
 msgid "Complete the previous lessons before taking this quiz."
 msgstr ""
 
-#: includes/Services/QuizService.php:195
-#: templates/parts/quiz-player.php:35
+#: includes/Services/QuizService.php:226
+#: templates/parts/quiz-player.php:36
 msgid "This quiz has no questions yet."
 msgstr ""
 
-#: includes/Services/QuizService.php:201
+#: includes/Services/QuizService.php:232
 msgid "You have used all your attempts for this quiz."
 msgstr ""
 
-#: includes/Services/QuizService.php:266
+#: includes/Services/QuizService.php:408
 msgid "Question is not part of this attempt."
 msgstr ""
 
-#: includes/Services/QuizService.php:384
-#: includes/Services/QuizService.php:476
+#: includes/Services/QuizService.php:749
+#: includes/Services/QuizService.php:887
 msgid "Attempt not found."
 msgstr ""
 
-#: includes/Services/QuizService.php:480
+#: includes/Services/QuizService.php:891
 msgid "This attempt has already been submitted."
 msgstr ""
 
-#: includes/Services/QuizService.php:485
+#: includes/Services/QuizService.php:896
 msgid "Time is up. The attempt has been submitted."
 msgstr ""
 
-#: includes/Services/ReportService.php:268
+#: includes/Services/ReportService.php:269
 msgid "Unknown"
 msgstr ""
 
@@ -1637,18 +1630,20 @@ msgstr ""
 msgid "Filters"
 msgstr ""
 
+#: src/shared/components.js:86
 #: templates/archive-course.php:105
 #: templates/dashboard/qa.php:102
-#: templates/learn.php:146
-#: templates/parts/quiz-player.php:64
+#: templates/learn.php:173
+#: templates/parts/quiz-player.php:65
 msgid "Previous"
 msgstr ""
 
+#: src/shared/components.js:89
 #: templates/archive-course.php:106
 #: templates/dashboard/qa.php:103
-#: templates/learn.php:158
-#: templates/learn.php:160
-#: templates/parts/quiz-player.php:65
+#: templates/learn.php:189
+#: templates/learn.php:191
+#: templates/parts/quiz-player.php:66
 msgid "Next"
 msgstr ""
 
@@ -1691,9 +1686,11 @@ msgstr ""
 msgid "Username or Email Address"
 msgstr ""
 
+#: src/admin/screens/Courses.js:118
 #: templates/auth/login.php:46
 #: templates/auth/register.php:53
 #: templates/instructor-register.php:65
+#: templates/single-course-password.php:40
 msgid "Password"
 msgstr ""
 
@@ -1747,6 +1744,7 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
+#: includes/Modules/Checkout/Module.php:186
 #: templates/auth/register.php:49
 #: templates/instructor-register.php:61
 msgid "Email"
@@ -1788,60 +1786,65 @@ msgstr ""
 msgid "Save password"
 msgstr ""
 
-#: templates/checkout.php:50
+#: templates/checkout.php:71
 msgid "No course selected."
 msgstr ""
 
-#: templates/checkout.php:50
+#: templates/cart.php:34
+#: templates/checkout.php:71
 #: templates/dashboard/courses.php:58
 #: templates/dashboard/overview.php:63
 msgid "Browse courses"
 msgstr ""
 
-#: templates/checkout.php:52
+#: templates/checkout.php:73
 msgid "Please log in or create an account to continue."
 msgstr ""
 
-#: templates/checkout.php:54
+#: templates/checkout.php:75
 #: templates/instructor-register.php:37
 msgid "Log in"
 msgstr ""
 
-#: templates/checkout.php:56
+#: templates/checkout.php:77
 msgid "Create account"
 msgstr ""
 
-#: templates/checkout.php:60
+#: templates/checkout.php:81
 msgid "You already have access to these courses."
 msgstr ""
 
-#: templates/checkout.php:61
+#: templates/checkout.php:82
 msgid "Go to course"
 msgstr ""
 
-#: templates/checkout.php:63
+#: templates/checkout.php:84
 msgid "No payment method is configured yet. Please contact the site owner."
 msgstr ""
 
-#: templates/checkout.php:65
+#: templates/checkout-receipt.php:41
+#: templates/checkout.php:113
 msgid "Payment method"
 msgstr ""
 
 #. translators: %s: total
-#: templates/checkout.php:85
+#: templates/checkout.php:141
 #, php-format
 msgid "Pay %s"
 msgstr ""
 
-#: templates/checkout.php:88
+#: templates/checkout.php:144
 msgid "Payments are processed securely by the selected provider. Your card details never touch this site."
 msgstr ""
 
-#: templates/checkout.php:94
+#: templates/cart.php:54
+#: templates/checkout.php:150
 msgid "Order summary"
 msgstr ""
 
-#: templates/checkout.php:100
+#: src/admin/screens/Students.js:122
+#: src/admin/screens/Students.js:203
+#: templates/checkout.php:156
 #: templates/dashboard/instructor-students.php:48
 msgid "Enrolled"
 msgstr ""
@@ -1874,6 +1877,10 @@ msgstr ""
 msgid "Delete this announcement?"
 msgstr ""
 
+#: src/admin/screens/Orders.js:83
+#: src/admin/screens/Quizzes.js:65
+#: src/builder/components/QuestionsEditor.js:171
+#: src/builder/tabs/CurriculumTab.js:44
 #: templates/dashboard/announcements.php:58
 #: templates/parts/qa.php:46
 msgid "Delete"
@@ -1883,6 +1890,7 @@ msgstr ""
 msgid "No announcements yet."
 msgstr ""
 
+#: src/admin/screens/Instructors.js:57
 #: templates/dashboard/courses.php:34
 msgid "All"
 msgstr ""
@@ -1896,40 +1904,57 @@ msgstr ""
 msgid "No courses here yet."
 msgstr ""
 
+#: src/admin/screens/Courses.js:14
+#: src/admin/screens/Courses.js:157
+#: src/builder/components/ItemEditor.js:136
 #: templates/dashboard/instructor-courses.php:19
 msgid "Published"
 msgstr ""
 
-#: templates/dashboard/instructor-courses.php:20
+#: src/admin/screens/Courses.js:16
+#: src/admin/screens/Courses.js:159
+#: src/builder/tabs/CurriculumTab.js:33
+#: templates/dashboard/instructor-courses.php:21
 msgid "Draft"
 msgstr ""
 
-#: templates/dashboard/instructor-courses.php:21
+#: src/admin/screens/Courses.js:160
+#: templates/dashboard/instructor-courses.php:22
 msgid "Pending review"
 msgstr ""
 
-#: templates/dashboard/instructor-courses.php:22
+#: src/admin/screens/Courses.js:18
+#: src/admin/screens/Courses.js:161
+#: src/builder/tabs/SettingsTab.js:57
+#: templates/dashboard/instructor-courses.php:23
 msgid "Private"
 msgstr ""
 
-#: templates/dashboard/instructor-courses.php:27
+#: templates/dashboard/instructor-courses.php:28
 msgid "Create course"
 msgstr ""
 
-#: templates/dashboard/instructor-courses.php:37
+#: src/admin/screens/Courses.js:126
+#: src/admin/screens/Reports.js:81
+#: templates/dashboard/instructor-courses.php:38
 #: templates/parts/reviews.php:51
 msgid "Rating"
 msgstr ""
 
-#: templates/dashboard/instructor-courses.php:55
+#: src/admin/screens/Courses.js:134
+#: src/builder/tabs/CurriculumTab.js:43
+#: templates/dashboard/instructor-courses.php:56
 msgid "Edit"
 msgstr ""
 
-#: templates/dashboard/instructor-courses.php:57
+#: src/admin/screens/Courses.js:135
+#: src/admin/screens/Orders.js:83
+#: templates/dashboard/instructor-courses.php:58
+#: templates/dashboard/orders.php:61
 msgid "View"
 msgstr ""
 
-#: templates/dashboard/instructor-courses.php:64
+#: templates/dashboard/instructor-courses.php:65
 msgid "You haven't created a course yet."
 msgstr ""
 
@@ -1941,6 +1966,7 @@ msgstr ""
 msgid "Sales"
 msgstr ""
 
+#: src/admin/screens/Reports.js:65
 #: templates/dashboard/instructor-earnings.php:53
 msgid "Revenue"
 msgstr ""
@@ -1965,24 +1991,28 @@ msgstr ""
 msgid "No students yet."
 msgstr ""
 
+#: src/admin/screens/Courses.js:17
+#: src/admin/screens/Instructors.js:57
 #: templates/dashboard/orders.php:22
 msgid "Pending"
 msgstr ""
 
-#: templates/dashboard/orders.php:23
+#: src/blocks/index.js:49
+#: templates/dashboard/orders.php:24
 #: templates/parts/filters.php:49
 msgid "Paid"
 msgstr ""
 
-#: templates/dashboard/orders.php:24
+#: templates/dashboard/orders.php:25
 msgid "Refunded"
 msgstr ""
 
-#: templates/dashboard/orders.php:25
+#: src/admin/screens/Students.js:216
+#: templates/dashboard/orders.php:26
 msgid "Cancelled"
 msgstr ""
 
-#: templates/dashboard/orders.php:60
+#: templates/dashboard/orders.php:69
 msgid "No purchases yet."
 msgstr ""
 
@@ -1997,7 +2027,7 @@ msgid "Enrolled courses"
 msgstr ""
 
 #: templates/dashboard/overview.php:48
-#: templates/parts/enroll-box.php:65
+#: templates/parts/enroll-box.php:82
 msgid "Continue learning"
 msgstr ""
 
@@ -2010,13 +2040,14 @@ msgid "Latest announcements"
 msgstr ""
 
 #. translators: %d: percent
+#: assets/js/frontend.js:333
 #: templates/dashboard/parts/enrolled-card.php:40
-#: templates/learn.php:68
-#: assets/js/frontend.js:275
+#: templates/learn.php:73
 #, php-format,js-format
 msgid "%d%% complete"
 msgstr ""
 
+#: src/admin/screens/Tools.js:88
 #: templates/dashboard/parts/enrolled-card.php:44
 msgid "Continue"
 msgstr ""
@@ -2043,6 +2074,7 @@ msgstr ""
 msgid "Change your name, email and password in your <a href=\"%s\">account settings</a>."
 msgstr ""
 
+#: src/admin/screens/Instructors.js:34
 #: templates/dashboard/profile.php:27
 #: templates/instructor-register.php:72
 msgid "Headline"
@@ -2068,6 +2100,7 @@ msgstr ""
 msgid "LinkedIn"
 msgstr ""
 
+#: src/builder/components/ItemEditor.js:66
 #: templates/dashboard/profile.php:39
 msgid "YouTube"
 msgstr ""
@@ -2106,12 +2139,13 @@ msgstr ""
 msgid "No questions yet."
 msgstr ""
 
+#: src/admin/screens/Quizzes.js:63
 #: templates/dashboard/quizzes.php:35
-#: templates/parts/quiz-player.php:47
+#: templates/parts/quiz-player.php:48
 msgid "Result"
 msgstr ""
 
-#: templates/dashboard/quizzes.php:52
+#: templates/dashboard/quizzes.php:58
 msgid "No quiz attempts yet."
 msgstr ""
 
@@ -2204,38 +2238,33 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
-#: templates/learn.php:56
+#: templates/learn.php:61
 msgid "Toggle course content"
 msgstr ""
 
-#: templates/learn.php:76
+#: templates/learn.php:81
 #: templates/single-course.php:96
 msgid "Course content"
 msgstr ""
 
-#: templates/learn.php:105
-#: templates/parts/curriculum.php:69
+#: includes/Services/ProgressService.php:517
 msgid "Complete the previous lessons to unlock"
 msgstr ""
 
-#: templates/learn.php:105
-#: templates/parts/curriculum.php:69
+#: templates/learn.php:110
+#: templates/parts/curriculum.php:75
 msgid "Enroll to unlock"
 msgstr ""
 
-#: templates/learn.php:121
-msgid "That lesson is locked. Finish this one first and the next will open."
-msgstr ""
-
-#: templates/learn.php:153
+#: templates/learn.php:184
 msgid "Mark as complete"
 msgstr ""
 
-#: templates/learn.php:158
+#: templates/learn.php:189
 msgid "Complete this lesson to continue"
 msgstr ""
 
-#: templates/learn.php:162
+#: templates/learn.php:193
 msgid "Back to course"
 msgstr ""
 
@@ -2249,24 +2278,31 @@ msgstr ""
 msgid "Resources"
 msgstr ""
 
+#: src/builder/tabs/BasicsTab.js:59
 #: templates/parts/course-card.php:23
 #: templates/parts/filters.php:41
 #: templates/single-course.php:22
 msgid "All levels"
 msgstr ""
 
+#: src/blocks/index.js:37
+#: src/builder/tabs/BasicsTab.js:60
 #: templates/parts/course-card.php:24
 #: templates/parts/filters.php:42
 #: templates/single-course.php:23
 msgid "Beginner"
 msgstr ""
 
+#: src/blocks/index.js:38
+#: src/builder/tabs/BasicsTab.js:61
 #: templates/parts/course-card.php:25
 #: templates/parts/filters.php:43
 #: templates/single-course.php:24
 msgid "Intermediate"
 msgstr ""
 
+#: src/blocks/index.js:39
+#: src/builder/tabs/BasicsTab.js:62
 #: templates/parts/course-card.php:26
 #: templates/parts/filters.php:44
 #: templates/single-course.php:25
@@ -2274,6 +2310,7 @@ msgid "Advanced"
 msgstr ""
 
 #. translators: %d: lessons
+#: src/admin/screens/Courses.js:124
 #: templates/parts/course-card.php:54
 #: templates/single-course.php:55
 #: templates/single-course.php:106
@@ -2300,88 +2337,94 @@ msgid_plural "%d students"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/parts/curriculum.php:18
+#: templates/parts/curriculum.php:22
 msgid "The curriculum will be published soon."
 msgstr ""
 
 #. translators: %d: number of items
-#: templates/parts/curriculum.php:33
+#: src/shared/components.js:79
+#: src/shared/components.js:83
+#: templates/parts/curriculum.php:39
 #, php-format
 msgid "%d item"
 msgid_plural "%d items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/parts/curriculum.php:61
-#: templates/parts/curriculum.php:63
+#: src/builder/App.js:176
+#: src/builder/tabs/CurriculumTab.js:34
+#: templates/parts/curriculum.php:67
+#: templates/parts/curriculum.php:69
 msgid "Preview"
 msgstr ""
 
-#: templates/parts/curriculum.php:69
+#: templates/parts/curriculum.php:75
 msgid "Locked"
 msgstr ""
 
-#: templates/parts/enroll-box.php:45
+#: templates/parts/enroll-box.php:62
 msgid "Preview this course"
 msgstr ""
 
 #. translators: 1: done, 2: total
-#: templates/parts/enroll-box.php:58
+#: templates/parts/enroll-box.php:75
 #, php-format
 msgid "%1$d of %2$d completed"
 msgstr ""
 
-#: templates/parts/enroll-box.php:61
+#: templates/parts/enroll-box.php:78
 msgid "You have completed this course."
 msgstr ""
 
-#: templates/parts/enroll-box.php:65
+#: templates/parts/enroll-box.php:82
+#: templates/parts/enroll-box.php:95
 msgid "Start learning"
 msgstr ""
 
 #. translators: %d: percent
-#: templates/parts/enroll-box.php:73
+#: templates/parts/enroll-box.php:90
 #, php-format
 msgid "%d%% off"
 msgstr ""
 
-#: templates/parts/enroll-box.php:81
+#: templates/parts/enroll-box.php:103
 msgid "Complete these courses first:"
 msgstr ""
 
-#: templates/parts/enroll-box.php:91
+#: templates/parts/enroll-box.php:113
 msgid "Enroll for free"
 msgstr ""
 
-#: templates/parts/enroll-box.php:95
+#: templates/parts/enroll-box.php:117
 msgid "Log in to enroll"
 msgstr ""
 
-#: templates/parts/enroll-box.php:100
+#: templates/parts/enroll-box.php:48
 msgid "Buy now"
 msgstr ""
 
-#: templates/parts/enroll-box.php:116
+#: templates/parts/enroll-box.php:140
 msgid "This course includes"
 msgstr ""
 
-#: templates/parts/enroll-box.php:121
+#: templates/parts/enroll-box.php:145
 msgid "Duration"
 msgstr ""
 
-#: templates/parts/enroll-box.php:124
+#: templates/parts/enroll-box.php:158
 msgid "Access"
 msgstr ""
 
-#: templates/parts/enroll-box.php:124
+#: templates/parts/enroll-box.php:156
 msgid "Lifetime"
 msgstr ""
 
-#: templates/parts/enroll-box.php:126
+#: templates/parts/enroll-box.php:160
 msgid "Progression"
 msgstr ""
 
-#: templates/parts/enroll-box.php:126
+#: src/builder/tabs/SettingsTab.js:138
+#: templates/parts/enroll-box.php:160
 msgid "Step by step"
 msgstr ""
 
@@ -2430,6 +2473,8 @@ msgstr ""
 msgid "All categories"
 msgstr ""
 
+#: src/blocks/index.js:33
+#: src/builder/tabs/BasicsTab.js:56
 #: templates/parts/filters.php:127
 #: templates/parts/filters.php:174
 msgid "Level"
@@ -2471,16 +2516,16 @@ msgstr ""
 msgid "No questions yet. Be the first to ask."
 msgstr ""
 
-#: templates/parts/quiz-player.php:27
+#: templates/parts/quiz-player.php:28
 msgid "Pass mark"
 msgstr ""
 
-#: templates/parts/quiz-player.php:28
+#: templates/parts/quiz-player.php:29
 msgid "Time limit"
 msgstr ""
 
 #. translators: %d: minutes
-#: templates/parts/quiz-player.php:28
+#: templates/parts/quiz-player.php:29
 #, php-format
 msgid "%d minute"
 msgid_plural "%d minutes"
@@ -2488,37 +2533,37 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: minutes
-#: templates/parts/quiz-player.php:28
+#: templates/parts/quiz-player.php:29
 msgid "None"
 msgstr ""
 
 #. translators: %d: minutes
-#: templates/parts/quiz-player.php:29
+#: templates/parts/quiz-player.php:30
 msgid "Attempts"
 msgstr ""
 
 #. translators: %d: minutes
-#: templates/parts/quiz-player.php:29
+#: templates/parts/quiz-player.php:30
 msgid "Unlimited"
 msgstr ""
 
-#: templates/parts/quiz-player.php:33
+#: templates/parts/quiz-player.php:34
 msgid "Enroll in the course to take this quiz."
 msgstr ""
 
-#: templates/parts/quiz-player.php:37
+#: templates/parts/quiz-player.php:38
 msgid "Start quiz"
 msgstr ""
 
-#: templates/parts/quiz-player.php:41
+#: templates/parts/quiz-player.php:42
 msgid "Previous attempts"
 msgstr ""
 
-#: templates/parts/quiz-player.php:45
+#: templates/parts/quiz-player.php:46
 msgid "Attempt"
 msgstr ""
 
-#: templates/parts/quiz-player.php:66
+#: templates/parts/quiz-player.php:67
 msgid "Submit quiz"
 msgstr ""
 
@@ -2593,6 +2638,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: quizzes
+#: src/admin/screens/Courses.js:124
 #: templates/single-course.php:108
 #, php-format
 msgid "%d quiz"
@@ -2600,6 +2646,7 @@ msgid_plural "%d quizzes"
 msgstr[0] ""
 msgstr[1] ""
 
+#: src/builder/tabs/BasicsTab.js:69
 #: templates/single-course.php:119
 msgid "Requirements"
 msgstr ""
@@ -2610,10 +2657,12 @@ msgstr ""
 msgid "Complete the course %s first"
 msgstr ""
 
+#: src/builder/tabs/BasicsTab.js:26
 #: templates/single-course.php:143
 msgid "Description"
 msgstr ""
 
+#: src/builder/tabs/BasicsTab.js:70
 #: templates/single-course.php:150
 msgid "Who this course is for"
 msgstr ""
@@ -2624,156 +2673,158 @@ msgstr ""
 msgid "See all courses by %s."
 msgstr ""
 
-#: assets/js/checkout.js:72
+#: assets/js/checkout.js:99
 msgid "Stripe could not be loaded."
 msgstr ""
 
-#: assets/js/checkout.js:111
+#: assets/js/checkout.js:143
 msgid "Payment received. Finishing your order…"
 msgstr ""
 
-#: assets/js/checkout.js:124
+#: assets/js/checkout.js:156
 msgid "PayPal could not be loaded."
 msgstr ""
 
-#: assets/js/checkout.js:141
+#: assets/js/checkout.js:176
 msgid "Payment approved. Finishing your order…"
 msgstr ""
 
-#: assets/js/checkout.js:147
+#: assets/js/checkout.js:182
 msgid "PayPal could not process the payment. Please try again."
 msgstr ""
 
-#: assets/js/checkout.js:180
+#: assets/js/checkout.js:227
 msgid "Finishing your order…"
 msgstr ""
 
-#: assets/js/frontend.js:61
+#: assets/js/frontend.js:71
 msgid "Something went wrong."
 msgstr ""
 
-#: assets/js/frontend.js:144
+#: assets/js/frontend.js:154
 msgid "You are enrolled! Redirecting…"
 msgstr ""
 
 #. translators: 1: attempts left, 2: attempts allowed
-#: assets/js/frontend.js:314
+#: assets/js/frontend.js:372
 #, js-format
 msgid "%1$d of %2$d left"
 msgstr ""
 
-#: assets/js/frontend.js:318
+#: assets/js/frontend.js:376
 msgid "No attempts left"
 msgstr ""
 
-#: assets/js/frontend.js:321
-msgid "Resume quiz"
-msgstr ""
-
-#: assets/js/frontend.js:336
+#: assets/js/frontend.js:391
+#: src/admin/screens/Quizzes.js:65
 msgid "Review"
 msgstr ""
 
 #. translators: %d: percent
-#: assets/js/frontend.js:341
-#: assets/js/frontend.js:553
+#: assets/js/frontend.js:396
+#: assets/js/frontend.js:723
+#: src/admin/screens/Quizzes.js:25
 #, js-format
 msgid "%d%%"
 msgstr ""
 
 #. translators: 1: question number, 2: total questions
-#: assets/js/frontend.js:420
+#: assets/js/frontend.js:519
 #, js-format
 msgid "Question %1$d of %2$d"
 msgstr ""
 
 #. translators: 1: current page, 2: total pages
-#: assets/js/frontend.js:421
+#: assets/js/frontend.js:520
+#: src/shared/components.js:83
 #, js-format
 msgid "Page %1$d of %2$d"
 msgstr ""
 
 #. translators: %s: points
-#: assets/js/frontend.js:433
+#: assets/js/frontend.js:548
 #, js-format
 msgid "(%s pts)"
 msgstr ""
 
 #. translators: %d: blank number
-#: assets/js/frontend.js:477
+#: assets/js/frontend.js:604
 #, js-format
 msgid "Blank %d"
 msgstr ""
 
-#: assets/js/frontend.js:502
+#: assets/js/frontend.js:635
 msgid "Correct!"
 msgstr ""
 
-#: assets/js/frontend.js:502
+#: assets/js/frontend.js:635
 msgid "Not quite."
 msgstr ""
 
 #. translators: %d: number of unanswered questions
-#: assets/js/frontend.js:522
+#: assets/js/frontend.js:682
 #, js-format
 msgid "You have %d unanswered question. Submit anyway?"
 msgid_plural "You have %d unanswered questions. Submit anyway?"
 msgstr[0] ""
 msgstr[1] ""
 
-#: assets/js/frontend.js:554
+#: assets/js/frontend.js:724
 msgid "Congratulations, you passed!"
 msgstr ""
 
-#: assets/js/frontend.js:554
+#: assets/js/frontend.js:724
 msgid "You did not pass this time."
 msgstr ""
 
 #. translators: 1: score, 2: maximum score, 3: pass mark percent
-#: assets/js/frontend.js:555
+#: assets/js/frontend.js:725
 #, js-format
 msgid "Score: %1$s of %2$s points. Pass mark: %3$d%%."
 msgstr ""
 
 #. translators: %s: the student's answer
-#: assets/js/frontend.js:563
+#: assets/js/frontend.js:734
 #, js-format
 msgid "Your answer: %s"
 msgstr ""
 
 #. translators: %s: the correct answer
-#: assets/js/frontend.js:565
+#: assets/js/frontend.js:736
 #, js-format
 msgid "Correct answer: %s"
 msgstr ""
 
 #. translators: 1: points earned, 2: maximum points
-#: assets/js/frontend.js:567
+#: assets/js/frontend.js:738
 #, js-format
 msgid "%1$s / %2$s points"
 msgstr ""
 
-#: assets/js/frontend.js:577
+#: assets/js/frontend.js:751
 msgid "Back to quiz"
 msgstr ""
 
-#: assets/js/frontend.js:584
+#: assets/js/frontend.js:761
 msgid "Next lesson"
 msgstr ""
 
-#: assets/js/frontend.js:599
+#: assets/js/frontend.js:776
 msgid "(no answer)"
 msgstr ""
 
-#: assets/js/frontend.js:675
+#: assets/js/frontend.js:859
+#: src/builder/components/ItemEditor.js:36
 msgid "Saved."
 msgstr ""
 
-#: assets/js/frontend.js:804
+#: assets/js/frontend.js:988
+#: src/admin/screens/Orders.js:48
+#: src/builder/components/ItemEditor.js:169
 msgid "Close"
 msgstr ""
 
-#: assets/js/frontend.js:839
+#: assets/js/frontend.js:1023
 msgid "Open lesson"
 msgstr ""
 
@@ -2943,4 +2994,1878 @@ msgstr ""
 #: blocks/register/block.json
 msgctxt "block description"
 msgid "Front-end student registration form."
+msgstr ""
+
+#: assets/js/frontend.js:397
+#: assets/js/frontend.js:738
+#: src/admin/screens/Quizzes.js:24
+#: src/admin/screens/Quizzes.js:63
+#: templates/dashboard/quizzes.php:47
+msgid "Waiting for review"
+msgstr ""
+
+#: assets/js/frontend.js:620
+msgid "Check answer"
+msgstr ""
+
+#: assets/js/frontend.js:666
+#: includes/Services/QuizService.php:308
+msgid "Choose an answer first."
+msgstr ""
+
+#: assets/js/frontend.js:718
+msgid "Submitted. Waiting for review."
+msgstr ""
+
+#: assets/js/frontend.js:719
+msgid "Some answers are graded by your instructor. Your final score appears here once they are reviewed."
+msgstr ""
+
+#: assets/js/frontend.js:740
+msgid "Feedback: "
+msgstr ""
+
+#: includes/Api/CoursesController.php:345
+msgid "Only the course author can change its instructors."
+msgstr ""
+
+#: includes/Api/CoursesController.php:476
+msgid "You cannot publish courses, so you cannot make this one private."
+msgstr ""
+
+#: includes/Api/CoursesController.php:488
+msgid "Enter a password of up to 255 characters."
+msgstr ""
+
+#: includes/Api/CoursesController.php:492
+msgid "Unknown visibility."
+msgstr ""
+
+#: includes/Api/CoursesController.php:520
+msgid "You cannot publish courses, so you cannot schedule this one."
+msgstr ""
+
+#: includes/Api/CoursesController.php:525
+msgid "Choose a date and time in the future."
+msgstr ""
+
+#: includes/Api/CoursesController.php:656
+msgid "Invalid product."
+msgstr ""
+
+#: includes/Api/CoursesController.php:662
+msgid "You are not allowed to use this product."
+msgstr ""
+
+#: includes/Api/CoursesController.php:668
+msgid "This product is already linked to another course."
+msgstr ""
+
+#: includes/Content/Curriculum.php:49
+#: src/builder/itemTypes.js:8
+msgid "+ Lesson"
+msgstr ""
+
+#: includes/Content/Curriculum.php:50
+#: src/builder/itemTypes.js:8
+msgid "Edit lesson"
+msgstr ""
+
+#: includes/Content/Curriculum.php:56
+#: src/builder/itemTypes.js:9
+msgid "+ Quiz"
+msgstr ""
+
+#: includes/Content/Curriculum.php:57
+#: src/builder/itemTypes.js:9
+msgid "Edit quiz"
+msgstr ""
+
+#: includes/Core/Pages.php:35
+msgid "Cart"
+msgstr ""
+
+#: includes/Core/Settings.php:87
+msgid "Cart page"
+msgstr ""
+
+#: includes/Core/Settings.php:204
+#: src/admin/screens/Tools.js:66
+msgid "Native Checkout"
+msgstr ""
+
+#: includes/Core/Settings.php:209
+msgid "Enable \"Buy Now\" button"
+msgstr ""
+
+#: includes/Core/Settings.php:212
+msgid "Allow users to purchase courses directly without adding them to the cart. When off, the course page shows \"Add to cart\" instead."
+msgstr ""
+
+#: includes/Core/Settings.php:215
+msgid "Complete paid WooCommerce course orders automatically"
+msgstr ""
+
+#: includes/Core/Settings.php:218
+msgid "Students get access as soon as an online payment goes through. Cash on delivery, bank transfer and check orders still wait until you mark them completed."
+msgstr ""
+
+#: includes/Core/Settings.php:221
+msgid "Redirect to courses after a completed WooCommerce order"
+msgstr ""
+
+#: includes/Core/Settings.php:224
+msgid "Students go from the order received page to their courses in the dashboard. Orders that are not completed yet stay on the order received page."
+msgstr ""
+
+#: includes/Core/Settings.php:274
+msgid "Paste the secret that starts with whsec_, not the URL. Add this webhook URL in Stripe: /wp-json/shapelms/v1/webhooks/stripe"
+msgstr ""
+
+#: includes/Core/Settings.php:297
+msgid "PayPal webhook ID"
+msgstr ""
+
+#: includes/Core/Settings.php:303
+msgid "Terms and conditions page"
+msgstr ""
+
+#: includes/Core/Settings.php:306
+msgid "When set, students must accept this page at checkout."
+msgstr ""
+
+#: includes/Core/Settings.php:309
+msgid "Enable cash on delivery"
+msgstr ""
+
+#: includes/Core/Settings.php:312
+#: includes/Core/Settings.php:328
+msgid "Students get access when you mark the order completed in Orders."
+msgstr ""
+
+#: includes/Core/Settings.php:315
+msgid "Cash on delivery title"
+msgstr ""
+
+#: includes/Core/Settings.php:320
+msgid "Cash on delivery description"
+msgstr ""
+
+#: includes/Core/Settings.php:325
+msgid "Enable direct bank transfer"
+msgstr ""
+
+#: includes/Core/Settings.php:331
+msgid "Bank transfer title"
+msgstr ""
+
+#: includes/Core/Settings.php:336
+msgid "Bank transfer description"
+msgstr ""
+
+#: includes/Core/Settings.php:341
+msgid "Bank transfer instructions"
+msgstr ""
+
+#: includes/Core/Settings.php:344
+msgid "Shown on the order page and in the email."
+msgstr ""
+
+#: includes/Core/Settings.php:347
+msgid "Bank account details"
+msgstr ""
+
+#: includes/Core/Settings.php:350
+msgid "Bank name, account name, account number and so on. Shown on the order page and in the email."
+msgstr ""
+
+#: includes/Modules/Checkout/BacsGateway.php:38
+msgid "Direct bank transfer"
+msgstr ""
+
+#: includes/Modules/Checkout/BacsGateway.php:58
+msgid "Pay directly into our bank account and use your order number as the reference. You get access once the money arrives."
+msgstr ""
+
+#: includes/Modules/Checkout/CodGateway.php:38
+msgid "Cash on delivery"
+msgstr ""
+
+#: includes/Modules/Checkout/CodGateway.php:58
+msgid "Pay in cash. You get access to the course once we receive your payment."
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:68
+msgid "Built-in checkout for one-time course payments with Stripe, PayPal, cash on delivery and bank transfer."
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:184
+msgid "First name"
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:185
+msgid "Last name"
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:187
+msgid "Phone"
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:188
+msgid "Country"
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:189
+msgid "State"
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:190
+msgid "City"
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:191
+msgid "Postcode / ZIP"
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:192
+msgid "Address"
+msgstr ""
+
+#. translators: %s: field label
+#: includes/Modules/Checkout/Module.php:233
+#, php-format
+msgid "%s is required."
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:242
+msgid "Enter a valid email address."
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:247
+msgid "Please accept the terms and conditions."
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:402
+#: includes/Modules/WooCommerce/Module.php:328
+msgid "View order"
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:405
+#: includes/Modules/Checkout/Module.php:650
+#: includes/Modules/WooCommerce/Module.php:337
+msgid "View cart"
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:405
+#: includes/Modules/WooCommerce/Module.php:337
+msgid "Add to cart"
+msgstr ""
+
+#: includes/Modules/Checkout/Module.php:639
+#: templates/cart.php:17
+msgid "The cart is not available."
+msgstr ""
+
+#: includes/Modules/Checkout/OfflineGateway.php:63
+msgid "This order is completed by the site owner after the payment arrives."
+msgstr ""
+
+#: includes/Modules/Checkout/OfflineGateway.php:73
+msgid "This payment method has no webhook."
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:62
+msgid "Hi {student_name},\n\nYou are now enrolled in {course_title}. Start learning here:\n{course_url}\n\nHappy learning!"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:68
+msgid "Hi {student_name},\n\nYou have completed {course_title}. Well done!\n\nSee your dashboard: {dashboard_url}"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:74
+msgid "Hi {student_name},\n\nYou scored {quiz_score}% on {quiz_title} in {course_title}. Result: {quiz_result}.\n\n{course_url}"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:80
+msgid "Hi {student_name},\n\nThanks for your purchase. Order #{order_id} for {order_total} is complete.\n\n{order_items}\n\nGo to your dashboard: {dashboard_url}"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:86
+msgid "A new order was completed on {site_name}.\n\nOrder #{order_id}\nStudent: {student_name} ({student_email})\nTotal: {order_total}\n\n{order_items}"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:89
+msgid "Student: order waiting for payment"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:91
+msgid "Your order #{order_id} on {site_name} is waiting for payment"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:92
+msgid "Hi {student_name},\n\nWe received order #{order_id} for {order_total}. You get access as soon as we receive your payment.\n\n{order_items}\n\n{payment_instructions}"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:95
+msgid "Admin: order waiting for payment"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:97
+msgid "Order #{order_id} is waiting for payment ({order_total})"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:98
+msgid "Order #{order_id} on {site_name} is waiting for an offline payment.\n\nStudent: {student_name} ({student_email})\nTotal: {order_total}\n\n{order_items}\n\nMark it completed in ShapeLMS > Orders once the money arrives. The student gets access then."
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:104
+msgid "{student_name} ({student_email}) applied to become an instructor on {site_name}.\n\nReview applications: {admin_instructors_url}"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:110
+msgid "Hi {student_name},\n\nYour instructor application was approved. You can create your first course here:\n{dashboard_url}"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:116
+msgid "{student_name} enrolled in {course_title}.\n\n{course_url}"
+msgstr ""
+
+#: includes/Modules/Emails/Module.php:122
+msgid "Hi {student_name},\n\nA new announcement was posted in {course_title}:\n\n{announcement_title}\n\n{announcement_content}\n\n{course_url}"
+msgstr ""
+
+#: includes/Modules/WooCommerce/Module.php:132
+msgid "ShapeLMS sells courses through WooCommerce, but WooCommerce is not active. Students cannot buy paid courses until you activate it or change the commerce engine in Settings → Selling."
+msgstr ""
+
+#: includes/Modules/WooCommerce/Module.php:161
+msgid "Course order completed automatically by ShapeLMS."
+msgstr ""
+
+#: includes/Modules/WooCommerce/Module.php:253
+msgid "ShapeLMS could not enroll the buyer: this order has no customer account."
+msgstr ""
+
+#: includes/Modules/WooCommerce/Module.php:745
+msgid "Save the course with a price first."
+msgstr ""
+
+#: includes/Services/CartService.php:71
+msgid "This course is free. Enroll from its page."
+msgstr ""
+
+#: includes/Services/CartService.php:75
+msgid "You are already enrolled in this course."
+msgstr ""
+
+#. translators: %s: course title
+#: includes/Services/CartService.php:80
+#: includes/Services/OrderService.php:189
+#, php-format
+msgid "You already have an order for %s that is waiting for payment."
+msgstr ""
+
+#: includes/Services/EnrollmentService.php:309
+#: includes/Services/OrderService.php:60
+msgid "Enter the password on the course page first."
+msgstr ""
+
+#: includes/Services/OrderService.php:58
+msgid "This course is not available."
+msgstr ""
+
+#. translators: %s: course title
+#: includes/Services/OrderService.php:65
+#, php-format
+msgid "%s is full."
+msgstr ""
+
+#: includes/Services/ProgressService.php:177
+msgid "Item not found."
+msgstr ""
+
+#: includes/Services/QuizService.php:303
+msgid "Answers are sent when the quiz is submitted."
+msgstr ""
+
+#: includes/Services/QuizService.php:314
+msgid "This question has already been answered."
+msgstr ""
+
+#: includes/Services/QuizService.php:645
+msgid "This attempt cannot be graded."
+msgstr ""
+
+#: includes/Services/QuizService.php:758
+msgid "Submit the quiz to see the result."
+msgstr ""
+
+#: src/admin/components/LineChart.js:14
+msgid "No data for this period."
+msgstr ""
+
+#: src/admin/screens/Courses.js:15
+#: src/admin/screens/Courses.js:158
+#: templates/dashboard/instructor-courses.php:20
+msgid "Scheduled"
+msgstr ""
+
+#: src/admin/screens/Courses.js:19
+#: src/admin/screens/Courses.js:136
+#: src/admin/screens/Courses.js:162
+msgid "Trash"
+msgstr ""
+
+#. translators: %s: course title
+#: src/admin/screens/Courses.js:51
+msgid "Move \"%s\" to the trash?"
+msgstr ""
+
+#: src/admin/screens/Courses.js:56
+msgid "Course moved to trash."
+msgstr ""
+
+#. translators: %s: course status
+#: src/admin/screens/Courses.js:71
+msgid "Status changed to %s."
+msgstr ""
+
+#: src/admin/screens/Courses.js:73
+#: src/builder/App.js:138
+msgid "Course submitted for review."
+msgstr ""
+
+#: src/admin/screens/Courses.js:75
+msgid "You cannot change the status of this course."
+msgstr ""
+
+#. translators: %s: course title
+#: src/admin/screens/Courses.js:111
+msgid "Status of %s"
+msgstr ""
+
+#: src/admin/screens/Courses.js:119
+#: src/builder/tabs/SettingsTab.js:115
+msgid "Public course"
+msgstr ""
+
+#: src/admin/screens/Courses.js:127
+msgid "Updated"
+msgstr ""
+
+#: src/admin/screens/Courses.js:144
+#: src/admin/screens/Courses.js:172
+#: src/admin/screens/Dashboard.js:36
+msgid "New course"
+msgstr ""
+
+#: src/admin/screens/Courses.js:156
+#: src/admin/screens/Orders.js:91
+#: src/admin/screens/Students.js:216
+msgid "All statuses"
+msgstr ""
+
+#: src/admin/screens/Courses.js:167
+msgid "No courses yet. Create your first course."
+msgstr ""
+
+#: src/admin/screens/Courses.js:173
+#: src/builder/App.js:169
+msgid "Course title"
+msgstr ""
+
+#: src/admin/screens/Courses.js:175
+#: src/admin/screens/Students.js:64
+#: src/builder/components/QuestionsEditor.js:107
+#: src/builder/tabs/CurriculumTab.js:85
+msgid "Cancel"
+msgstr ""
+
+#: src/admin/screens/Courses.js:176
+msgid "Create and open builder"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:12
+msgid "enrolled in"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:13
+msgid "completed"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:14
+msgid "finished a quiz in"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:15
+msgid "purchased"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:16
+msgid "reviewed"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:17
+msgid "applied to become an instructor"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:32
+msgid "Last 30 days at a glance."
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:43
+msgid "Finish setting up ShapeLMS"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:44
+msgid "Create the dashboard and checkout pages, choose your currency and import a demo course."
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:45
+msgid "Run setup wizard"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:52
+msgid "Published courses"
+msgstr ""
+
+#. translators: %d: active students
+#: src/admin/screens/Dashboard.js:53
+msgid "%d active"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:54
+msgid "Enrollments (30 days)"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:55
+msgid "Completions (30 days)"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:56
+msgid "Revenue (30 days)"
+msgstr ""
+
+#. translators: %s: all-time revenue
+#: src/admin/screens/Dashboard.js:56
+msgid "%s total"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:58
+msgid "Pending instructors"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:63
+#: src/admin/screens/Dashboard.js:64
+#: src/admin/screens/Reports.js:62
+#: src/admin/screens/Reports.js:68
+#: src/admin/screens/Students.js:115
+msgid "Enrollments"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:64
+#: src/admin/screens/Reports.js:63
+#: src/admin/screens/Reports.js:68
+msgid "Completions"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:66
+msgid "Recent activity"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:77
+msgid "No activity yet"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:77
+msgid "Enrollments, completions and purchases will show up here."
+msgstr ""
+
+#: src/admin/screens/Instructors.js:26
+msgid "Instructor updated."
+msgstr ""
+
+#: src/admin/screens/Instructors.js:37
+msgid "Joined"
+msgstr ""
+
+#: src/admin/screens/Instructors.js:44
+msgid "Approve"
+msgstr ""
+
+#: src/admin/screens/Instructors.js:45
+msgid "Reject"
+msgstr ""
+
+#: src/admin/screens/Instructors.js:46
+msgid "Block this instructor? Their courses stay published."
+msgstr ""
+
+#: src/admin/screens/Instructors.js:46
+msgid "Block"
+msgstr ""
+
+#: src/admin/screens/Instructors.js:57
+msgid "Approved"
+msgstr ""
+
+#: src/admin/screens/Instructors.js:57
+msgid "Rejected"
+msgstr ""
+
+#: src/admin/screens/Instructors.js:57
+msgid "Blocked"
+msgstr ""
+
+#: src/admin/screens/Instructors.js:58
+msgid "No instructors yet."
+msgstr ""
+
+#: src/admin/screens/Modules.js:24
+msgid "Module enabled. Reload to apply."
+msgstr ""
+
+#: src/admin/screens/Modules.js:24
+msgid "Module disabled. Reload to apply."
+msgstr ""
+
+#: src/admin/screens/Modules.js:31
+msgid "Switch features on or off. Disabled modules load no code."
+msgstr ""
+
+#: src/admin/screens/Modules.js:40
+msgid "Add-on"
+msgstr ""
+
+#: src/admin/screens/Modules.js:43
+msgid "Requires:"
+msgstr ""
+
+#: src/admin/screens/Modules.js:44
+msgid "Enabled"
+msgstr ""
+
+#: src/admin/screens/Modules.js:44
+msgid "Disabled"
+msgstr ""
+
+#: src/admin/screens/Orders.js:23
+msgid "Order updated."
+msgstr ""
+
+#. translators: %d: order id
+#: src/admin/screens/Orders.js:32
+msgid "Order #%d"
+msgstr ""
+
+#: src/admin/screens/Orders.js:46
+msgid "Completing enrolls the buyer; refunding or cancelling removes access."
+msgstr ""
+
+#: src/admin/screens/Orders.js:49
+msgid "Update status"
+msgstr ""
+
+#: src/admin/screens/Orders.js:66
+msgid "Delete this order permanently? Enrollments are not changed."
+msgstr ""
+
+#: src/admin/screens/Orders.js:70
+msgid "Order deleted."
+msgstr ""
+
+#: src/admin/screens/Orders.js:77
+msgid "Customer"
+msgstr ""
+
+#: src/admin/screens/Orders.js:80
+msgid "Gateway"
+msgstr ""
+
+#: src/admin/screens/Orders.js:92
+msgid "No orders yet."
+msgstr ""
+
+#: src/admin/screens/Quizzes.js:19
+msgid "Attempt review"
+msgstr ""
+
+#: src/admin/screens/Quizzes.js:30
+msgid "Answer:"
+msgstr ""
+
+#: src/admin/screens/Quizzes.js:30
+msgid "Correct:"
+msgstr ""
+
+#: src/admin/screens/Quizzes.js:49
+msgid "Delete this attempt? The student will get the attempt back."
+msgstr ""
+
+#: src/admin/screens/Quizzes.js:53
+msgid "Attempt deleted."
+msgstr ""
+
+#: src/admin/screens/Quizzes.js:73
+#: src/admin/screens/Reports.js:56
+#: src/admin/screens/Students.js:215
+msgid "All courses"
+msgstr ""
+
+#: src/admin/screens/Quizzes.js:74
+msgid "No attempts yet."
+msgstr ""
+
+#. translators: 1: score, 2: maximum score
+#: src/admin/screens/Quizzes.js:25
+msgid "%1$s / %2$s point"
+msgid_plural "%1$s / %2$s points"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/admin/screens/Reports.js:52
+msgid "Export CSV"
+msgstr ""
+
+#: src/admin/screens/Reports.js:55
+msgid "Last 7 days"
+msgstr ""
+
+#: src/admin/screens/Reports.js:55
+msgid "Last 30 days"
+msgstr ""
+
+#: src/admin/screens/Reports.js:55
+msgid "Last 90 days"
+msgstr ""
+
+#: src/admin/screens/Reports.js:55
+msgid "Last year"
+msgstr ""
+
+#: src/admin/screens/Reports.js:64
+#: src/admin/screens/Reports.js:80
+msgid "Completion rate"
+msgstr ""
+
+#: src/admin/screens/Reports.js:67
+msgid "Enrollments and completions"
+msgstr ""
+
+#: src/admin/screens/Settings.js:21
+msgid "— Select a page —"
+msgstr ""
+
+#: src/admin/screens/Settings.js:69
+#: src/admin/screens/Tools.js:187
+msgid "On"
+msgstr ""
+
+#: src/admin/screens/Settings.js:69
+msgid "Off"
+msgstr ""
+
+#: src/admin/screens/Settings.js:73
+msgid "Send this email"
+msgstr ""
+
+#: src/admin/screens/Settings.js:112
+msgid "Settings saved."
+msgstr ""
+
+#: src/admin/screens/Settings.js:129
+msgid "Save changes"
+msgstr ""
+
+#: src/admin/screens/Students.js:38
+msgid "Student enrolled."
+msgstr ""
+
+#: src/admin/screens/Students.js:46
+msgid "Enroll a student"
+msgstr ""
+
+#: src/admin/screens/Students.js:48
+msgid "User"
+msgstr ""
+
+#: src/admin/screens/Students.js:53
+msgid "Type at least two characters to search by name or email."
+msgstr ""
+
+#: src/admin/screens/Students.js:60
+msgid "Select a course"
+msgstr ""
+
+#: src/admin/screens/Students.js:65
+msgid "Enroll"
+msgstr ""
+
+#: src/admin/screens/Students.js:81
+msgid "Reset all progress for this course?"
+msgstr ""
+
+#: src/admin/screens/Students.js:85
+msgid "Progress reset."
+msgstr ""
+
+#: src/admin/screens/Students.js:92
+msgid "Remove this student from the course?"
+msgstr ""
+
+#: src/admin/screens/Students.js:96
+msgid "Student removed from course."
+msgstr ""
+
+#. translators: %s: registration date
+#: src/admin/screens/Students.js:112
+msgid "Joined %s"
+msgstr ""
+
+#: src/admin/screens/Students.js:134
+msgid "Reset"
+msgstr ""
+
+#: src/admin/screens/Students.js:135
+#: src/builder/components/ItemEditor.js:105
+#: src/builder/components/ListEditor.js:40
+#: src/builder/components/MediaPicker.js:33
+#: src/builder/components/QuestionsEditor.js:41
+#: templates/cart.php:45
+msgid "Remove"
+msgstr ""
+
+#: src/admin/screens/Students.js:143
+msgid "Activity"
+msgstr ""
+
+#: src/admin/screens/Students.js:202
+msgid "Source"
+msgstr ""
+
+#: src/admin/screens/Students.js:208
+msgid "Enroll student"
+msgstr ""
+
+#: src/admin/screens/Students.js:216
+#: src/admin/screens/Tools.js:188
+msgid "Active"
+msgstr ""
+
+#: src/admin/screens/Students.js:219
+msgid "No enrollments yet."
+msgstr ""
+
+#: src/admin/screens/Tools.js:41
+msgid "You are all set!"
+msgstr ""
+
+#: src/admin/screens/Tools.js:42
+msgid "Pages were created and your settings are saved."
+msgstr ""
+
+#: src/admin/screens/Tools.js:44
+msgid "Create your first course"
+msgstr ""
+
+#: src/admin/screens/Tools.js:45
+msgid "Open the demo course"
+msgstr ""
+
+#: src/admin/screens/Tools.js:46
+msgid "All settings"
+msgstr ""
+
+#: src/admin/screens/Tools.js:54
+msgid "Welcome"
+msgstr ""
+
+#: src/admin/screens/Tools.js:57
+msgid "This wizard creates the pages ShapeLMS needs (dashboard, checkout, instructor registration), sets your currency and can import a demo course so you can see everything working."
+msgstr ""
+
+#: src/admin/screens/Tools.js:58
+msgid "You can change all of this later in Settings."
+msgstr ""
+
+#: src/admin/screens/Tools.js:66
+msgid "How do you want to sell courses?"
+msgstr ""
+
+#: src/admin/screens/Tools.js:66
+msgid "WooCommerce (not installed)"
+msgstr ""
+
+#: src/admin/screens/Tools.js:68
+msgid "Add your Stripe or PayPal keys in Settings → Selling when you are ready to accept payments. Free courses work right away."
+msgstr ""
+
+#: src/admin/screens/Tools.js:73
+msgid "Demo content"
+msgstr ""
+
+#: src/admin/screens/Tools.js:76
+msgid "Import a demo course with lessons and a quiz"
+msgstr ""
+
+#: src/admin/screens/Tools.js:77
+msgid "The demo course is created as a draft. Delete it whenever you like."
+msgstr ""
+
+#. translators: 1: current step, 2: total steps, 3: step title
+#: src/admin/screens/Tools.js:84
+msgid "Step %1$d of %2$d: %3$s"
+msgstr ""
+
+#: src/admin/screens/Tools.js:87
+msgid "Back"
+msgstr ""
+
+#: src/admin/screens/Tools.js:89
+msgid "Finish setup"
+msgstr ""
+
+#: src/admin/screens/Tools.js:124
+msgid "That file is not valid JSON."
+msgstr ""
+
+#: src/admin/screens/Tools.js:140
+msgid "Demo course created."
+msgstr ""
+
+#: src/admin/screens/Tools.js:160
+msgid "Export courses"
+msgstr ""
+
+#: src/admin/screens/Tools.js:161
+msgid "Downloads courses with their curriculum and quiz questions as JSON. Enrollments are not included."
+msgstr ""
+
+#: src/admin/screens/Tools.js:162
+msgid "Course IDs (comma separated, empty = all)"
+msgstr ""
+
+#: src/admin/screens/Tools.js:164
+msgid "Export JSON"
+msgstr ""
+
+#: src/admin/screens/Tools.js:167
+msgid "Import courses"
+msgstr ""
+
+#: src/admin/screens/Tools.js:168
+msgid "Upload a JSON file exported from ShapeLMS. Courses are created as new drafts."
+msgstr ""
+
+#: src/admin/screens/Tools.js:169
+msgid "Choose JSON file"
+msgstr ""
+
+#: src/admin/screens/Tools.js:171
+msgid "Or create the bundled demo course (one draft), or a sample pack of six published courses to try the archive, filters, checkout and dashboards."
+msgstr ""
+
+#: src/admin/screens/Tools.js:173
+msgid "Import demo course"
+msgstr ""
+
+#: src/admin/screens/Tools.js:174
+msgid "Create 6 sample courses"
+msgstr ""
+
+#: src/admin/screens/Tools.js:183
+msgid "Plugin version"
+msgstr ""
+
+#: src/admin/screens/Tools.js:184
+msgid "Database version"
+msgstr ""
+
+#: src/admin/screens/Tools.js:185
+msgid "WordPress"
+msgstr ""
+
+#: src/admin/screens/Tools.js:186
+msgid "PHP"
+msgstr ""
+
+#: src/admin/screens/Tools.js:187
+msgid "Pretty permalinks"
+msgstr ""
+
+#: src/admin/screens/Tools.js:187
+msgid "Off — lesson URLs need pretty permalinks"
+msgstr ""
+
+#: src/admin/screens/Tools.js:188
+msgid "Not active"
+msgstr ""
+
+#: src/admin/screens/Tools.js:189
+msgid "Action Scheduler"
+msgstr ""
+
+#: src/admin/screens/Tools.js:189
+msgid "Available (background emails)"
+msgstr ""
+
+#: src/admin/screens/Tools.js:189
+msgid "Not available (WP-Cron is used)"
+msgstr ""
+
+#: src/admin/screens/Tools.js:193
+msgid "System"
+msgstr ""
+
+#: src/admin/screens/Tools.js:196
+msgid "Pages"
+msgstr ""
+
+#: src/admin/screens/Tools.js:199
+msgid "Missing"
+msgstr ""
+
+#: src/admin/screens/Tools.js:223
+msgid "Setup wizard"
+msgstr ""
+
+#: src/admin/screens/Tools.js:223
+msgid "Import / Export"
+msgstr ""
+
+#. translators: %d: number of courses
+#: src/admin/screens/Tools.js:129
+msgid "Imported %d course."
+msgid_plural "Imported %d courses."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of courses
+#: src/admin/screens/Tools.js:151
+msgid "Created %d sample course."
+msgid_plural "Created %d sample courses."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/blocks/index.js:20
+msgid "Tag slug"
+msgstr ""
+
+#: src/blocks/index.js:36
+#: src/blocks/index.js:47
+msgid "Any"
+msgstr ""
+
+#: src/blocks/index.js:53
+msgid "Featured courses only"
+msgstr ""
+
+#: src/blocks/index.js:69
+msgid "Course ID (0 = current course)"
+msgstr ""
+
+#: src/blocks/index.js:78
+msgid "Shows for the current course on course pages. Set a course ID to use it elsewhere."
+msgstr ""
+
+#: src/blocks/index.js:93
+msgid "LMS Dashboard"
+msgstr ""
+
+#: src/blocks/index.js:93
+msgid "The student and instructor dashboard renders here on the front end."
+msgstr ""
+
+#: src/blocks/index.js:94
+msgid "LMS Checkout"
+msgstr ""
+
+#: src/blocks/index.js:94
+msgid "The checkout renders here on the front end."
+msgstr ""
+
+#: src/blocks/index.js:95
+msgid "LMS Cart"
+msgstr ""
+
+#: src/blocks/index.js:95
+msgid "The cart renders here on the front end."
+msgstr ""
+
+#: src/blocks/index.js:96
+msgid "Instructor Registration"
+msgstr ""
+
+#: src/blocks/index.js:96
+msgid "The instructor application form renders here on the front end."
+msgstr ""
+
+#: src/blocks/index.js:97
+msgid "LMS Sign In"
+msgstr ""
+
+#: src/blocks/index.js:97
+msgid "The login, lost password and reset password forms render here on the front end."
+msgstr ""
+
+#: src/blocks/index.js:98
+msgid "LMS Sign Up"
+msgstr ""
+
+#: src/blocks/index.js:98
+msgid "The student registration form renders here on the front end."
+msgstr ""
+
+#: src/builder/App.js:20
+msgid "Basics"
+msgstr ""
+
+#: src/builder/App.js:21
+#: src/builder/tabs/CurriculumTab.js:207
+msgid "Curriculum"
+msgstr ""
+
+#: src/builder/App.js:23
+#: src/builder/tabs/PricingTab.js:27
+msgid "Pricing"
+msgstr ""
+
+#: src/builder/App.js:138
+msgid "Course published."
+msgstr ""
+
+#: src/builder/App.js:138
+msgid "Course saved as draft."
+msgstr ""
+
+#. translators: %s: date and time
+#: src/builder/App.js:149
+msgid "Course scheduled for %s."
+msgstr ""
+
+#: src/builder/App.js:149
+msgid "Schedule cancelled. The course is now a draft."
+msgstr ""
+
+#: src/builder/App.js:171
+msgid "Saving…"
+msgstr ""
+
+#: src/builder/App.js:171
+msgid "Unsaved changes"
+msgstr ""
+
+#: src/builder/App.js:171
+msgid "Saved"
+msgstr ""
+
+#. translators: %s: date and time
+#: src/builder/App.js:174
+msgid "Scheduled: %s"
+msgstr ""
+
+#: src/builder/App.js:177
+#: src/builder/components/ItemEditor.js:170
+msgid "Save"
+msgstr ""
+
+#: src/builder/App.js:179
+#: src/builder/components/SchedulePanel.js:93
+msgid "Update schedule"
+msgstr ""
+
+#: src/builder/App.js:179
+#: src/builder/components/SchedulePanel.js:93
+msgid "Schedule course"
+msgstr ""
+
+#: src/builder/App.js:181
+msgid "Unpublish"
+msgstr ""
+
+#: src/builder/App.js:183
+msgid "Publish now"
+msgstr ""
+
+#: src/builder/App.js:183
+msgid "Publish"
+msgstr ""
+
+#: src/builder/App.js:185
+msgid "Awaiting review"
+msgstr ""
+
+#: src/builder/App.js:185
+msgid "Submit for review"
+msgstr ""
+
+#: src/builder/App.js:190
+msgid "Builder sections"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:65
+msgid "No video"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:67
+msgid "Vimeo"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:68
+msgid "Self-hosted (MP4)"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:69
+msgid "Embed code"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:75
+msgid "Video URL"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:79
+msgid "Video file URL"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:80
+msgid "Choose video"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:80
+msgid "Choose from media library"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:84
+msgid "Embed code (iframe)"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:84
+msgid "Only iframes from known video hosts are kept."
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:90
+msgid "Lesson content"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:90
+msgid "Instructions"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:96
+msgid "Attachments"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:109
+msgid "Add attachments"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:120
+msgid "Add files"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:136
+msgid "Draft (hidden)"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:140
+msgid "Duration (minutes)"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:141
+msgid "Free preview"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:141
+msgid "Anyone can open this lesson without enrolling."
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:147
+msgid "Time limit (minutes, 0 = none)"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:148
+msgid "Attempts allowed (0 = unlimited)"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:149
+msgid "Pass mark (%)"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:150
+msgid "Questions per page (0 = all)"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:151
+msgid "Feedback"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:151
+msgid "After each answer: students check choice and true/false questions one by one, and a checked answer is final. Other types are graded at the end."
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:151
+msgid "After each answer"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:151
+msgid "At the end"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:151
+msgid "Score only"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:152
+msgid "Randomize question order"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:153
+msgid "Show correct answers in results"
+msgstr ""
+
+#: src/builder/components/ItemEditor.js:171
+msgid "Save & close"
+msgstr ""
+
+#: src/builder/components/ListEditor.js:43
+msgid "Add item"
+msgstr ""
+
+#: src/builder/components/MediaPicker.js:15
+msgid "Use this file"
+msgstr ""
+
+#: src/builder/components/MediaPicker.js:31
+msgid "Replace"
+msgstr ""
+
+#: src/builder/components/MediaPicker.js:31
+msgid "Choose"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:36
+msgid "Answer options (tick the correct ones)"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:39
+msgid "Correct"
+msgstr ""
+
+#. translators: %d: option number
+#: src/builder/components/QuestionsEditor.js:40
+msgid "Option %d"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:44
+msgid "Add option"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:45
+msgid "Give partial credit"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:54
+msgid "Question type"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:55
+msgid "Points"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:61
+msgid "Text with blanks"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:61
+msgid "Write {blank} where a gap should appear. Then list one accepted answer per blank below; separate alternatives with |."
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:66
+msgid "Extra details (optional)"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:78
+msgid "Correct answer"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:83
+msgid "Accepted answers (one per line)"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:84
+#: src/builder/components/QuestionsEditor.js:91
+msgid "Case sensitive"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:90
+msgid "Answers, one line per blank (alternatives separated by |)"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:104
+msgid "Explanation (shown after answering)"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:108
+msgid "Save question"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:120
+msgid "New question"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:136
+msgid "Question saved."
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:143
+msgid "Delete this question?"
+msgstr ""
+
+#. translators: %d: number of questions
+#: src/builder/components/QuestionsEditor.js:162
+msgid "Questions (%d)"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:166
+msgid "(untitled)"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:169
+msgid "Move up"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:170
+msgid "Move down"
+msgstr ""
+
+#: src/builder/components/QuestionsEditor.js:174
+msgid "Add question"
+msgstr ""
+
+#. translators: %s: points
+#: src/builder/components/QuestionsEditor.js:168
+msgid "%s pt"
+msgid_plural "%s pts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/builder/components/SchedulePanel.js:62
+msgid "Schedule publishing"
+msgstr ""
+
+#: src/builder/components/SchedulePanel.js:66
+msgid "This course is scheduled"
+msgstr ""
+
+#. translators: 1: date and time, 2: time zone
+#: src/builder/components/SchedulePanel.js:67
+msgid "It goes live on %1$s (%2$s)."
+msgstr ""
+
+#: src/builder/components/SchedulePanel.js:69
+msgid "Change date"
+msgstr ""
+
+#: src/builder/components/SchedulePanel.js:70
+msgid "Cancel schedule"
+msgstr ""
+
+#: src/builder/components/SchedulePanel.js:75
+msgid "Pick when this course should go live. Until then visitors cannot see it; it publishes by itself at that time."
+msgstr ""
+
+#: src/builder/components/SchedulePanel.js:78
+msgid "Time"
+msgstr ""
+
+#. translators: 1: time zone, 2: current date and time
+#: src/builder/components/SchedulePanel.js:80
+msgid "Times use the site time zone (%1$s). It is now %2$s there."
+msgstr ""
+
+#: src/builder/components/SchedulePanel.js:82
+msgid "That time has already passed. Pick a later date or time."
+msgstr ""
+
+#. translators: %s: date and time
+#: src/builder/components/SchedulePanel.js:87
+msgid "This course is live now. Scheduling takes it offline until %s."
+msgstr ""
+
+#. translators: %s: date and time
+#: src/builder/components/SchedulePanel.js:88
+msgid "It will go live on %s. Press the button to confirm."
+msgstr ""
+
+#: src/builder/components/SchedulePanel.js:95
+msgid "Keep current date"
+msgstr ""
+
+#: src/builder/components/SchedulePanel.js:97
+msgid "Clear"
+msgstr ""
+
+#: src/builder/tabs/BasicsTab.js:21
+msgid "Course basics"
+msgstr ""
+
+#: src/builder/tabs/BasicsTab.js:23
+msgid "Short description"
+msgstr ""
+
+#: src/builder/tabs/BasicsTab.js:23
+msgid "Shown on course cards and under the title."
+msgstr ""
+
+#: src/builder/tabs/BasicsTab.js:31
+msgid "Course image"
+msgstr ""
+
+#: src/builder/tabs/BasicsTab.js:32
+msgid "Intro video URL"
+msgstr ""
+
+#: src/builder/tabs/BasicsTab.js:32
+msgid "YouTube or Vimeo link shown in the enroll box."
+msgstr ""
+
+#: src/builder/tabs/BasicsTab.js:50
+msgid "No categories yet. Add some under ShapeLMS → Categories."
+msgstr ""
+
+#: src/builder/tabs/BasicsTab.js:68
+msgid "e.g. Build a responsive layout with CSS Grid"
+msgstr ""
+
+#: src/builder/tabs/BasicsTab.js:69
+msgid "e.g. Basic HTML knowledge"
+msgstr ""
+
+#: src/builder/tabs/BasicsTab.js:70
+msgid "e.g. Designers moving into front-end"
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:18
+msgid "Drag to reorder"
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:68
+msgid "Topic title"
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:70
+msgid "Delete topic"
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:78
+msgid "No lessons yet. Add one below."
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:83
+msgid "Quiz title"
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:83
+msgid "Lesson title"
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:84
+msgid "Add"
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:131
+msgid "Delete this topic and everything in it?"
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:147
+msgid "Delete this item? Student progress for it will be lost."
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:208
+msgid "Drag topics and lessons to reorder. Click a lesson or quiz to edit its content."
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:221
+msgid "New topic title, e.g. \"Getting started\""
+msgstr ""
+
+#: src/builder/tabs/CurriculumTab.js:222
+msgid "Add topic"
+msgstr ""
+
+#: src/builder/tabs/PricingTab.js:19
+msgid "WooCommerce product created."
+msgstr ""
+
+#: src/builder/tabs/PricingTab.js:32
+msgid "Free — anyone with an account can enroll"
+msgstr ""
+
+#: src/builder/tabs/PricingTab.js:33
+msgid "Paid — students buy the course"
+msgstr ""
+
+#. translators: %s: currency symbol
+#: src/builder/tabs/PricingTab.js:40
+msgid "Regular price (%s)"
+msgstr ""
+
+#. translators: %s: currency symbol
+#: src/builder/tabs/PricingTab.js:41
+msgid "Sale price (%s)"
+msgstr ""
+
+#: src/builder/tabs/PricingTab.js:41
+msgid "Leave 0 for no sale."
+msgstr ""
+
+#: src/builder/tabs/PricingTab.js:50
+msgid "Linked to product"
+msgstr ""
+
+#: src/builder/tabs/PricingTab.js:51
+msgid "Edit product"
+msgstr ""
+
+#: src/builder/tabs/PricingTab.js:55
+msgid "Create a hidden WooCommerce product for this course so it can be bought through the WooCommerce checkout."
+msgstr ""
+
+#: src/builder/tabs/PricingTab.js:56
+msgid "Create product"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:53
+msgid "Public"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:54
+msgid "Password protected"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:60
+msgid "Anyone can see the course once it is published. It moves to draft until you publish it again."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:60
+msgid "Anyone can see the course once it is published."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:61
+msgid "Listed in the catalog, but visitors need the password to see the details and to enroll or buy. Enrolled students never need it."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:62
+msgid "Hidden from the catalog right away. Only admins, its instructors and enrolled students can open it. Add students manually."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:68
+msgid "Anyone can read the lessons without enrolling or logging in. Taking quizzes and saving progress still need enrollment."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:70
+msgid "Paid courses cannot be public."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:72
+msgid "Only available when Visibility is set to Public."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:96
+msgid "URL slug"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:100
+msgid "Visibility"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:103
+msgid "Course password"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:104
+msgid "Enter a password. The course keeps its current visibility until you do."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:122
+msgid "Total duration"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:124
+msgid "Hours"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:125
+msgid "Minutes"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:127
+msgid "Leave at 0 to add up the lesson video durations automatically."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:130
+msgid "Maximum students (0 = unlimited)"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:133
+msgid "Course progression"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:134
+msgid "Step by step locks each lesson and quiz until the previous one is completed."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:137
+msgid "Site default (step by step)"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:137
+msgid "Site default (free order)"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:139
+msgid "Free order"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:147
+msgid "Prerequisite courses"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:166
+msgid "Students must complete these courses before they can enroll. Type at least two characters to search."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:169
+msgid "Featured course"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:169
+msgid "Featured courses can be shown with the Course Grid block."
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:174
+msgid "Co-instructors"
+msgstr ""
+
+#: src/builder/tabs/SettingsTab.js:193
+msgid "Type at least two characters to search users. Co-instructors can edit this course and see its students."
+msgstr ""
+
+#: src/shared/components.js:100
+msgid "Search…"
+msgstr ""
+
+#: src/shared/components.js:115
+msgid "Nothing here yet."
+msgstr ""
+
+#: templates/cart.php:34
+msgid "Your cart is empty."
+msgstr ""
+
+#: templates/cart.php:60
+msgid "Proceed to checkout"
+msgstr ""
+
+#: templates/checkout-receipt.php:23
+#: templates/checkout-receipt.php:26
+msgid "Order Confirmed"
+msgstr ""
+
+#: templates/checkout-receipt.php:24
+msgid "You will receive an order confirmation email shortly."
+msgstr ""
+
+#: templates/checkout-receipt.php:27
+msgid "You will receive an order confirmation email shortly. You get access to the course as soon as we receive your payment."
+msgstr ""
+
+#: templates/checkout-receipt.php:29
+msgid "Order details"
+msgstr ""
+
+#: templates/checkout-receipt.php:30
+msgid "This order is not paid."
+msgstr ""
+
+#: templates/checkout-receipt.php:39
+msgid "Order number"
+msgstr ""
+
+#: templates/checkout-receipt.php:48
+msgid "Amount due"
+msgstr ""
+
+#: templates/checkout-receipt.php:53
+msgid "Check order list"
+msgstr ""
+
+#: templates/checkout-receipt.php:54
+msgid "Continue shopping"
+msgstr ""
+
+#: templates/checkout.php:28
+msgid "Order not found. Please log in with the account that placed it."
+msgstr ""
+
+#: templates/checkout.php:87
+msgid "Billing details"
+msgstr ""
+
+#. translators: %s: link to the terms page
+#: templates/checkout.php:104
+#, php-format
+msgid "I have read and accept the %s."
+msgstr ""
+
+#: templates/checkout.php:140
+msgid "Place order"
+msgstr ""
+
+#: templates/dashboard/orders.php:23
+msgid "Waiting for payment"
+msgstr ""
+
+#: templates/dashboard/orders.php:59
+msgid "Pay"
+msgstr ""
+
+#: templates/learn.php:126
+msgid "That lesson is not available yet."
+msgstr ""
+
+#: templates/parts/enroll-box.php:96
+msgid "No enrollment needed to read. Enroll to save your progress and take quizzes."
+msgstr ""
+
+#: templates/parts/enroll-box.php:125
+msgid "This course cannot be bought right now."
+msgstr ""
+
+#: templates/single-course-password.php:31
+msgid "This course is password protected. Enter the password to see its details."
+msgstr ""
+
+#: templates/single-course-password.php:34
+msgid "That password is not correct. Please try again."
+msgstr ""
+
+#: templates/single-course-password.php:43
+msgid "Unlock course"
+msgstr ""
+
+#: includes/Core/Settings.php:300
+msgid "Webhook URL: /wp-json/shapelms/v1/webhooks/paypal. Add it in your PayPal app, then paste the webhook ID PayPal shows. Subscribe to Checkout order approved and Payment capture completed, pending, denied, declined, refunded and reversed. Delayed payments and refunds are only processed when this is set."
+msgstr ""
+
+#: includes/Modules/Checkout/PayPalGateway.php:284
+msgid "PayPal did not accept this payment."
+msgstr ""
+
+#: includes/Modules/Checkout/PayPalGateway.php:186
+msgid "PayPal declined this payment method. Please try again with another one."
+msgstr ""
+
+#: includes/Modules/Checkout/PayPalGateway.php:189
+msgid "The payment was not approved in PayPal. Please try again."
 msgstr ""

@@ -74,6 +74,169 @@ class ShapeLMS_QuizServiceTest extends ShapeLMS_TestCase {
 	}
 
 	/**
+	 * While an attempt is open its owner gets no result, even for answers already saved.
+	 */
+	public function test_open_attempt_hides_result_from_owner() {
+		update_post_meta( $this->quiz, '_shapelms_show_answers', true );
+
+		$service  = $this->service( QuizService::class );
+		$payload  = $service->start( $this->student, $this->quiz );
+		$attempt  = $payload['attempt']['id'];
+		$question = $payload['questions'][0]['id'];
+
+		wp_set_current_user( $this->student );
+		$this->assertTrue( $service->answer( $this->student, $attempt, $question, 'a' )['saved'] );
+
+		$open = $service->result( $this->student, $attempt );
+		$this->assertWPError( $open );
+		$this->assertSame( 'shapelms_attempt_open', $open->get_error_code() );
+		$this->assertSame( 409, $open->get_error_data()['status'] );
+
+		$request  = new WP_REST_Request( 'GET', '/shapelms/v1/quizzes/attempts/' . $attempt );
+		$response = rest_do_request( $request );
+		$this->assertSame( 409, $response->get_status() );
+		$this->assertStringNotContainsString( '"correct"', (string) wp_json_encode( $response->get_data() ) );
+
+		$this->assertArrayHasKey( 'correct', $service->submit( $this->student, $attempt, array() )['questions'][0] );
+		$this->assertArrayHasKey( 'correct', $service->result( $this->student, $attempt )['questions'][0] );
+	}
+
+	/**
+	 * A manager can still look at someone else's open attempt.
+	 */
+	public function test_manager_can_read_open_attempt() {
+		$service = $this->service( QuizService::class );
+		$payload = $service->start( $this->student, $this->quiz );
+		$attempt = $payload['attempt']['id'];
+		$manager = $this->make_instructor();
+
+		$service->answer( $this->student, $attempt, $payload['questions'][0]['id'], 'a' );
+
+		wp_set_current_user( $manager );
+		$result = $service->result( $manager, $attempt );
+		$this->assertCount( 1, $result['questions'], 'Only what the server holds, like Tutor.' );
+	}
+
+	/**
+	 * Outside instant mode nothing reaches the server until the quiz is submitted.
+	 */
+	public function test_answers_wait_for_submit() {
+		update_post_meta( $this->quiz, '_shapelms_feedback_mode', 'end' );
+
+		$service  = $this->service( QuizService::class );
+		$payload  = $service->start( $this->student, $this->quiz );
+		$attempt  = $payload['attempt']['id'];
+		$question = $payload['questions'][0]['id'];
+
+		$refused = $service->answer( $this->student, $attempt, $question, 'a' );
+		$this->assertWPError( $refused );
+		$this->assertSame( 'shapelms_answer_on_submit', $refused->get_error_code() );
+		$this->assertFalse( $payload['questions'][0]['checkable'] );
+
+		$result = $service->submit( $this->student, $attempt, array( $question => 'a' ) );
+		$this->assertEquals( 1, $result['score'] );
+	}
+
+	/**
+	 * A checked answer is final: it cannot be changed by checking again or on submit.
+	 */
+	public function test_checked_answer_is_final() {
+		$service  = $this->service( QuizService::class );
+		$payload  = $service->start( $this->student, $this->quiz );
+		$attempt  = $payload['attempt']['id'];
+		$question = $payload['questions'][0]['id'];
+
+		$this->assertTrue( $payload['questions'][0]['checkable'] );
+		$this->assertFalse( $service->answer( $this->student, $attempt, $question, 'b' )['is_correct'] );
+
+		$again = $service->answer( $this->student, $attempt, $question, 'a' );
+		$this->assertWPError( $again );
+		$this->assertSame( 'shapelms_answer_committed', $again->get_error_code() );
+
+		// Reloading brings the feedback back and keeps it locked.
+		$resumed = $service->start( $this->student, $this->quiz );
+		$this->assertFalse( $resumed['questions'][0]['checked']['is_correct'] );
+		$this->assertArrayNotHasKey( 'checked', $resumed['questions'][1] );
+
+		$result = $service->submit( $this->student, $attempt, array( $question => 'a' ) );
+		$this->assertEquals( 0, $result['score'] );
+	}
+
+	/**
+	 * An empty check is refused, so it cannot burn the question.
+	 */
+	public function test_check_needs_an_answer() {
+		$service = $this->service( QuizService::class );
+		$payload = $service->start( $this->student, $this->quiz );
+
+		$this->assertSame( 'shapelms_answer_required', $service->answer( $this->student, $payload['attempt']['id'], $payload['questions'][0]['id'], '' )->get_error_code() );
+	}
+
+	/**
+	 * Only choice questions are checked one by one; the rest wait for submit, even in instant mode.
+	 */
+	public function test_other_types_wait_in_instant_mode() {
+		add_filter( 'shapelms_quiz_checkable_types', '__return_empty_array' );
+
+		$service = $this->service( QuizService::class );
+		$payload = $service->start( $this->student, $this->quiz );
+		$refused = $service->answer( $this->student, $payload['attempt']['id'], $payload['questions'][0]['id'], 'a' );
+
+		remove_filter( 'shapelms_quiz_checkable_types', '__return_empty_array' );
+
+		$this->assertSame( 'shapelms_answer_on_submit', $refused->get_error_code() );
+	}
+
+	/**
+	 * An add-on can keep a question saving as it changes (per-question time limits need this).
+	 */
+	public function test_save_now_filter() {
+		update_post_meta( $this->quiz, '_shapelms_feedback_mode', 'end' );
+		add_filter( 'shapelms_quiz_save_answer_now', '__return_true' );
+
+		$service  = $this->service( QuizService::class );
+		$payload  = $service->start( $this->student, $this->quiz );
+		$saved    = $service->answer( $this->student, $payload['attempt']['id'], $payload['questions'][0]['id'], 'b' );
+		$replaced = $service->answer( $this->student, $payload['attempt']['id'], $payload['questions'][0]['id'], 'a' );
+
+		remove_filter( 'shapelms_quiz_save_answer_now', '__return_true' );
+
+		$this->assertSame( array( 'saved' => true ), $saved );
+		$this->assertSame( array( 'saved' => true ), $replaced );
+	}
+
+	/**
+	 * The quiz page knows about a running attempt, and closes one whose time ran out.
+	 */
+	public function test_running_attempt() {
+		global $wpdb;
+
+		$service = $this->service( QuizService::class );
+		$this->assertFalse( $service->has_running_attempt( $this->student, $this->quiz ) );
+
+		$attempt = $service->start( $this->student, $this->quiz )['attempt']['id'];
+		$this->assertTrue( $service->has_running_attempt( $this->student, $this->quiz ) );
+
+		$wpdb->update( $wpdb->prefix . 'shapelms_quiz_attempts', array( 'expires_at' => gmdate( 'Y-m-d H:i:s', time() - 120 ) ), array( 'id' => $attempt ) );
+		$this->assertFalse( $service->has_running_attempt( $this->student, $this->quiz ) );
+		$this->assertSame( 'expired', $wpdb->get_var( $wpdb->prepare( "SELECT status FROM {$wpdb->prefix}shapelms_quiz_attempts WHERE id = %d", $attempt ) ) );
+	}
+
+	/**
+	 * An attempt whose time ran out closes when its result is asked for.
+	 */
+	public function test_expired_attempt_closes_on_result() {
+		global $wpdb;
+
+		$service = $this->service( QuizService::class );
+		$attempt = $service->start( $this->student, $this->quiz )['attempt']['id'];
+		$wpdb->update( $wpdb->prefix . 'shapelms_quiz_attempts', array( 'expires_at' => gmdate( 'Y-m-d H:i:s', time() - 120 ) ), array( 'id' => $attempt ) );
+
+		wp_set_current_user( $this->student );
+		$this->assertSame( 'expired', $service->result( $this->student, $attempt )['status'] );
+	}
+
+	/**
 	 * Non-enrolled users cannot start.
 	 */
 	public function test_start_requires_access() {

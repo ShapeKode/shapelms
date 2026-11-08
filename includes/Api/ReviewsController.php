@@ -76,10 +76,17 @@ class ReviewsController extends RestController {
 	 * Lists approved reviews.
 	 *
 	 * @param WP_REST_Request $request Request.
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function list_reviews( WP_REST_Request $request ) {
-		$result = ReviewService::list( (int) $request->get_param( 'course_id' ), (int) $request->get_param( 'page' ), (int) $request->get_param( 'per_page' ) );
+		$course_id = (int) $request->get_param( 'course_id' );
+
+		// Reviews are as visible as their course.
+		if ( \ShapeLMS\Content\PostTypes::COURSE !== get_post_type( $course_id ) || post_password_required( $course_id ) || ( 'publish' !== get_post_status( $course_id ) && ! current_user_can( 'read_post', $course_id ) ) ) {
+			return $this->not_found();
+		}
+
+		$result = ReviewService::list( $course_id, (int) $request->get_param( 'page' ), (int) $request->get_param( 'per_page' ) );
 
 		return $this->paginated( $result['items'], $result['total'], (int) $request->get_param( 'per_page' ) );
 	}

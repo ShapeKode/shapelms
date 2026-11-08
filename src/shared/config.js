@@ -18,11 +18,20 @@ export function readConfig( root ) {
 		}
 	} );
 	data.canManage = data.canManage === '1';
+	data.canPublish = data.canPublish === '1';
 	data.sequentialDefault = data.sequentialDefault === '1';
 	data.setupDone = data.setupDone === '1';
 	data.userId = parseInt( data.userId, 10 ) || 0;
 	data.courseId = parseInt( data.courseId, 10 ) || 0;
 	data.pendingInstructors = parseInt( data.pendingInstructors, 10 ) || 0;
+	data.perPage = parseInt( data.perPage, 10 ) || 20;
+	try {
+		const preload = data.preload ? JSON.parse( data.preload ) : [];
+		// One entry per preloaded request; older markup sent a single object.
+		data.preload = Array.isArray( preload ) ? preload : [ preload ];
+	} catch ( e ) {
+		data.preload = [];
+	}
 
 	// WordPress registers the REST root and nonce middlewares on wp.apiFetch in the admin.
 	// Outside the admin (or if the nonce is missing) register the nonce ourselves.

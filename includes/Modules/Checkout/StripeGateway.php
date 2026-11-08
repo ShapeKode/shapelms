@@ -241,7 +241,7 @@ class StripeGateway implements GatewayInterface {
 	 * Webhook: verifies the signature and maps events to order actions.
 	 *
 	 * @param WP_REST_Request $request Request.
-	 * @return array{order_id: int, transaction_id: string, action: string}|WP_Error
+	 * @return array{order_id: int, transaction_id: string, action: string, amount?: float}|WP_Error
 	 */
 	public function webhook( WP_REST_Request $request ) {
 		$secret    = (string) Settings::get( 'commerce', 'stripe_webhook_secret', '' );
@@ -319,11 +319,20 @@ class StripeGateway implements GatewayInterface {
 				$order          = $intent_id ? shapelms()->get( \ShapeLMS\Database\OrderRepository::class )->find_by_transaction( $intent_id ) : null;
 				$fully_refunded = ! empty( $object['refunded'] ) || ( isset( $object['amount_refunded'], $object['amount'] ) && (int) $object['amount_refunded'] >= (int) $object['amount'] );
 
-				return array(
-					'order_id'       => $order && $fully_refunded ? (int) $order->id : 0,
+				$result = array(
+					'order_id'       => $order ? (int) $order->id : 0,
 					'transaction_id' => $intent_id,
 					'action'         => 'refund',
 				);
+
+				// A partial refund keeps access; pass the running total (amount_refunded is cumulative, in minor units).
+				if ( $order && ! $fully_refunded ) {
+					$minor            = (int) ( $object['amount_refunded'] ?? 0 );
+					$result['amount']   = in_array( strtoupper( (string) $order->currency ), $this->zero_decimal(), true ) ? (float) $minor : $minor / 100;
+					$result['order_id'] = $result['amount'] > 0 ? (int) $order->id : 0;
+				}
+
+				return $result;
 
 			case 'payment_intent.payment_failed':
 				$site = isset( $object['metadata']['site'] ) ? (string) $object['metadata']['site'] : '';

@@ -8,6 +8,8 @@ import Dashboard from './screens/Dashboard';
 import Courses from './screens/Courses';
 import Students from './screens/Students';
 import Quizzes from './screens/Quizzes';
+import QA from './screens/QA';
+import Announcements from './screens/Announcements';
 import Instructors from './screens/Instructors';
 import Orders from './screens/Orders';
 import Reports from './screens/Reports';
@@ -20,6 +22,8 @@ const screens = {
 	courses: Courses,
 	students: Students,
 	quizzes: Quizzes,
+	qa: QA,
+	announcements: Announcements,
 	instructors: Instructors,
 	orders: Orders,
 	reports: Reports,

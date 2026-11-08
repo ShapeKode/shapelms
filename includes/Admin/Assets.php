@@ -84,6 +84,12 @@ class Assets {
 			wp_enqueue_editor();
 		}
 
+		// The course builder saves on its own. Core's autosave would post the hidden classic
+		// title and content fields from page load and could undo edits made in the builder.
+		if ( 'builder' === $this->screen_kind() ) {
+			wp_dequeue_script( 'autosave' );
+		}
+
 		wp_enqueue_script(
 			$handle,
 			SHAPELMS_URL . 'assets/build/' . $entry . '.js',
@@ -147,6 +153,7 @@ class Assets {
 			'admin-url'          => admin_url(),
 			'site-url'           => home_url( '/' ),
 			'can-manage'         => current_user_can( Capabilities::MANAGE ) ? '1' : '0',
+			'can-publish'        => current_user_can( Capabilities::MANAGE ) || shapelms_get_setting( 'instructor', 'can_publish', false ) ? '1' : '0',
 			'sequential-default' => shapelms_get_setting( 'course', 'sequential_learning', false ) ? '1' : '0',
 			'user-id'            => (string) get_current_user_id(),
 			'currency'           => \ShapeLMS\Services\CurrencyService::symbol(),
@@ -155,6 +162,7 @@ class Assets {
 			'new-course'         => admin_url( 'post-new.php?post_type=' . PostTypes::COURSE ),
 			'setup-done'         => get_option( 'shapelms_setup_complete' ) ? '1' : '0',
 			'primary'            => (string) Settings::get( 'design', 'primary_color', '#3b5bdb' ),
+			'per-page'           => (string) Settings::admin_per_page(),
 			'item-types'         => (string) wp_json_encode( \ShapeLMS\Content\Curriculum::item_types() ),
 		);
 

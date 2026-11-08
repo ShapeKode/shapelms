@@ -6,6 +6,7 @@ import { Button, SelectControl, ToggleControl, TabPanel, FormFileUpload, TextCon
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { get, post, errorMessage } from '../../shared/api';
 import { PageHeader, Card, Loading, ErrorNotice, Badge } from '../../shared/components';
+import { takePreloadedData } from '../../shared/hooks';
 import { success, error as notifyError } from '../notices';
 
 function Setup( { status, reload, config } ) {
@@ -65,7 +66,7 @@ function Setup( { status, reload, config } ) {
 				<>
 					<SelectControl label={ __( 'How do you want to sell courses?', 'shapelms' ) } value={ engine } onChange={ setEngine } options={ [ { value: 'native', label: __( 'Native Checkout', 'shapelms' ) }, { value: 'woocommerce', label: status.woocommerce ? __( 'WooCommerce', 'shapelms' ) : __( 'WooCommerce (not installed)', 'shapelms' ) } ] } __nextHasNoMarginBottom />
 					<SelectControl label={ __( 'Currency', 'shapelms' ) } value={ currency } onChange={ setCurrency } options={ Object.entries( currencies ).map( ( [ k, l ] ) => ( { value: k, label: l } ) ) } __nextHasNoMarginBottom />
-					<p className="shapelms-muted">{ __( 'Add your Stripe or PayPal keys in Settings → Selling when you are ready to accept payments. Free courses work right away.', 'shapelms' ) }</p>
+					<p className="shapelms-muted">{ __( 'Add your Stripe or PayPal keys in Settings → Payments when you are ready to accept payments. Free courses work right away.', 'shapelms' ) }</p>
 				</>
 			),
 		},
@@ -160,7 +161,9 @@ function ImportExport( { config } ) {
 			<Card title={ __( 'Export courses', 'shapelms' ) }>
 				<p>{ __( 'Downloads courses with their curriculum and quiz questions as JSON. Enrollments are not included.', 'shapelms' ) }</p>
 				<TextControl label={ __( 'Course IDs (comma separated, empty = all)', 'shapelms' ) } value={ ids } onChange={ setIds } __nextHasNoMarginBottom />
-				<Button variant="primary" isBusy={ busy } onClick={ exportJson }>{ __( 'Export JSON', 'shapelms' ) }</Button>
+				<div className="shapelms-modal-actions shapelms-modal-actions--left">
+					<Button variant="primary" isBusy={ busy } onClick={ exportJson }>{ __( 'Export JSON', 'shapelms' ) }</Button>
+				</div>
 			</Card>
 			<Card title={ __( 'Import courses', 'shapelms' ) }>
 				<p>{ __( 'Upload a JSON file exported from ShapeLMS. Courses are created as new drafts.', 'shapelms' ) }</p>
@@ -203,13 +206,16 @@ function Status( { status } ) {
 }
 
 export default function Tools( { config } ) {
-	const [ status, setStatus ] = useState( null );
+	const [ status, setStatus ] = useState( () => takePreloadedData( 'tools/status' ) );
 	const [ error, setError ] = useState( '' );
 	const initial = new URL( window.location.href ).searchParams.get( 'tab' ) || 'status';
 
 	const load = () => get( 'tools/status' ).then( setStatus ).catch( ( e ) => setError( errorMessage( e ) ) );
 	useEffect( () => {
-		load();
+		if ( ! status ) {
+			load(); // Normally preloaded with the page.
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	return (

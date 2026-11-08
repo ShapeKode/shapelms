@@ -85,44 +85,55 @@ class CoursesController extends RestController {
 					'args'                => array_merge(
 						$this->pagination_args(),
 						array(
-							'category' => array(
+							'category'  => array(
 								'type'              => 'string',
 								'default'           => '',
 								'sanitize_callback' => 'sanitize_text_field',
 							),
-							'tag'      => array(
+							'tag'       => array(
 								'type'              => 'string',
 								'default'           => '',
 								'sanitize_callback' => 'sanitize_text_field',
 							),
-							'level'    => array(
+							'level'     => array(
 								'type'              => 'string',
 								'default'           => '',
 								'sanitize_callback' => 'sanitize_key',
 							),
-							'price'    => array(
+							'price'     => array(
 								'type'    => 'string',
 								'default' => '',
 								'enum'    => array( '', 'free', 'paid' ),
 							),
-							'orderby'  => array(
+							'orderby'   => array(
 								'type'    => 'string',
 								'default' => 'date',
 								'enum'    => array( 'date', 'title', 'price', 'popular' ),
 							),
-							'order'    => array(
+							'order'     => array(
 								'type'    => 'string',
 								'default' => 'DESC',
 								'enum'    => array( 'ASC', 'DESC' ),
 							),
-							'status'   => array(
+							'status'    => array(
 								'type'              => 'string',
 								'default'           => 'publish',
 								'sanitize_callback' => 'sanitize_key',
 							),
-							'mine'     => array(
+							'mine'      => array(
 								'type'    => 'boolean',
 								'default' => false,
+							),
+							// Inclusive publish-date range, Y-m-d in site time.
+							'date_from' => array(
+								'type'              => 'string',
+								'default'           => '',
+								'sanitize_callback' => array( __CLASS__, 'sanitize_day' ),
+							),
+							'date_to'   => array(
+								'type'              => 'string',
+								'default'           => '',
+								'sanitize_callback' => array( __CLASS__, 'sanitize_day' ),
 							),
 						)
 					),
@@ -187,6 +198,15 @@ class CoursesController extends RestController {
 		);
 
 		$this->route(
+			'/filters',
+			array(
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'filter_options' ),
+				'permission_callback' => array( $this, 'allow_instructor' ),
+			)
+		);
+
+		$this->route(
 			'/taxonomies',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -212,26 +232,33 @@ class CoursesController extends RestController {
 			'orderby'  => $request->get_param( 'orderby' ),
 			'order'    => $request->get_param( 'order' ),
 			'per_page' => $request->get_param( 'per_page' ),
-			'page'     => $request->get_param( 'page' ),
-			'status'   => 'publish',
+			'page'      => $request->get_param( 'page' ),
+			'status'    => 'publish',
+			'date_from' => $request->get_param( 'date_from' ),
+			'date_to'   => $request->get_param( 'date_to' ),
 		);
 
 		$can_edit = current_user_can( Capabilities::EDIT_COURSES );
+		$own_ids  = static function () use ( $request ) {
+			return 'trash' === $request->get_param( 'status' )
+				? InstructorService::course_ids( get_current_user_id(), array( 'trash' ) )
+				: InstructorService::course_ids( get_current_user_id() );
+		};
 
 		if ( $can_edit && 'publish' !== $request->get_param( 'status' ) ) {
-			$args['status'] = in_array( $request->get_param( 'status' ), array( 'any', 'draft', 'pending', 'private', 'publish' ), true ) ? $request->get_param( 'status' ) : 'publish';
+			$args['status'] = in_array( $request->get_param( 'status' ), array( 'any', 'draft', 'pending', 'private', 'future', 'publish', 'trash' ), true ) ? $request->get_param( 'status' ) : 'publish';
 			if ( 'any' === $args['status'] ) {
-				$args['status'] = array( 'publish', 'draft', 'pending', 'private' );
+				$args['status'] = array( 'publish', 'future', 'draft', 'pending', 'private' );
 			}
 		}
 
 		if ( $request->get_param( 'mine' ) && $can_edit ) {
-			$args['ids'] = InstructorService::course_ids( get_current_user_id() );
+			$args['ids'] = $own_ids();
 			if ( empty( $args['ids'] ) ) {
 				return $this->paginated( array(), 0, (int) $args['per_page'] );
 			}
 		} elseif ( $can_edit && ! current_user_can( Capabilities::MANAGE ) && 'publish' !== $args['status'] ) {
-			$args['ids'] = InstructorService::course_ids( get_current_user_id() );
+			$args['ids'] = $own_ids();
 			if ( empty( $args['ids'] ) ) {
 				return $this->paginated( array(), 0, (int) $args['per_page'] );
 			}
@@ -262,7 +289,7 @@ class CoursesController extends RestController {
 			return $this->not_found();
 		}
 
-		if ( 'publish' !== $post->post_status && ! current_user_can( 'shapelms_edit_course', $id ) ) {
+		if ( 'publish' !== $post->post_status && ! current_user_can( 'read_post', $id ) ) {
 			return $this->not_found();
 		}
 
@@ -342,6 +369,13 @@ class CoursesController extends RestController {
 			}
 		}
 
+		if ( is_array( $meta ) ) {
+			$product_error = $this->check_product_link( $id, $meta );
+			if ( is_wp_error( $product_error ) ) {
+				return $product_error;
+			}
+		}
+
 		$update = array( 'ID' => $id );
 
 		if ( null !== $request->get_param( 'title' ) ) {
@@ -364,8 +398,33 @@ class CoursesController extends RestController {
 				if ( in_array( $status, array( 'publish', 'private' ), true ) && ! $can_publish ) {
 					$status = 'pending';
 				}
+				// Core's restore also brings back the slug it changed when trashing.
+				if ( 'trash' === $post->post_status ) {
+					if ( ! current_user_can( 'delete_post', $id ) ) {
+						return $this->forbidden();
+					}
+					wp_untrash_post( $id );
+				}
 				$update['post_status'] = $status;
 			}
+		}
+		if ( null !== $request->get_param( 'visibility' ) ) {
+			$update = $this->apply_visibility( $request, $post, $update );
+			if ( is_wp_error( $update ) ) {
+				return $update;
+			}
+		}
+		if ( null !== $request->get_param( 'schedule' ) ) {
+			$update = $this->apply_schedule( (string) $request->get_param( 'schedule' ), $post, $update );
+			if ( is_wp_error( $update ) ) {
+				return $update;
+			}
+		}
+		// Core turns "publish" with a future date back into a schedule: publishing now means now.
+		if ( 'publish' === ( $update['post_status'] ?? '' ) && strtotime( $post->post_date_gmt ) > time() ) {
+			$update['post_date']     = current_time( 'mysql' );
+			$update['post_date_gmt'] = current_time( 'mysql', true );
+			$update['edit_date']     = true;
 		}
 		if ( null !== $request->get_param( 'image_id' ) ) {
 			$image_id = absint( $request->get_param( 'image_id' ) );
@@ -408,6 +467,11 @@ class CoursesController extends RestController {
 		Curriculum::flush( $id );
 		clean_post_cache( $id );
 
+		// Going paid or hidden turns public off, so going back later cannot reopen the lessons by surprise.
+		if ( ! \ShapeLMS\Services\CourseService::pricing( $id )['is_free'] || 'public' !== \ShapeLMS\Services\CourseService::visibility( $id ) ) {
+			delete_post_meta( $id, '_shapelms_public' );
+		}
+
 		/**
 		 * Fires after a course was saved with its meta and terms (the selling modules hook here).
 		 *
@@ -416,6 +480,79 @@ class CoursesController extends RestController {
 		do_action( 'shapelms_course_saved', $id );
 
 		return $this->builder_data( $request );
+	}
+
+	/**
+	 * Adds the post fields a visibility change needs.
+	 *
+	 * @param WP_REST_Request      $request Request.
+	 * @param \WP_Post             $post    Course.
+	 * @param array<string, mixed> $update  Post fields so far.
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	private function apply_visibility( WP_REST_Request $request, $post, array $update ) {
+		$visibility = (string) $request->get_param( 'visibility' );
+
+		if ( 'private' === $visibility ) {
+			if ( ! current_user_can( Capabilities::MANAGE ) && ! shapelms_get_setting( 'instructor', 'can_publish', false ) ) {
+				return new \WP_Error( 'shapelms_forbidden', __( 'You cannot publish courses, so you cannot make this one private.', 'shapelms' ), array( 'status' => 403 ) );
+			}
+			$update['post_status']   = 'private';
+			$update['post_password'] = '';
+			return $update;
+		}
+
+		if ( 'public' === $visibility ) {
+			$update['post_password'] = '';
+		} elseif ( 'password' === $visibility ) {
+			$password = trim( sanitize_text_field( (string) $request->get_param( 'password' ) ) );
+			if ( '' === $password || mb_strlen( $password ) > 255 ) {
+				return new \WP_Error( 'shapelms_invalid_password', __( 'Enter a password of up to 255 characters.', 'shapelms' ), array( 'status' => 400 ) );
+			}
+			$update['post_password'] = $password;
+		} else {
+			return new \WP_Error( 'shapelms_invalid_visibility', __( 'Unknown visibility.', 'shapelms' ), array( 'status' => 400 ) );
+		}
+
+		// Leaving private must not put the course live by itself: it waits as a draft until published.
+		if ( 'private' === ( $update['post_status'] ?? $post->post_status ) ) {
+			$update['post_status'] = 'draft';
+		}
+
+		return $update;
+	}
+
+	/**
+	 * Adds the post fields a schedule change needs.
+	 *
+	 * @param string               $value  Date in the site time zone (Y-m-d\TH:i), empty to cancel.
+	 * @param \WP_Post             $post   Course.
+	 * @param array<string, mixed> $update Post fields so far.
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	private function apply_schedule( $value, $post, array $update ) {
+		if ( '' === $value ) {
+			if ( 'future' === ( $update['post_status'] ?? $post->post_status ) ) {
+				$update['post_status'] = 'draft';
+			}
+			return $update;
+		}
+
+		if ( ! current_user_can( Capabilities::MANAGE ) && ! shapelms_get_setting( 'instructor', 'can_publish', false ) ) {
+			return new \WP_Error( 'shapelms_forbidden', __( 'You cannot publish courses, so you cannot schedule this one.', 'shapelms' ), array( 'status' => 403 ) );
+		}
+
+		$date = \DateTimeImmutable::createFromFormat( 'Y-m-d\TH:i', $value, wp_timezone() );
+		if ( ! $date || $date->getTimestamp() <= time() ) {
+			return new \WP_Error( 'shapelms_invalid_schedule', __( 'Choose a date and time in the future.', 'shapelms' ), array( 'status' => 400 ) );
+		}
+
+		$update['post_status']   = 'future';
+		$update['post_date']     = $date->format( 'Y-m-d H:i:s' );
+		$update['post_date_gmt'] = $date->setTimezone( new \DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' );
+		$update['edit_date']     = true;
+
+		return $update;
 	}
 
 	/**
@@ -484,6 +621,10 @@ class CoursesController extends RestController {
 		$data['curriculum']   = Curriculum::tree( $id, true );
 		$data['can_publish']  = current_user_can( Capabilities::MANAGE ) || (bool) shapelms_get_setting( 'instructor', 'can_publish', false );
 		$data['preview_url']  = get_preview_post_link( $post );
+		$data['password']     = $post->post_password;
+		$data['schedule']     = 'future' === $post->post_status ? mysql2date( 'Y-m-d\TH:i', $post->post_date, false ) : '';
+		$data['site_now']     = current_datetime()->format( 'Y-m-d\TH:i' );
+		$data['timezone']     = preg_replace( '/^([+-])/', 'UTC$1', wp_timezone_string() );
 
 		$data['can_manage_instructors'] = $this->can_manage_instructors( $post );
 		$data['can_change_status']      = true;
@@ -508,6 +649,52 @@ class CoursesController extends RestController {
 	}
 
 	/**
+	 * Checks a change to the course's WooCommerce product. Saving copies the course's name, image
+	 * and price onto that product, so the user must be able to edit it, and a product sells one
+	 * course only.
+	 *
+	 * @param int                  $id   Course id.
+	 * @param array<string, mixed> $meta Meta from the request.
+	 * @return true|\WP_Error
+	 */
+	private function check_product_link( $id, array $meta ) {
+		foreach ( $meta as $key => $value ) {
+			if ( '_shapelms_woo_product_id' !== '_shapelms_' . sanitize_key( str_replace( '_shapelms_', '', (string) $key ) ) ) {
+				continue;
+			}
+
+			$wanted  = absint( $value );
+			$current = (int) get_post_meta( $id, '_shapelms_woo_product_id', true );
+
+			if ( $wanted === $current ) {
+				continue;
+			}
+
+			// Removing the link is judged on the product it leaves.
+			$product = $wanted ? $wanted : $current;
+
+			if ( 'product' !== get_post_type( $product ) ) {
+				if ( $wanted ) {
+					return new \WP_Error( 'shapelms_invalid_product', __( 'Invalid product.', 'shapelms' ), array( 'status' => 400 ) );
+				}
+				continue;
+			}
+
+			if ( ! current_user_can( 'edit_post', $product ) ) {
+				return new \WP_Error( 'shapelms_forbidden', __( 'You are not allowed to use this product.', 'shapelms' ), array( 'status' => 403 ) );
+			}
+
+			$owner = $wanted ? (int) get_post_meta( $wanted, '_shapelms_course_id', true ) : 0;
+
+			if ( $owner && $owner !== $id ) {
+				return new \WP_Error( 'shapelms_product_linked', __( 'This product is already linked to another course.', 'shapelms' ), array( 'status' => 409 ) );
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Progress summary for the current user.
 	 *
 	 * @param WP_REST_Request $request Request.
@@ -525,6 +712,74 @@ class CoursesController extends RestController {
 		$summary['resume_item'] = $this->progress->resume_item( $user_id, $id );
 
 		return $summary;
+	}
+
+	/**
+	 * Category and month choices for the admin course filters.
+	 *
+	 * @return array{categories: array<int, array{id: int, name: string, parent: int, count: int}>, months: array<int, array{value: string, label: string}>}
+	 */
+	public function filter_options() {
+		global $wpdb;
+
+		$categories = array();
+		$terms      = get_terms(
+			array(
+				'taxonomy'   => Taxonomies::CATEGORY,
+				'hide_empty' => false,
+			)
+		);
+		if ( ! is_wp_error( $terms ) ) {
+			foreach ( $terms as $term ) {
+				$categories[] = array(
+					'id'     => (int) $term->term_id,
+					'name'   => $term->name,
+					'parent' => (int) $term->parent,
+					'count'  => (int) $term->count,
+				);
+			}
+		}
+
+		// Months that have courses, like the "All dates" menu on core list tables.
+		$where = $wpdb->prepare( "post_type = %s AND post_status NOT IN ('auto-draft', 'inherit')", PostTypes::COURSE );
+		if ( ! current_user_can( Capabilities::MANAGE ) ) {
+			$ids = array_map( 'intval', InstructorService::course_ids( get_current_user_id(), array( 'publish', 'future', 'draft', 'pending', 'private', 'trash' ) ) );
+			if ( ! $ids ) {
+				return array(
+					'categories' => $categories,
+					'months'     => array(),
+				);
+			}
+			$where .= ' AND ID IN (' . implode( ',', $ids ) . ')';
+		}
+		$rows = $wpdb->get_results( "SELECT DISTINCT YEAR( post_date ) AS y, MONTH( post_date ) AS m FROM {$wpdb->posts} WHERE {$where} ORDER BY post_date DESC" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $where is prepared above; ids are integers.
+
+		$months = array();
+		foreach ( (array) $rows as $row ) {
+			$value = sprintf( '%04d-%02d', (int) $row->y, (int) $row->m );
+			if ( ! isset( $months[ $value ] ) ) {
+				$months[ $value ] = array(
+					'value' => $value,
+					'label' => date_i18n( 'F Y', (int) mktime( 0, 0, 0, (int) $row->m, 1, (int) $row->y ) ),
+				);
+			}
+		}
+
+		return array(
+			'categories' => $categories,
+			'months'     => array_values( $months ),
+		);
+	}
+
+	/**
+	 * Keeps a Y-m-d date, anything else becomes empty.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string
+	 */
+	public static function sanitize_day( $value ) {
+		$value = is_string( $value ) ? trim( $value ) : '';
+		return preg_match( '/^\d{4}-\d{2}-\d{2}$/', $value ) && checkdate( (int) substr( $value, 5, 2 ), (int) substr( $value, 8, 2 ), (int) substr( $value, 0, 4 ) ) ? $value : '';
 	}
 
 	/**

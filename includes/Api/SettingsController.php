@@ -71,8 +71,19 @@ class SettingsController extends RestController {
 	 * @return array<string, mixed>
 	 */
 	public function get_settings() {
+		$schema = Settings::schema();
+
+		// Full webhook URLs for the Payments tab (the schema only holds the route, it is built before rewrites exist).
+		if ( ! empty( $schema['commerce']['gateways'] ) && is_array( $schema['commerce']['gateways'] ) ) {
+			foreach ( $schema['commerce']['gateways'] as $id => $gateway ) {
+				if ( ! empty( $gateway['webhook'] ) ) {
+					$schema['commerce']['gateways'][ $id ]['webhook_url'] = rest_url( $gateway['webhook'] );
+				}
+			}
+		}
+
 		return array(
-			'schema' => Settings::schema(),
+			'schema' => $schema,
 			'values' => Settings::for_client(),
 		);
 	}

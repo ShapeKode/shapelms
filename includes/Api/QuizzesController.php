@@ -139,9 +139,61 @@ class QuizzesController extends RestController {
 						'quiz_id'   => $this->id_arg( false ),
 						'course_id' => $this->id_arg( false ),
 						'user_id'   => $this->id_arg( false ),
+						'result'    => array(
+							'type'    => 'string',
+							'default' => '',
+							'enum'    => array( '', 'pass', 'fail', 'pending' ),
+						),
 					)
 				),
 			)
+		);
+
+		$this->route(
+			'/attempts/bulk',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'bulk_attempts' ),
+				'permission_callback' => array( $this, 'allow_instructor' ),
+				'args'                => array(
+					'action' => array(
+						'type'     => 'string',
+						'required' => true,
+						'enum'     => array( 'delete' ),
+					),
+					'ids'    => array(
+						'type'     => 'array',
+						'required' => true,
+						'items'    => array( 'type' => 'integer' ),
+						'minItems' => 1,
+						'maxItems' => 100,
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Bulk delete of attempts (with their answers). Only attempts in courses the user can edit.
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return array{done: int, skipped: int}
+	 */
+	public function bulk_attempts( WP_REST_Request $request ) {
+		$ids  = array_values( array_unique( array_filter( array_map( 'absint', (array) $request->get_param( 'ids' ) ) ) ) );
+		$done = 0;
+
+		foreach ( $ids as $id ) {
+			$attempt = $this->attempts->find( $id );
+
+			if ( $attempt && current_user_can( 'shapelms_edit_course', (int) $attempt->course_id ) && $this->attempts->delete( $id ) ) {
+				++$done;
+			}
+		}
+
+		return array(
+			'done'    => $done,
+			'skipped' => count( $ids ) - $done,
 		);
 	}
 
@@ -257,13 +309,19 @@ class QuizzesController extends RestController {
 			}
 		}
 
-		$result = $this->attempts->paginate(
-			array(
-				'quiz_id'   => $quiz_id,
-				'course_id' => $course_id,
-				'user_id'   => (int) $request->get_param( 'user_id' ),
-				'page'      => $request->get_param( 'page' ),
-				'per_page'  => $request->get_param( 'per_page' ),
+		$filters = array(
+			'quiz_id'   => $quiz_id,
+			'course_id' => $course_id,
+			'user_id'   => (int) $request->get_param( 'user_id' ),
+		);
+		$result  = $this->attempts->paginate(
+			array_merge(
+				$filters,
+				array(
+					'result'   => (string) $request->get_param( 'result' ),
+					'page'     => $request->get_param( 'page' ),
+					'per_page' => $request->get_param( 'per_page' ),
+				)
 			)
 		);
 
@@ -276,6 +334,13 @@ class QuizzesController extends RestController {
 			$items[]            = $item;
 		}
 
-		return $this->paginated( $items, $result['total'], (int) $request->get_param( 'per_page' ) );
+		$response = $this->paginated( $items, $result['total'], (int) $request->get_param( 'per_page' ) );
+		$data     = $response->get_data();
+
+		// Counts for the result filter, within the same course/quiz/student.
+		$data['counts'] = $this->attempts->counts( $filters );
+		$response->set_data( $data );
+
+		return $response;
 	}
 }

@@ -26,7 +26,7 @@ ShapeLMS turns your WordPress site into an online school. It is built on custom 
 
 * Single choice, multiple choice, true/false, short answer and fill-in-the-blank questions
 * Time limits, attempt limits, pass marks, random order and instant or end-of-quiz feedback
-* Server-side grading; answers are never sent to the browser before submission
+* Server-side grading; correct answers are never sent to the browser before a question is answered
 
 **Students**
 
@@ -67,6 +67,7 @@ ShapeLMS only connects to third-party services when you enable them or add their
 **Vimeo** (when an instructor adds a Vimeo lesson or intro video). The video is embedded from https://player.vimeo.com with "do not track" enabled; Vimeo receives the visitor's IP address and browser data. [Terms](https://vimeo.com/terms) · [Privacy](https://vimeo.com/privacy)
 
 **Other video providers.** If an instructor pastes a URL from another provider that WordPress supports for oEmbed, your server requests the embed code from that provider (cached for a day) and the visitor's browser loads the player from it. The provider receives your server's IP address and the video URL, and the visitor's IP address and browser data.
+
 **Embed code.** If an instructor pastes embed code from Wistia, Loom, Bunny Stream, Dailymotion or Vidyard into a lesson, the visitor's browser loads the player from that service, which receives the visitor's IP address and browser data. Wistia: [Terms](https://wistia.com/terms) · [Privacy](https://wistia.com/privacy). Loom (Atlassian): [Terms](https://www.atlassian.com/legal/atlassian-customer-agreement) · [Privacy](https://www.atlassian.com/legal/privacy-policy). Bunny Stream: [Terms](https://bunny.net/tos/) · [Privacy](https://bunny.net/privacy/). Dailymotion: [Terms](https://www.dailymotion.com/legal/terms) · [Privacy](https://legal.dailymotion.com/en/privacy-policy/). Vidyard: [Terms](https://www.vidyard.com/terms/) · [Privacy](https://www.vidyard.com/privacy/)
 
 **Course import.** Only when an administrator imports a course JSON file that references image URLs: your server downloads each image into the media library. The host of each image receives your server's IP address and your site URL (WordPress's standard HTTP user agent). No other data is sent.

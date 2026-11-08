@@ -87,6 +87,10 @@ class Meta {
 					'type'    => 'boolean',
 					'default' => false,
 				),
+				'_shapelms_public'         => array(
+					'type'    => 'boolean',
+					'default' => false,
+				),
 				'_shapelms_progression'    => array(
 					'type'     => 'string',
 					'default'  => 'default',

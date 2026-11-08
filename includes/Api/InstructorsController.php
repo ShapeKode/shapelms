@@ -74,6 +74,30 @@ class InstructorsController extends RestController {
 		);
 
 		$this->route(
+			'/bulk',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'bulk' ),
+				'permission_callback' => array( $this, 'allow_manager' ),
+				'args'                => array(
+					'action' => array(
+						'type'     => 'string',
+						'required' => true,
+						'enum'     => array( 'approved', 'rejected', 'blocked', 'delete' ),
+					),
+					// User ids.
+					'ids'    => array(
+						'type'     => 'array',
+						'required' => true,
+						'items'    => array( 'type' => 'integer' ),
+						'minItems' => 1,
+						'maxItems' => 100,
+					),
+				),
+			)
+		);
+
+		$this->route(
 			'/(?P<id>\d+)/status',
 			array(
 				'methods'             => WP_REST_Server::CREATABLE,
@@ -158,6 +182,42 @@ class InstructorsController extends RestController {
 		}
 
 		return array( 'status' => InstructorService::status( $user_id ) );
+	}
+
+	/**
+	 * Bulk approve, reject, block or remove. Site managers are skipped: they always teach,
+	 * and changing their own access from here could lock them out.
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return array{done: int, skipped: int}
+	 */
+	public function bulk( WP_REST_Request $request ) {
+		$action = (string) $request->get_param( 'action' );
+		$ids    = array_values( array_unique( array_filter( array_map( 'absint', (array) $request->get_param( 'ids' ) ) ) ) );
+		$done   = 0;
+
+		foreach ( $ids as $user_id ) {
+			if ( ! get_userdata( $user_id ) || user_can( $user_id, \ShapeLMS\Core\Capabilities::MANAGE ) ) {
+				continue;
+			}
+
+			if ( 'delete' === $action ) {
+				$done += InstructorService::remove( $user_id ) ? 1 : 0;
+				continue;
+			}
+
+			if ( 'approved' === $action ) {
+				InstructorService::approve( $user_id );
+			} else {
+				InstructorService::reject( $user_id, $action );
+			}
+			++$done;
+		}
+
+		return array(
+			'done'    => $done,
+			'skipped' => count( $ids ) - $done,
+		);
 	}
 
 	/**

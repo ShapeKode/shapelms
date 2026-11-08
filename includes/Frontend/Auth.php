@@ -14,8 +14,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use ShapeLMS\Content\PostTypes;
 use ShapeLMS\Core\Capabilities;
 use ShapeLMS\Core\Pages;
+use ShapeLMS\Services\CourseService;
+use ShapeLMS\Services\EnrollmentService;
+use ShapeLMS\Services\ProgressService;
 
 /**
  * Handles the account forms and renders the auth views.
@@ -282,6 +286,34 @@ class Auth {
 	}
 
 	/**
+	 * Finishes "Log in to enroll" as part of a sign in or sign up, which a nonce protects. The
+	 * course page itself never enrolls from a link. Paid courses go on to checkout from there.
+	 *
+	 * @param int    $user_id User who just signed in.
+	 * @param string $target  Where they are going; its shapelms_enroll argument names the course.
+	 * @return string Where to send them now.
+	 */
+	public static function finish_enroll( $user_id, $target ) {
+		$query = array();
+		wp_parse_str( (string) wp_parse_url( $target, PHP_URL_QUERY ), $query );
+		$course_id = isset( $query['shapelms_enroll'] ) ? absint( $query['shapelms_enroll'] ) : 0;
+
+		if ( ! $course_id || PostTypes::COURSE !== get_post_type( $course_id ) || ! CourseService::pricing( $course_id )['is_free'] ) {
+			return $target;
+		}
+
+		$clean = remove_query_arg( 'shapelms_enroll', $target );
+
+		if ( is_wp_error( shapelms()->get( EnrollmentService::class )->enroll_free( $user_id, $course_id ) ) ) {
+			return $clean;
+		}
+
+		$next = shapelms()->get( ProgressService::class )->resume_item( $user_id, $course_id );
+
+		return $next ? (string) get_permalink( $next ) : $clean;
+	}
+
+	/**
 	 * Cookie that remembers where to send the visitor after they sign in or sign up.
 	 *
 	 * @return string
@@ -373,7 +405,7 @@ class Auth {
 
 		self::clear( $user_bucket );
 		wp_set_current_user( $user->ID );
-		wp_safe_redirect( $this->redirect_target() );
+		wp_safe_redirect( self::finish_enroll( $user->ID, $this->redirect_target() ) );
 		exit;
 		// phpcs:enable
 	}
@@ -431,7 +463,7 @@ class Auth {
 		wp_set_current_user( $result );
 		wp_set_auth_cookie( $result, true, is_ssl() );
 
-		wp_safe_redirect( add_query_arg( 'signup', '1', $this->redirect_target() ) );
+		wp_safe_redirect( add_query_arg( 'signup', '1', self::finish_enroll( $result, $this->redirect_target() ) ) );
 		exit;
 		// phpcs:enable
 	}

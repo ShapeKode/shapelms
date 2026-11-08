@@ -15,13 +15,14 @@ $shapelms_quiz_id  = isset( $args['quiz_id'] ) ? (int) $args['quiz_id'] : get_th
 $shapelms_enrolled = ! empty( $args['enrolled'] );
 $shapelms_settings = \ShapeLMS\Services\QuizService::settings( $shapelms_quiz_id );
 $shapelms_count    = count( \ShapeLMS\Services\QuizService::attempt_questions( $shapelms_quiz_id ) );
+$shapelms_running  = $shapelms_enrolled && shapelms()->get( \ShapeLMS\Services\QuizService::class )->has_running_attempt( get_current_user_id(), $shapelms_quiz_id );
 ?>
 <?php if ( get_the_content() ) : ?>
 	<div class="shapelms-prose"><?php the_content(); ?></div>
 <?php endif; ?>
 
-<div class="shapelms-quiz" id="shapelms-quiz" data-quiz-id="<?php echo esc_attr( (string) $shapelms_quiz_id ); ?>">
-	<div class="shapelms-quiz__intro" data-shapelms-quiz-intro>
+<div class="shapelms-quiz" id="shapelms-quiz" data-quiz-id="<?php echo esc_attr( (string) $shapelms_quiz_id ); ?>" data-running="<?php echo $shapelms_running ? '1' : '0'; ?>">
+	<div class="shapelms-quiz__intro" data-shapelms-quiz-intro<?php echo $shapelms_running ? ' hidden' : ''; ?>>
 		<ul class="shapelms-quiz__facts">
 			<li><span><?php esc_html_e( 'Questions', 'shapelms' ); ?></span><strong><?php echo esc_html( (string) $shapelms_count ); ?></strong></li>
 			<li><span><?php esc_html_e( 'Pass mark', 'shapelms' ); ?></span><strong><?php echo esc_html( $shapelms_settings['pass_mark'] . '%' ); ?></strong></li>

@@ -7,8 +7,9 @@ import { __ } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
 import { get, list } from '../../shared/api';
 import { useDebounce } from '../../shared/hooks';
+import SchedulePanel from '../components/SchedulePanel';
 
-export default function SettingsTab( { course, update, config } ) {
+export default function SettingsTab( { course, update, config, scheduleDraft, setScheduleDraft, applySchedule } ) {
 	const [ userSearch, setUserSearch ] = useState( '' );
 	const [ users, setUsers ] = useState( [] );
 	const [ selected, setSelected ] = useState( [] );
@@ -17,6 +18,8 @@ export default function SettingsTab( { course, update, config } ) {
 	const [ courses, setCourses ] = useState( [] );
 	const [ prereqs, setPrereqs ] = useState( [] );
 	const debouncedCourse = useDebounce( courseSearch );
+	const [ choosingPassword, setChoosingPassword ] = useState( false );
+	const [ password, setPassword ] = useState( course.password || '' );
 
 	useEffect( () => {
 		const ids = course.meta.prerequisites || [];
@@ -45,11 +48,75 @@ export default function SettingsTab( { course, update, config } ) {
 	const hours = Math.floor( ( course.meta.duration || 0 ) / 3600 );
 	const minutes = Math.floor( ( ( course.meta.duration || 0 ) % 3600 ) / 60 );
 
+	const visibility = choosingPassword ? 'password' : course.visibility || 'public';
+	const visibilityOptions = [
+		{ value: 'public', label: __( 'Public', 'shapelms' ) },
+		{ value: 'password', label: __( 'Password protected', 'shapelms' ) },
+	];
+	if ( course.can_publish || course.status === 'private' ) {
+		visibilityOptions.push( { value: 'private', label: __( 'Private', 'shapelms' ) } );
+	}
+	const visibilityHelp = {
+		public: course.status === 'private' ? __( 'Anyone can see the course once it is published. It moves to draft until you publish it again.', 'shapelms' ) : __( 'Anyone can see the course once it is published.', 'shapelms' ),
+		password: __( 'Listed in the catalog, but visitors need the password to see the details and to enroll or buy. Enrolled students never need it.', 'shapelms' ),
+		private: __( 'Hidden from the catalog right away. Only admins, its instructors and enrolled students can open it. Add students manually.', 'shapelms' ),
+	};
+
+	// Same rule as the server: a paid course or a hidden one cannot be public.
+	const isPaid = course.meta.price_type === 'paid' && Number( course.meta.price ) > 0;
+	const canBePublic = ! isPaid && visibility === 'public';
+	let publicHelp = __( 'Anyone can read the lessons without enrolling or logging in. Taking quizzes and saving progress still need enrollment.', 'shapelms' );
+	if ( isPaid ) {
+		publicHelp = __( 'Paid courses cannot be public.', 'shapelms' );
+	} else if ( visibility !== 'public' ) {
+		publicHelp = __( 'Only available when Visibility is set to Public.', 'shapelms' );
+	}
+
+	// The password is only sent once it has a value: an empty one must not lift the protection.
+	const changeVisibility = ( next ) => {
+		if ( next === 'password' && ! password.trim() ) {
+			setChoosingPassword( true );
+			return;
+		}
+		setChoosingPassword( false );
+		update( next === 'password' ? { visibility: next, password } : { visibility: next } );
+	};
+	const changePassword = ( next ) => {
+		setPassword( next );
+		if ( next.trim() ) {
+			setChoosingPassword( false );
+			update( { visibility: 'password', password: next } );
+		}
+	};
+
 	return (
 		<>
 			<h2>{ __( 'Settings', 'shapelms' ) }</h2>
 
 			<TextControl label={ __( 'URL slug', 'shapelms' ) } value={ course.slug || '' } onChange={ ( slug ) => update( { slug } ) } __nextHasNoMarginBottom />
+
+			{ course.can_change_status !== false && (
+				<div className="shapelms-list-editor">
+					<SelectControl label={ __( 'Visibility', 'shapelms' ) } help={ visibilityHelp[ visibility ] } value={ visibility } options={ visibilityOptions } onChange={ changeVisibility } __nextHasNoMarginBottom />
+					{ visibility === 'password' && (
+						<TextControl
+							label={ __( 'Course password', 'shapelms' ) }
+							help={ password.trim() ? '' : __( 'Enter a password. The course keeps its current visibility until you do.', 'shapelms' ) }
+							value={ password }
+							maxLength={ 255 }
+							autoComplete="off"
+							onChange={ changePassword }
+							__nextHasNoMarginBottom
+						/>
+					) }
+				</div>
+			) }
+
+			<ToggleControl label={ __( 'Public course', 'shapelms' ) } help={ publicHelp } checked={ canBePublic && !! course.meta.public } disabled={ ! canBePublic } onChange={ ( next ) => update( { meta: { public: next } } ) } __nextHasNoMarginBottom />
+
+			{ course.can_change_status !== false && course.can_publish && course.status !== 'private' && (
+				<SchedulePanel course={ course } draft={ scheduleDraft } setDraft={ setScheduleDraft } apply={ applySchedule } />
+			) }
 
 			<div className="shapelms-list-editor">
 				<span className="shapelms-list-editor__label">{ __( 'Total duration', 'shapelms' ) }</span>

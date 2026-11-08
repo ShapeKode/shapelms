@@ -291,18 +291,23 @@ class Curriculum {
 	}
 
 	/**
-	 * Counts lessons and quizzes.
+	 * Counts lessons, quizzes and every registered item type.
 	 *
 	 * @param int $course_id Course id.
-	 * @return array{lessons: int, quizzes: int, topics: int}
+	 * @return array{lessons: int, quizzes: int, topics: int, items: array<string, int>}
 	 */
 	public static function counts( $course_id ) {
 		$tree    = self::tree( $course_id );
 		$lessons = 0;
 		$quizzes = 0;
+		// Every registered item type, so add-on types (assignments, ...) are counted too.
+		$items = array_fill_keys( array_keys( self::item_types() ), 0 );
 
 		foreach ( $tree as $topic ) {
 			foreach ( $topic['items'] as $item ) {
+				if ( isset( $items[ $item['type'] ] ) ) {
+					++$items[ $item['type'] ];
+				}
 				if ( 'quiz' === $item['type'] ) {
 					++$quizzes;
 				} elseif ( 'lesson' === $item['type'] ) {
@@ -315,6 +320,7 @@ class Curriculum {
 			'lessons' => $lessons,
 			'quizzes' => $quizzes,
 			'topics'  => count( $tree ),
+			'items'   => $items,
 		);
 	}
 

@@ -22,7 +22,8 @@ class Deactivator {
 	 * @return void
 	 */
 	public static function deactivate() {
-		wp_clear_scheduled_hook( 'shapelms_send_queued_email' );
+		// Queued emails carry arguments, which wp_clear_scheduled_hook() would need to match.
+		wp_unschedule_hook( 'shapelms_send_queued_email' );
 		flush_rewrite_rules();
 	}
 }

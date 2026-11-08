@@ -23,7 +23,8 @@ $shapelms_tree      = \ShapeLMS\Content\Curriculum::tree( $shapelms_course_id );
 $shapelms_neighbors = \ShapeLMS\Content\Curriculum::neighbors( $shapelms_course_id, $shapelms_item_id );
 $shapelms_user_id   = get_current_user_id();
 $shapelms_enrolled  = $shapelms_user_id && shapelms()->get( \ShapeLMS\Services\EnrollmentService::class )->is_enrolled( $shapelms_user_id, $shapelms_course_id );
-$shapelms_summary   = $shapelms_user_id ? shapelms()->get( \ShapeLMS\Services\ProgressService::class )->summary( $shapelms_user_id, $shapelms_course_id ) : null;
+$shapelms_reader    = \ShapeLMS\Services\CourseService::is_public( $shapelms_course_id ) && ! ( $shapelms_user_id && shapelms()->get( \ShapeLMS\Services\EnrollmentService::class )->can_access( $shapelms_user_id, $shapelms_course_id ) );
+$shapelms_summary   = $shapelms_user_id && ! $shapelms_reader ? shapelms()->get( \ShapeLMS\Services\ProgressService::class )->summary( $shapelms_user_id, $shapelms_course_id ) : null;
 $shapelms_statuses  = $shapelms_summary ? $shapelms_summary['statuses'] : array();
 $shapelms_done      = isset( $shapelms_statuses[ $shapelms_item_id ] ) && 'completed' === $shapelms_statuses[ $shapelms_item_id ];
 $shapelms_locked    = $shapelms_summary ? $shapelms_summary['locked'] : array();
@@ -94,7 +95,7 @@ $shapelms_data_attributes = \ShapeLMS\Frontend\Frontend::data_attributes(
 								<?php
 								$shapelms_item_done = isset( $shapelms_statuses[ $shapelms_item['id'] ] ) && 'completed' === $shapelms_statuses[ $shapelms_item['id'] ];
 								$shapelms_item_lock = in_array( (int) $shapelms_item['id'], $shapelms_locked, true );
-								$shapelms_can_open  = ! $shapelms_item_lock && ( $shapelms_enrolled || ! empty( $shapelms_item['preview'] ) || current_user_can( 'shapelms_edit_course', $shapelms_course_id ) );
+								$shapelms_can_open  = ! $shapelms_item_lock && ( $shapelms_enrolled || ! empty( $shapelms_item['preview'] ) || current_user_can( 'shapelms_edit_course', $shapelms_course_id ) || ( $shapelms_reader && \ShapeLMS\Services\CourseService::is_public_item( $shapelms_course_id, $shapelms_item['type'] ) ) );
 								?>
 								<li class="shapelms-learn__item shapelms-learn__item--<?php echo esc_attr( $shapelms_item['type'] ); ?><?php echo $shapelms_item_done ? ' is-done' : ''; ?><?php echo $shapelms_item_lock ? ' is-locked' : ''; ?><?php echo (int) $shapelms_item['id'] === $shapelms_item_id ? ' is-current' : ''; ?>" data-item-id="<?php echo esc_attr( (string) $shapelms_item['id'] ); ?>"<?php echo $shapelms_item_lock && $shapelms_enrolled ? ' data-item-url="' . esc_url( $shapelms_item['url'] ) . '"' : ''; ?>>
 									<?php if ( $shapelms_can_open ) : ?>

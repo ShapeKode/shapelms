@@ -36,6 +36,19 @@ class PostTypes {
 		add_action( 'before_delete_post', array( $this, 'cascade_delete' ) );
 		add_filter( 'use_block_editor_for_post_type', array( $this, 'block_editor' ), 10, 2 );
 		add_action( 'add_meta_boxes', array( $this, 'remove_meta_boxes' ), 99 );
+		add_filter( 'protected_title_format', array( $this, 'plain_course_title' ), 10, 2 );
+		add_filter( 'private_title_format', array( $this, 'plain_course_title' ), 10, 2 );
+	}
+
+	/**
+	 * Drops core's "Protected:" and "Private:" title prefixes on courses; the builder shows the visibility.
+	 *
+	 * @param string   $format Title format.
+	 * @param \WP_Post $post   Post.
+	 * @return string
+	 */
+	public function plain_course_title( $format, $post ) {
+		return self::COURSE === get_post_type( $post ) ? '%s' : $format;
 	}
 
 	/**
